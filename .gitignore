@@ -1,0 +1,4 @@
+.vscode
+signal-cli-config
+__pycache__
+*.pyc

@@ -1,5 +1,0 @@
-aiofiles
-aiohttp
-websockets
-apscheduler
-requests

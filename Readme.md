@@ -1,4 +1,18 @@
-# Signal Bot Framework 
+# Signal Bot Framework
+
+Todo
+
+## Todos
+
+- [x] Create dummy project
+- [ ] Add real code
+- [ ] Think about the license again
+- [ ] Github actions to test and publish on release  
+- [ ] Example bot & commands
+- [ ] PR to API project
+
+## Deprecated
+
 Micro framework to create your own signal bots. Just fork this repository and extend it with your commands. The API builds on top of https://github.com/bbernhard/signal-cli-rest-api which provides a Websocket/REST API for https://github.com/AsamK/signal-cli.
 
 ## How to run the bot

@@ -14,7 +14,7 @@ class Storage:
         raise NotImplementedError
 
 
-class StorageError:
+class StorageError(Exception):
     pass
 
 
@@ -25,7 +25,7 @@ class InMemoryStorage(Storage):
     def exists(self, key: str) -> bool:
         return key in self._storage
 
-    def load(self, key: str) -> Any:
+    def read(self, key: str) -> Any:
         try:
             result_str = self._storage[key]
             result_dict = json.loads(result_str)
@@ -48,7 +48,7 @@ class RedisStorage(Storage):
     def exists(self, key: str) -> bool:
         return self._redis.exists(key)
 
-    def load(self, key: str) -> Any:
+    def read(self, key: str) -> Any:
         try:
             result_bytes = self._redis.get(key)
             result_str = result_bytes.decode("utf-8")

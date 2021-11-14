@@ -9,6 +9,7 @@ from .api import SignalAPI, ReceiveMessagesError
 from .command import Command
 from .message import Message, UnknownMessageFormatError
 from .storage import RedisStorage, InMemoryStorage
+from .context import Context
 
 
 class SignalBot:
@@ -62,9 +63,8 @@ class SignalBot:
         except Exception:
             self.storage = InMemoryStorage()
             logging.warn(
-                "[Bot] Could not initialize Redis. In-memory storage will be used.\n"
-                "Restarting will delete the storage and "
-                "scheduled jobs will not be persisted!"
+                "[Bot] Could not initialize Redis. In-memory storage will be used. "
+                "Restarting will delete the storage!"
             )
 
     def _init_scheduler(self):
@@ -75,26 +75,27 @@ class SignalBot:
             raise SignalBotError(f"Could not initialize scheduler: {e}")
 
         # optional: jobstore option
-        try:
-            enable_jobstore = self.config["scheduler"]["enable_jobstore"]
-            if enable_jobstore is False:
-                return
-            if not isinstance(self.storage, RedisStorage):
-                raise Exception("Scheduler is not Redis Storage")
-            host, port = self._redis_host, self._redis_port
-            self.scheduler.add_jobstore(
-                "redis",
-                jobs_key="Signalbot:scheduler:jobs",
-                run_times_key="Signalbot:scheduler:run_times",
-                host=host,
-                port=port,
-            )
-        except Exception as e:
-            logging.warn(
-                "[Bot] Could not enable scheduler's job store, despite setting "
-                f"`enable_jobstore` to True: {e}"
-            )
-            return
+        # TODO: do not use jobstore because it does not work with coroutines
+        # try:
+        #     enable_jobstore = self.config["scheduler"]["enable_jobstore"]
+        #     if enable_jobstore is False:
+        #         return
+        #     if not isinstance(self.storage, RedisStorage):
+        #         raise Exception("Scheduler is not Redis Storage")
+        #     host, port = self._redis_host, self._redis_port
+        #     self.scheduler.add_jobstore(
+        #         "redis",
+        #         jobs_key="Signalbot:scheduler:jobs",
+        #         run_times_key="Signalbot:scheduler:run_times",
+        #         host=host,
+        #         port=port,
+        #     )
+        # except Exception as e:
+        #     logging.warn(
+        #         "[Bot] Could not enable scheduler's job store, despite setting "
+        #         f"`enable_jobstore` to True: {e}"
+        #     )
+        #     return
 
     def listen(self, group: str, secret: str):
         self.groups[group] = secret
@@ -120,7 +121,12 @@ class SignalBot:
         logging.info(f"[Bot] New message sent:\n{text}")
 
     async def react(self, message: Message, emoji: str):
-        await self.send(message, emoji)  # TODO
+        # TODO: check that emoji is really an emoji
+        recipient = self._resolve_receiver(message)
+        target_author = message.source
+        timestamp = message.timestamp
+        await self._signal.react(recipient, emoji, target_author, timestamp)
+        logging.info(f"[Bot] New reaction: {emoji}")
 
     async def start_typing(self, receiver: Union[Message, str]):
         receiver_secret = self._resolve_receiver(receiver)
@@ -129,10 +135,6 @@ class SignalBot:
     async def stop_typing(self, receiver: Union[Message, str]):
         receiver_secret = self._resolve_receiver(receiver)
         await self._signal.stop_typing(receiver_secret)
-
-    async def _typing(self, receiver: Union[Message, str], action: str):
-        # receiver_secret = self._resolve_receiver(receiver)
-        raise NotImplementedError
 
     def _resolve_receiver(self, receiver: Union[Message, str]) -> str:
         # accept both messages and direct group ids
@@ -197,7 +199,8 @@ class SignalBot:
 
         # handle Command
         try:
-            await command.handle(message)
+            context = Context(self, message)
+            await command.handle(context)
         except Exception as e:
             logging.error(f"[{command.__class__.__name__}] Error: {e}")
             raise e

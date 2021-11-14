@@ -1,4 +1,5 @@
 from .message import Message
+from .context import Context
 
 
 class Command:
@@ -11,7 +12,7 @@ class Command:
         return None
 
     # overwrite
-    async def handle(self, message: Message):
+    async def handle(self, context: Context):
         raise NotImplementedError
 
     # helper method

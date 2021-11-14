@@ -41,13 +41,15 @@ class SignalAPI:
         ):
             raise SendMessageError
 
-    async def react(self, timestamp: int, reaction: str) -> aiohttp.ClientResponse:
-        uri = self._react_rest_uri(self)
+    async def react(
+        self, recipient: str, reaction: str, target_author: str, timestamp: int
+    ) -> aiohttp.ClientResponse:
+        uri = self._react_rest_uri()
         payload = {
+            "recipient": recipient,
             "reaction": reaction,
+            "target_author": target_author,
             "timestamp": timestamp,
-            # "number": "", # TODO
-            # "recipient": "", # TODO
         }
         try:
             async with aiohttp.ClientSession() as session:
@@ -58,7 +60,7 @@ class SignalAPI:
             aiohttp.ClientError,
             aiohttp.http_exceptions.HttpProcessingError,
         ):
-            raise SendMessageError
+            raise ReactionError
 
     async def start_typing(self, receiver: str):
         uri = self._typing_indicator_uri()
@@ -99,7 +101,7 @@ class SignalAPI:
         return f"http://{self.signal_service}/v2/send"
 
     def _react_rest_uri(self):
-        return f"http://{self.signal_service}/v1/react"
+        return f"http://{self.signal_service}/v1/reactions/{self.phone_number}"
 
     def _typing_indicator_uri(self):
         return f"http://{self.signal_service}/v1/typing-indicator/{self.phone_number}"
@@ -122,4 +124,8 @@ class StartTypingError(TypingError):
 
 
 class StopTypingError(TypingError):
+    pass
+
+
+class ReactionError(Exception):
     pass

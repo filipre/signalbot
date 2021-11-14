@@ -13,7 +13,7 @@ Python package to build your own Signal bots. To run the the bot you need to sta
 ### Signalbot
 
 ```python
-bot = Signalbot({
+bot = SignalBot({
     "signal_service": "127.0.0.1:8080"
     "phone_number": "+49123456789"
     "storage": {

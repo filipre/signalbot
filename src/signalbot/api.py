@@ -38,6 +38,7 @@ class SignalAPI:
         except (
             aiohttp.ClientError,
             aiohttp.http_exceptions.HttpProcessingError,
+            KeyError,
         ):
             raise SendMessageError
 

@@ -2,7 +2,6 @@ import asyncio
 import time
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 import logging
-from typing import Union
 
 
 from .api import SignalAPI, ReceiveMessagesError
@@ -117,7 +116,7 @@ class SignalBot:
 
     async def send(
         self,
-        receiver: Message,
+        receiver: str,
         text: str,
         base64_attachments: list = None,
         listen: bool = False,
@@ -132,39 +131,36 @@ class SignalBot:
 
         if listen:
             sent_message = Message(
-                source=receiver.source,
+                source=self._phone_number,
                 timestamp=timestamp,
                 type=MessageType.SYNC_MESSAGE,
                 text=text,
                 base64_attachments=base64_attachments,
-                group=receiver.group,
+                group=receiver,
             )
             await self._ask_commands_to_handle(sent_message)
 
     async def react(self, message: Message, emoji: str):
         # TODO: check that emoji is really an emoji
-        recipient = self._resolve_receiver(message)
+        recipient = self._resolve_receiver(message.group)
         target_author = message.source
         timestamp = message.timestamp
         await self._signal.react(recipient, emoji, target_author, timestamp)
         logging.info(f"[Bot] New reaction: {emoji}")
 
-    async def start_typing(self, receiver: Message):
+    async def start_typing(self, receiver: str):
         receiver_secret = self._resolve_receiver(receiver)
         await self._signal.start_typing(receiver_secret)
 
-    async def stop_typing(self, receiver: Message):
+    async def stop_typing(self, receiver: str):
         receiver_secret = self._resolve_receiver(receiver)
         await self._signal.stop_typing(receiver_secret)
 
-    def _resolve_receiver(self, receiver: Message) -> str:
-        # accept both messages and direct group ids
-        group_id = receiver.group
-
-        # resolve group id by using group secrets
-        if group_id not in self.groups:
-            raise SignalBotError("group_id is not in self.groups")
-        receiver_secret = self.groups[group_id]
+    def _resolve_receiver(self, receiver: str) -> str:
+        # resolve receiver group id by using group secrets
+        if receiver not in self.groups:
+            raise SignalBotError("receiver is not in self.groups")
+        receiver_secret = self.groups[receiver]
 
         return receiver_secret
 

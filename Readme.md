@@ -34,3 +34,12 @@ To implement your own commands, you need to inherent `Command` and overwrite fol
 - `setup()`: Start any task that requires to send messages already, optional
 - `describe()`: String to describe your command, optional
 - `handle(context)`: Handle an incoming message. By default, any command will read any incoming message. Context can be used to easily reply (`c.send(text)`), react (`c.react(emoji)`) and to type in a group (`c.start_typing()` and `c.stop_typing()`).
+
+## Local development and package
+
+Increase version in `setup.cfg`, then
+
+```
+python -m build
+python -m twine upload dist/*
+```

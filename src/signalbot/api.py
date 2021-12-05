@@ -34,10 +34,14 @@ class SignalAPI:
             async with aiohttp.ClientSession() as session:
                 resp = await session.post(uri, json=payload)
                 resp.raise_for_status()
+                # resp_payload = resp.json()
+                # timestamp = resp_payload["timestamp"]
+                # return timestamp
                 return resp
         except (
             aiohttp.ClientError,
             aiohttp.http_exceptions.HttpProcessingError,
+            KeyError,
         ):
             raise SendMessageError
 

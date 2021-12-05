@@ -7,8 +7,8 @@ class Context:
         self.bot = bot
         self.message = message
 
-    async def send(self, text: str):
-        await self.bot.send(self.message, text)
+    async def send(self, text: str, listen: bool = False):
+        await self.bot.send(self.message, text, listen=listen)
 
     async def react(self, emoji: str):
         await self.bot.react(self.message, emoji)

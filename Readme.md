@@ -1,32 +1,26 @@
 # Signal Bot Framework
 
-Python package to build your own Signal bots. To run the the bot you need to start the [signal-cli-rest-api](https://github.com/bbernhard/signal-cli-rest-api) service and link your device with it.
-
-## Todos
-
-- Examples on how to use the package
-- Documentation
-- Github actions to build on release
+Python package to build your own Signal bots. To run the the bot you need to start the [signal-cli-rest-api](https://github.com/bbernhard/signal-cli-rest-api) service and link your device with it. Please refer to that project for more details.
 
 ## Classes and API
 
-### Signalbot
+*Documentation work in progress. Feel free to open an issue for questions.*
 
-```python
-bot = SignalBot({
-    "signal_service": "127.0.0.1:8080"
-    "phone_number": "+49123456789"
-    "storage": {
-        "redis_host": "redis"
-        "redis_port": 6379
-    }
-})
-```
+### Example Bot
+
+See `src/example` for a complete example on how to use the library. To run it, you need to define following env variables:
+- `SIGNAL_SERVICE`: Address of the signal service without protocol, e.g. `127.0.0.1:8080`
+- `PHONE_NUMBER`: Phone number of the bot, e.g. `+49123456789`
+- `GROUP_ID`: Group that the bot should listen to. Currently, only groups are supported.
+- `GROUP_SECRET`: Group secret / internal_id. You can get it by calling `/v1/groups/{number}/{groupid}`, see [API documentation](https://bbernhard.github.io/signal-cli-rest-api/)
+
+
+### Signalbot
 
 - `bot.listen(group_id, group_secret)`: Listen for messages in a group
 - `bot.register(command)`: Register a new command
 - `bot.start()`: Start the bot
-- `bot.send(receiver, text)`: Send a new message
+- `bot.send(receiver, text, listen=False)`: Send a new message
 - `bot.react(message, emoji)`: React to a message
 - `bot.start_typing(receiver)`: Start typing
 - `bot.stop_typing(receiver)`: Stop typing
@@ -35,6 +29,8 @@ bot = SignalBot({
 
 ### Command
 
-- `cmd.setup()`: Start any task that requires to send messages already, optional
-- `cmd.describe()`: String to describe your command, optional
-- `cmd.handle(context)`: Handle an incoming message. By default, any command will read any incoming message. Context can be used to easily reply (`c.send(text)`), react (`c.react(emoji)`) and to type in a group (`c.start_typing()` and `c.stop_typing()`).
+To implement your own commands, you need to inherent `Command` and overwrite following methods:
+
+- `setup()`: Start any task that requires to send messages already, optional
+- `describe()`: String to describe your command, optional
+- `handle(context)`: Handle an incoming message. By default, any command will read any incoming message. Context can be used to easily reply (`c.send(text)`), react (`c.react(emoji)`) and to type in a group (`c.start_typing()` and `c.stop_typing()`).

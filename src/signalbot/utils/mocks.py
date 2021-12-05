@@ -1,3 +1,5 @@
+import time
+import aiohttp
 from unittest.mock import AsyncMock, MagicMock
 from .chat import ChatTestCase
 
@@ -11,6 +13,16 @@ class ReceiveMessagesMock(MagicMock):
 
 
 class SendMessagesMock(AsyncMock):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        mock = AsyncMock()
+        mock.return_value = {"timestamp": "1638715559464"}
+        self.return_value = AsyncMock(
+            spec=aiohttp.ClientResponse,
+            status_code=201,
+            json=mock,
+        )
+
     def results(self):
         results = []
         for args in self.call_args_list:

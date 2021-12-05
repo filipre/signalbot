@@ -7,7 +7,7 @@ from typing import Union
 
 from .api import SignalAPI, ReceiveMessagesError
 from .command import Command
-from .message import Message, UnknownMessageFormatError
+from .message import Message, UnknownMessageFormatError, MessageType
 from .storage import RedisStorage, InMemoryStorage
 from .context import Context
 
@@ -115,10 +115,22 @@ class SignalBot:
         # Run event loop
         self._event_loop.run_forever()
 
-    async def send(self, receiver: Union[Message, str], text: str):
+    async def send(self, receiver: Message, text: str, listen: bool = False):
         receiver_secret = self._resolve_receiver(receiver)
-        await self._signal.send(receiver_secret, text)
-        logging.info(f"[Bot] New message sent:\n{text}")
+        resp = await self._signal.send(receiver_secret, text)
+        resp_payload = await resp.json()
+        timestamp = resp_payload["timestamp"]
+        logging.info(f"[Bot] New message {timestamp} sent:\n{text}")
+
+        if listen:
+            sent_message = Message(
+                source=receiver.source,
+                timestamp=timestamp,
+                type=MessageType.DATA_MESSAGE,
+                text=text,
+                group=receiver.group,
+            )
+            await self._ask_commands_to_handle(sent_message)
 
     async def react(self, message: Message, emoji: str):
         # TODO: check that emoji is really an emoji
@@ -128,20 +140,17 @@ class SignalBot:
         await self._signal.react(recipient, emoji, target_author, timestamp)
         logging.info(f"[Bot] New reaction: {emoji}")
 
-    async def start_typing(self, receiver: Union[Message, str]):
+    async def start_typing(self, receiver: Message):
         receiver_secret = self._resolve_receiver(receiver)
         await self._signal.start_typing(receiver_secret)
 
-    async def stop_typing(self, receiver: Union[Message, str]):
+    async def stop_typing(self, receiver: Message):
         receiver_secret = self._resolve_receiver(receiver)
         await self._signal.stop_typing(receiver_secret)
 
-    def _resolve_receiver(self, receiver: Union[Message, str]) -> str:
+    def _resolve_receiver(self, receiver: Message) -> str:
         # accept both messages and direct group ids
-        if isinstance(receiver, Message):
-            group_id = receiver.group
-        else:
-            group_id = receiver
+        group_id = receiver.group
 
         # resolve group id by using group secrets
         if group_id not in self.groups:
@@ -177,12 +186,15 @@ class SignalBot:
                 if group not in self.groups:
                     continue
 
-                for command in self.commands:
-                    await self._q.put((command, message, time.perf_counter()))
+                await self._ask_commands_to_handle(message)
 
         except ReceiveMessagesError as e:
             # TODO: retry strategy
             raise SignalBotError(f"Cannot receive messages: {e}")
+
+    async def _ask_commands_to_handle(self, message: Message):
+        for command in self.commands:
+            await self._q.put((command, message, time.perf_counter()))
 
     async def _consume(self, name: int) -> None:
         logging.info(f"[Bot] Consumer #{name} started")

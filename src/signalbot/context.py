@@ -7,8 +7,12 @@ class Context:
         self.bot = bot
         self.message = message
 
-    async def send(self, text: str, listen: bool = False):
-        await self.bot.send(self.message, text, listen=listen)
+    async def send(
+        self, text: str, base64_attachments: list = None, listen: bool = False
+    ):
+        await self.bot.send(
+            self.message, text, base64_attachments=base64_attachments, listen=listen
+        )
 
     async def react(self, emoji: str):
         await self.bot.react(self.message, emoji)

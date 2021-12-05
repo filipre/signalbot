@@ -23,9 +23,14 @@ class SignalAPI:
         except Exception as e:
             raise ReceiveMessagesError(e)
 
-    async def send(self, receiver: str, message: str) -> aiohttp.ClientResponse:
+    async def send(
+        self, receiver: str, message: str, base64_attachments: list = None
+    ) -> aiohttp.ClientResponse:
         uri = self._send_rest_uri()
+        if base64_attachments is None:
+            base64_attachments = []
         payload = {
+            "base64_attachments": base64_attachments,
             "message": message,
             "number": self.phone_number,
             "recipients": [receiver],

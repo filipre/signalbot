@@ -115,9 +115,17 @@ class SignalBot:
         # Run event loop
         self._event_loop.run_forever()
 
-    async def send(self, receiver: Message, text: str, listen: bool = False):
+    async def send(
+        self,
+        receiver: Message,
+        text: str,
+        base64_attachments: list = None,
+        listen: bool = False,
+    ):
         receiver_secret = self._resolve_receiver(receiver)
-        resp = await self._signal.send(receiver_secret, text)
+        resp = await self._signal.send(
+            receiver_secret, text, base64_attachments=base64_attachments
+        )
         resp_payload = await resp.json()
         timestamp = resp_payload["timestamp"]
         logging.info(f"[Bot] New message {timestamp} sent:\n{text}")
@@ -128,6 +136,7 @@ class SignalBot:
                 timestamp=timestamp,
                 type=MessageType.SYNC_MESSAGE,
                 text=text,
+                base64_attachments=base64_attachments,
                 group=receiver.group,
             )
             await self._ask_commands_to_handle(sent_message)

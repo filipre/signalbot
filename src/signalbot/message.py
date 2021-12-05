@@ -14,6 +14,7 @@ class Message:
         timestamp: int,
         type: MessageType,
         text: str,
+        base64_attachments: list = None,
         group: str = None,
         reaction: str = None,
         raw_message: str = None,
@@ -24,6 +25,8 @@ class Message:
         self.type = type
         self.text = text
         # optional
+        if base64_attachments is None:
+            self.base64_attachments = []
         self.group = group
         self.reaction = reaction
 
@@ -64,7 +67,10 @@ class Message:
         else:
             raise UnknownMessageFormatError
 
-        return cls(source, timestamp, type, text, group, reaction)
+        # TODO: base64_attachments
+        base64_attachments = []
+
+        return cls(source, timestamp, type, text, base64_attachments, group, reaction)
 
     @classmethod
     def _parse_sync_message(cls, sync_message: dict) -> str:

@@ -1,6 +1,6 @@
 import os
 from src.signalbot import SignalBot
-from example.commands import PingCommand
+from example.commands import PingCommand, FridayCommand
 
 
 def main():
@@ -19,6 +19,7 @@ def main():
     bot.listen(group_id, group_secret)
 
     bot.register(PingCommand())
+    bot.register(FridayCommand())
 
     bot.start()
 

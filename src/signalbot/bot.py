@@ -126,7 +126,7 @@ class SignalBot:
             sent_message = Message(
                 source=receiver.source,
                 timestamp=timestamp,
-                type=MessageType.DATA_MESSAGE,
+                type=MessageType.SYNC_MESSAGE,
                 text=text,
                 group=receiver.group,
             )

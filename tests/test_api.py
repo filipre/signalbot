@@ -18,20 +18,12 @@ class TestAPI(unittest.IsolatedAsyncioTestCase):
 
     @patch("aiohttp.ClientSession.post", new_callable=AsyncMock)
     async def test_send(self, mock):
-        # TODO Fix this mock object
-
-        # mocked_post.return_value = Mock(status_code=201, json=lambda : {"data": {"id": "test"}})
-
+        mock2 = AsyncMock()
+        mock2.return_value = {"timestamp": "1638715559464"}
         mock.return_value = AsyncMock(
             spec=aiohttp.ClientResponse,
             status_code=201,
-            json=lambda: {
-                "jsonrpc": "2.0",
-                "method": "send",
-                "id": "03f69865-d5d8-41d9-8170-2540f9cf1a8d",
-                "params": {"message": "Hello World!", "group-id": "group_id1"},
-                "timestamp": 123,
-            },  # noqa
+            json=mock2,
         )
 
         receiver = TestAPI.group_id

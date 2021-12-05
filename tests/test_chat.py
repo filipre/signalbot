@@ -20,7 +20,7 @@ class ChingChangChongCommand(Command):
         text = c.message.text
         if text == "ching":
             await asyncio.sleep(1)
-            await c.send("chang", listen=self.listen)  # TODO
+            await c.send("chang", listen=self.listen)
             return
 
         if text == "chang":

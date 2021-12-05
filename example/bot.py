@@ -1,6 +1,6 @@
 import os
 from src.signalbot import SignalBot
-from src.example.commands import PingCommand
+from example.commands import PingCommand
 
 
 def main():

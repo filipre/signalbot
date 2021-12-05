@@ -8,7 +8,7 @@ Python package to build your own Signal bots. To run the the bot you need to sta
 
 ### Example Bot
 
-See `src/example` for a complete example on how to use the library. To run it, you need to define following env variables:
+See `example` folder for a complete example on how to use the library. To run it, you need to define following env variables:
 - `SIGNAL_SERVICE`: Address of the signal service without protocol, e.g. `127.0.0.1:8080`
 - `PHONE_NUMBER`: Phone number of the bot, e.g. `+49123456789`
 - `GROUP_ID`: Group that the bot should listen to. Currently, only groups are supported.

@@ -120,7 +120,7 @@ class SignalBot:
         text: str,
         base64_attachments: list = None,
         listen: bool = False,
-    ):
+    ) -> int:
         receiver_secret = self._resolve_receiver(receiver)
         resp = await self._signal.send(
             receiver_secret, text, base64_attachments=base64_attachments
@@ -139,6 +139,8 @@ class SignalBot:
                 group=receiver,
             )
             await self._ask_commands_to_handle(sent_message)
+
+        return timestamp
 
     async def react(self, message: Message, emoji: str):
         # TODO: check that emoji is really an emoji

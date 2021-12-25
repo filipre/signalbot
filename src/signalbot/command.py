@@ -1,5 +1,31 @@
+import functools
+
+
 from .message import Message
 from .context import Context
+
+
+def triggered(*by, case_sensitive=False):
+    def decorator_triggered(func):
+        @functools.wraps(func)
+        async def wrapper_triggered(*args, **kwargs):
+            c = args[1]
+            text = c.message.text
+            if not isinstance(text, str):
+                return
+
+            by_words = by
+            if not case_sensitive:
+                text = text.lower()
+                by_words = [t.lower() for t in by_words]
+            if text not in by_words:
+                return
+
+            return await func(*args, **kwargs)
+
+        return wrapper_triggered
+
+    return decorator_triggered
 
 
 class Command:
@@ -16,6 +42,7 @@ class Command:
         raise NotImplementedError
 
     # helper method
+    # deprecated: please use @triggered
     @classmethod
     def triggered(cls, message: Message, trigger_words: list[str]) -> bool:
         # Message needs to be text

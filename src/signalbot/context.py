@@ -21,7 +21,7 @@ class Context:
         await self.bot.react(self.message, emoji)
 
     async def start_typing(self):
-        await self.bot.start_typing(self.message)
+        await self.bot.start_typing(self.message.group)
 
     async def stop_typing(self):
-        await self.bot.stop_typing(self.message)
+        await self.bot.stop_typing(self.message.group)

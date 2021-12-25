@@ -1,6 +1,6 @@
 import os
 from src.signalbot import SignalBot
-from example.commands import PingCommand, FridayCommand
+from example.commands import PingCommand, FridayCommand, TypingCommand
 
 
 def main():
@@ -20,6 +20,7 @@ def main():
 
     bot.register(PingCommand())
     bot.register(FridayCommand())
+    bot.register(TypingCommand())
 
     bot.start()
 

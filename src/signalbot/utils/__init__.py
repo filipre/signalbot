@@ -6,8 +6,6 @@ from .chat import (
     chat,
 )
 
-# from .mocks import SendMessagesMock, ReceiveMessagesMock, ReactMessageMock
-
 __all__ = [
     "ChatTestCase",
     "SendMessagesMock",

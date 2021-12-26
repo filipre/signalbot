@@ -1,4 +1,4 @@
-from .chat import (
+from .chat_testing import (
     ChatTestCase,
     SendMessagesMock,
     ReceiveMessagesMock,

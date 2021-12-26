@@ -2,7 +2,34 @@ import unittest
 import uuid
 import time
 import json
+import functools
+import aiohttp
+from unittest.mock import AsyncMock, MagicMock
+
 from ..bot import SignalBot
+
+from unittest.mock import patch
+
+
+def chat(*messages):
+    def decorator_chat(func):
+        @functools.wraps(func)
+        @patch("signalbot.SignalAPI.react", new_callable=ReactMessageMock)
+        @patch("src.signalbot.SignalAPI.send", new_callable=SendMessagesMock)
+        @patch("src.signalbot.SignalAPI.receive", new_callable=ReceiveMessagesMock)
+        async def wrapper_chat(*args, **kwargs):
+            chat_test_case = args[0]
+            receive_mock = args[1]
+
+            receive_mock.define(messages)
+            await chat_test_case.run_bot()
+
+            value = func(*args, **kwargs)
+            return value
+
+        return wrapper_chat
+
+    return decorator_chat
 
 
 class ChatTestCase(unittest.IsolatedAsyncioTestCase):
@@ -60,3 +87,46 @@ class ChatTestCase(unittest.IsolatedAsyncioTestCase):
             }
         }
         return json.dumps(message)
+
+
+# from .chat import ChatTestCase
+
+
+class ReceiveMessagesMock(MagicMock):
+    def define(self, messages: list):
+        json_messages = [ChatTestCase.new_message(m) for m in messages]
+        mock_iterator = AsyncMock()
+        mock_iterator.__aiter__.return_value = json_messages
+        self.return_value = mock_iterator
+
+
+class SendMessagesMock(AsyncMock):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        mock = AsyncMock()
+        mock.return_value = {"timestamp": "1638715559464"}
+        self.return_value = AsyncMock(
+            spec=aiohttp.ClientResponse,
+            status_code=201,
+            json=mock,
+        )
+
+    def results(self) -> list:
+        return self._extract_responses()
+
+    def _extract_responses(self):
+        results = []
+        for args in self.call_args_list:
+            results.append(args[0])
+        return results
+
+
+class ReactMessageMock(AsyncMock):
+    def results(self) -> list:
+        return self._extract_responses()
+
+    def _extract_responses(self):
+        results = []
+        for args in self.call_args_list:
+            results.append(args[0])
+        return results

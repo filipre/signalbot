@@ -3,7 +3,12 @@ from unittest.mock import patch
 import asyncio
 import logging
 from src.signalbot import Message, MessageType, Command, Context
-from src.signalbot.utils import ChatTestCase, SendMessagesMock, ReceiveMessagesMock
+from src.signalbot.utils import (
+    ChatTestCase,
+    SendMessagesMock,
+    ReceiveMessagesMock,
+    chat,
+)
 
 
 class ChingChangChongCommand(Command):
@@ -53,6 +58,16 @@ class DisabledListenChatTest(ChatTestCase):
         receive_mock.define(["ching"])
         await self.run_bot()
         self.assertEqual(send_mock.call_count, 1)
+
+
+class DecoratorChatTest(ChatTestCase):
+    def setUp(self):
+        super().setUp()
+        self.signal_bot.register(ChingChangChongCommand(listen=True))
+
+    @chat("how are you doing", "ching")
+    def test_chat(self, query, replies, reactions):
+        self.assertEqual(replies.call_count, 2)
 
 
 if __name__ == "__main__":

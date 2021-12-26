@@ -1,6 +1,5 @@
 import functools
 
-
 from .message import Message
 from .context import Context
 

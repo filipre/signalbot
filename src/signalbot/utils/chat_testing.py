@@ -13,10 +13,14 @@ from unittest.mock import patch
 
 def chat(*messages):
     def decorator_chat(func):
+        signalbot_package = ".".join(__package__.split(".")[:-1])
+
         @functools.wraps(func)
-        @patch("signalbot.SignalAPI.react", new_callable=ReactMessageMock)
-        @patch("src.signalbot.SignalAPI.send", new_callable=SendMessagesMock)
-        @patch("src.signalbot.SignalAPI.receive", new_callable=ReceiveMessagesMock)
+        @patch(f"{signalbot_package}.SignalAPI.react", new_callable=ReactMessageMock)
+        @patch(f"{signalbot_package}.SignalAPI.send", new_callable=SendMessagesMock)
+        @patch(
+            f"{signalbot_package}.SignalAPI.receive", new_callable=ReceiveMessagesMock
+        )
         async def wrapper_chat(*args, **kwargs):
             chat_test_case = args[0]
             receive_mock = args[1]

@@ -1,6 +1,9 @@
 import os
 from src.signalbot import SignalBot
 from example.commands import PingCommand, FridayCommand, TypingCommand, TriggeredCommand
+import logging
+
+logging.getLogger().setLevel(logging.INFO)
 
 
 def main():

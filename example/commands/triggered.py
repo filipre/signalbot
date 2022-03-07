@@ -1,4 +1,4 @@
-from src.signalbot import Command, Context, triggered
+from signalbot import Command, Context, triggered
 
 
 class TriggeredCommand(Command):

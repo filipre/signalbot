@@ -1,5 +1,5 @@
 import asyncio
-from src.signalbot import Command, Context
+from signalbot import Command, Context
 
 
 class TypingCommand(Command):

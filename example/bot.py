@@ -1,9 +1,10 @@
 import os
-from src.signalbot import SignalBot
-from example.commands import PingCommand, FridayCommand, TypingCommand, TriggeredCommand
+from signalbot import SignalBot
+from commands import PingCommand, FridayCommand, TypingCommand, TriggeredCommand
 import logging
 
 logging.getLogger().setLevel(logging.INFO)
+logging.getLogger("apscheduler").setLevel(logging.WARNING)
 
 
 def main():

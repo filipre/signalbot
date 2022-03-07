@@ -1,4 +1,4 @@
-from src.signalbot import Command, Context
+from signalbot import Command, Context
 
 
 class FridayCommand(Command):

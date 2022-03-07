@@ -4,6 +4,8 @@ Python package to build your own Signal bots. To run the the bot you need to sta
 
 ## Getting Started
 
+*Also see https://github.com/bbernhard/signal-cli-rest-api#getting-started*
+
 1. Go into the `example` folder and run [signal-cli-rest-api](https://github.com/bbernhard/signal-cli-rest-api) in `normal` mode first.
 ```bash
 docker run -p 8080:8080 \
@@ -11,7 +13,7 @@ docker run -p 8080:8080 \
     -e 'MODE=normal' bbernhard/signal-cli-rest-api:0.57
 ```
 
-2. Open `http://127.0.0.1:8080/v1/qrcodelink?device_name=local` to link your account with the signal-cli-rest-api server
+2. Open http://127.0.0.1:8080/v1/qrcodelink?device_name=local to link your account with the signal-cli-rest-api server
 
 3. In your Signal app, open settings and scan the QR code. The server can now receive and send messages. The access key is stored in `$(PWD)/signal-cli-config`.
 
@@ -30,7 +32,7 @@ time="2022-03-07T13:02:22Z" level=info msg="Found number +491234567890 and added
 time="2022-03-07T13:02:24Z" level=info msg="Started Signal Messenger REST API"
 ```
 
-6. You can confirm that the server is running in the correct mode by visiting `http://127.0.0.1:8080/v1/about`
+6. You can confirm that the server is running in the correct mode by visiting http://127.0.0.1:8080/v1/about
 ```json
 {"versions":["v1","v2"],"build":2,"mode":"json-rpc","version":"0.57"}
 ```

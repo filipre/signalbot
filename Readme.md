@@ -6,7 +6,7 @@ Python package to build your own Signal bots. To run the the bot you need to sta
 
 *Documentation work in progress. Feel free to open an issue for questions.*
 
-The package provides a methods to easily listen for incoming messages and responding or reacting on them. It also provides a class to develop new commands which then can be registered within the bot.
+The package provides methods to easily listen for incoming messages and responding or reacting on them. It also provides a class to develop new commands which then can be registered within the bot.
 
 ### Signalbot
 
@@ -28,9 +28,29 @@ To implement your own commands, you need to inherent `Command` and overwrite fol
 - `describe(self)`: String to describe your command, optional
 - `handle(self, c: Context)`: Handle an incoming message. By default, any command will read any incoming message. `Context` can be used to easily reply (`c.send(text)`), react (`c.react(emoji)`) and to type in a group (`c.start_typing()` and `c.stop_typing()`). You can use the `@triggered` decorator to listen for specific commands or you can inspect `c.message.text`.
 
-## Getting the Example Bot Running
+### Unit Testing
 
-Please check out the example code to get an idea on how to develop your own bot or commands. Also see https://github.com/bbernhard/signal-cli-rest-api#getting-started to learn more about [signal-cli-rest-api](https://github.com/bbernhard/signal-cli-rest-api) and [signal-cli](https://github.com/AsamK/signal-cli).
+In many cases, we can mock receiving and sending messages to speed up development time. To do so, you can use `signalbot.utils.ChatTestCase` which sets up a "skeleton" bot. Then, you can send messages using the `@chat` decorator in `signalbot.utils` like this:
+```python
+class PingChatTest(ChatTestCase):
+    def setUp(self):
+        # initialize self.singal_bot
+        super().setUp() 
+        # all that is left to do is to register the commands that you want to test 
+        self.signal_bot.register(PingCommand()) 
+
+    @chat("ping", "ping")
+    async def test_ping(self, query, replies, reactions):
+        self.assertEqual(replies.call_count, 2)
+        for recipient, message in replies.results():
+            self.assertEqual(recipient, ChatTestCase.group_secret)
+            self.assertEqual(message, "pong")
+```
+In `signalbot.utils`, check out `ReceiveMessagesMock`, `SendMessagesMock` and `ReactMessageMock` to learn more about their API.
+
+## Getting Started
+
+Please check out the example code to get an idea on how to develop your own bot or commands. Also see https://github.com/bbernhard/signal-cli-rest-api#getting-started to learn more about [signal-cli-rest-api](https://github.com/bbernhard/signal-cli-rest-api) and [signal-cli](https://github.com/AsamK/signal-cli). A good first step is to make the example bot work:
 
 1. Go into the [example](https://github.com/filipre/signalbot/tree/master/example) folder and run signal-cli-rest-api in `normal` mode first.
 ```bash

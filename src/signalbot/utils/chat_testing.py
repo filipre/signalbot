@@ -93,9 +93,6 @@ class ChatTestCase(unittest.IsolatedAsyncioTestCase):
         return json.dumps(message)
 
 
-# from .chat import ChatTestCase
-
-
 class ReceiveMessagesMock(MagicMock):
     def define(self, messages: list):
         json_messages = [ChatTestCase.new_message(m) for m in messages]

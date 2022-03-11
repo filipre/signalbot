@@ -32,6 +32,14 @@ class Message:
 
         self.raw_message = raw_message
 
+    def recipient(self) -> str:
+        # Case 1: Group chat
+        if self.group:
+            return self.group
+
+        # Case 2: User chat
+        return self.source
+
     @classmethod
     def parse(cls, raw_message: str):
         try:

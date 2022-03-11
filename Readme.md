@@ -10,7 +10,7 @@ The package provides methods to easily listen for incoming messages and respondi
 
 ### Signalbot
 
-- `bot.listen(group_id, group_secret)`: Listen for messages in a group. `group_secret` must be prefixed with `group.`
+- `bot.listen(id, internal_id)`: Listen for messages in a group. `id` must be prefixed with `group.`
 - `bot.register(command)`: Register a new command
 - `bot.start()`: Start the bot
 - `bot.send(receiver, text, listen=False)`: Send a new message
@@ -78,18 +78,23 @@ time="2022-03-07T13:02:22Z" level=info msg="Found number +491234567890 and added
 time="2022-03-07T13:02:24Z" level=info msg="Started Signal Messenger REST API"
 ```
 
+6. The bot needs to listen to a group. Use the following snippet to get `id` and `internal_id`:
+```bash
+curl -X GET 'http://127.0.0.1:8080/v1/groups/+49123456789' | python -m json.tool
+```
+
 7. Install `signalbot` and start `bot.py`. You need to pass following environment variables to make the example run:
 - `SIGNAL_SERVICE`: Address of the signal service without protocol, e.g. `127.0.0.1:8080`
 - `PHONE_NUMBER`: Phone number of the bot, e.g. `+49123456789`
-- `GROUP_ID`: Group that the bot should listen to. Currently, only groups are supported.
-- `GROUP_SECRET`: Group's `internal_id`. You can get it by calling `http://127.0.0.1:8080/v1/groups/{number}/{groupid}`, see [API documentation](https://bbernhard.github.io/signal-cli-rest-api/). It should be prefixed like this: `group.*******************=`
+- `GROUP_ID`: Group that the bot should listen to. Currently, only groups are supported. Prefixed with `group.`
+- `GROUP_INTERNAL_ID`: Group's `internal_id`
 
 ```bash
 pip install signalbot
 export SIGNAL_SERVICE="127.0.0.1"
 export PHONE_NUMBER="+49123456789"
-export GROUP_ID="asdfasdfadfasdfasdfasdf="
-export GROUP_SECRET="group.qwerqwerqwerqwerqwerqwerqweqwer="
+export GROUP_ID="group.qwerqwerqwerqwerqwerqwerqweqwer=="
+export GROUP_INTERNAL_ID="asdfasdfasdfasdf="
 python bot.py
 ```
 

@@ -11,7 +11,7 @@ def main():
     signal_service = os.environ["SIGNAL_SERVICE"]
     phone_number = os.environ["PHONE_NUMBER"]
     group_id = os.environ["GROUP_ID"]
-    group_secret = os.environ["GROUP_SECRET"]
+    internal_id = os.environ["GROUP_INTERNAL_ID"]
 
     config = {
         "signal_service": signal_service,
@@ -20,7 +20,7 @@ def main():
     }
     bot = SignalBot(config)
 
-    bot.listen(group_id, group_secret)
+    bot.listen(group_id, internal_id)
 
     bot.register(PingCommand())
     bot.register(FridayCommand())

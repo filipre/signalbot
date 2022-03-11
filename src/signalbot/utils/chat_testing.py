@@ -40,8 +40,8 @@ class ChatTestCase(unittest.IsolatedAsyncioTestCase):
     signal_service = "127.0.0.1:8080"
     phone_number = "+49123456789"
 
-    group_id = "group_id1"
-    group_secret = "group.group_secret1"
+    group_id = "group_id1="
+    group_secret = "group.group_secret1="
     config = {
         "signal_service": signal_service,
         "phone_number": phone_number,

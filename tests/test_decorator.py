@@ -1,11 +1,8 @@
-from src.signalbot import Command, Context, triggered
-
 import unittest
 from unittest.mock import patch
-import asyncio
 import logging
-from src.signalbot import Message, MessageType, Command, Context
-from src.signalbot.utils import ChatTestCase, SendMessagesMock, ReceiveMessagesMock
+from signalbot import Command, Context, triggered
+from signalbot.utils import ChatTestCase, SendMessagesMock, ReceiveMessagesMock
 
 
 class TriggeredCommand(Command):
@@ -31,22 +28,22 @@ class TriggeredTest(ChatTestCase):
         super().setUp()
         self.signal_bot.register(TriggeredCommand())
 
-    @patch("src.signalbot.SignalAPI.send", new_callable=SendMessagesMock)
-    @patch("src.signalbot.SignalAPI.receive", new_callable=ReceiveMessagesMock)
+    @patch("signalbot.SignalAPI.send", new_callable=SendMessagesMock)
+    @patch("signalbot.SignalAPI.receive", new_callable=ReceiveMessagesMock)
     async def test_triggered(self, receive_mock, send_mock):
         receive_mock.define(["Trump"])
         await self.run_bot()
         self.assertEqual(send_mock.call_count, 1)
 
-    @patch("src.signalbot.SignalAPI.send", new_callable=SendMessagesMock)
-    @patch("src.signalbot.SignalAPI.receive", new_callable=ReceiveMessagesMock)
+    @patch("signalbot.SignalAPI.send", new_callable=SendMessagesMock)
+    @patch("signalbot.SignalAPI.receive", new_callable=ReceiveMessagesMock)
     async def test_also_triggered(self, receive_mock, send_mock):
         receive_mock.define(["Biden"])
         await self.run_bot()
         self.assertEqual(send_mock.call_count, 1)
 
-    @patch("src.signalbot.SignalAPI.send", new_callable=SendMessagesMock)
-    @patch("src.signalbot.SignalAPI.receive", new_callable=ReceiveMessagesMock)
+    @patch("signalbot.SignalAPI.send", new_callable=SendMessagesMock)
+    @patch("signalbot.SignalAPI.receive", new_callable=ReceiveMessagesMock)
     async def test_not_triggered(self, receive_mock, send_mock):
         receive_mock.define(["Scholz"])
         await self.run_bot()
@@ -58,15 +55,15 @@ class TriggeredCaseSensitiveTest(ChatTestCase):
         super().setUp()
         self.signal_bot.register(TriggeredCaseSensitiveCommand())
 
-    @patch("src.signalbot.SignalAPI.send", new_callable=SendMessagesMock)
-    @patch("src.signalbot.SignalAPI.receive", new_callable=ReceiveMessagesMock)
+    @patch("signalbot.SignalAPI.send", new_callable=SendMessagesMock)
+    @patch("signalbot.SignalAPI.receive", new_callable=ReceiveMessagesMock)
     async def test_triggered(self, receive_mock, send_mock):
         receive_mock.define(["Trump"])
         await self.run_bot()
         self.assertEqual(send_mock.call_count, 1)
 
-    @patch("src.signalbot.SignalAPI.send", new_callable=SendMessagesMock)
-    @patch("src.signalbot.SignalAPI.receive", new_callable=ReceiveMessagesMock)
+    @patch("signalbot.SignalAPI.send", new_callable=SendMessagesMock)
+    @patch("signalbot.SignalAPI.receive", new_callable=ReceiveMessagesMock)
     async def test_not_triggered(self, receive_mock, send_mock):
         receive_mock.define(["trump"])
         await self.run_bot()

@@ -1,7 +1,7 @@
 import unittest
 import asyncio
 from unittest.mock import patch, AsyncMock
-from src.signalbot import SignalBot, Command, SignalAPI
+from signalbot import SignalBot, Command, SignalAPI
 
 
 class TestBot(unittest.IsolatedAsyncioTestCase):

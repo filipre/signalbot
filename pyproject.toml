@@ -17,6 +17,7 @@ classifiers = [
     "License :: OSI Approved :: MIT License",
     "Operating System :: OS Independent"
 ]
+exclude = ["example/", "tests/"]
 
 [tool.poetry.dependencies]
 python = "^3.9"

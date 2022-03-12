@@ -4,21 +4,21 @@ from unittest.mock import patch, AsyncMock
 from src.signalbot import SignalBot, Command, SignalAPI
 
 
-class TestBot(unittest.IsolatedAsyncioTestCase):
+class BotTestCase(unittest.IsolatedAsyncioTestCase):
     signal_service = "127.0.0.1:8080"
     phone_number = "+49123456789"
-
-    group_id = "group_id1="
-    group_secret = "group.group_secret1="
-    config = {"groups": {group_id: group_secret}}
+    group_id = "group.group_secret1="
+    internal_id = "group_id1="
 
     def setUp(self):
         config = {
-            "signal_service": TestBot.signal_service,
-            "phone_number": TestBot.phone_number,
+            "signal_service": BotTestCase.signal_service,
+            "phone_number": BotTestCase.phone_number,
         }
         self.signal_bot = SignalBot(config)
 
+
+class TestProducer(BotTestCase):
     @patch("websockets.connect")
     async def test_produce(self, mock):
         # Two messages
@@ -31,9 +31,9 @@ class TestBot(unittest.IsolatedAsyncioTestCase):
 
         self.signal_bot._q = asyncio.Queue()
         self.signal_bot._signal = SignalAPI(
-            TestBot.signal_service, TestBot.phone_number
+            TestProducer.signal_service, TestProducer.phone_number
         )
-        self.signal_bot.listen(TestBot.group_id, TestBot.group_secret)
+        self.signal_bot.listen(TestProducer.group_id, TestProducer.internal_id)
         # Any two commands
         self.signal_bot.register(Command())
         self.signal_bot.register(Command())
@@ -41,3 +41,120 @@ class TestBot(unittest.IsolatedAsyncioTestCase):
         await self.signal_bot._produce(1337)
 
         self.assertEqual(self.signal_bot._q.qsize(), 4)
+
+
+class TestListenUser(BotTestCase):
+    def test_listen_phone_number(self):
+        user_number = "+49987654321"
+        self.signal_bot.listen(user_number)
+        expected_user_chats = {user_number}
+        self.assertSetEqual(self.signal_bot.user_chats, expected_user_chats)
+
+    def test_listenUser_phone_number(self):
+        user_number = "+49987654321"
+        self.signal_bot.listenUser(user_number)
+        expected_user_chats = {user_number}
+        self.assertSetEqual(self.signal_bot.user_chats, expected_user_chats)
+
+    def test_listen_multiple_user_chats(self):
+        user_number1 = "+49987654321"
+        user_number2 = "+49987654322"
+        user_number3 = "+49987654323"
+        self.signal_bot.listen(user_number1)
+        self.signal_bot.listen(user_number2)
+        self.signal_bot.listen(user_number3)
+        expected_user_chats = {user_number1, user_number3, user_number2}
+        self.assertSetEqual(self.signal_bot.user_chats, expected_user_chats)
+
+    def test_listenUser_multiple_user_chats(self):
+        user_number1 = "+49987654321"
+        user_number2 = "+49987654322"
+        user_number3 = "+49987654323"
+        self.signal_bot.listenUser(user_number1)
+        self.signal_bot.listenUser(user_number2)
+        self.signal_bot.listenUser(user_number3)
+        expected_user_chats = {user_number1, user_number3, user_number2}
+        self.assertSetEqual(self.signal_bot.user_chats, expected_user_chats)
+
+    def test_listen_invalid_phone_number(self):
+        invalid_number = "49987654321"
+        self.signal_bot.listen(invalid_number)
+        expected_user_chats = set()
+        self.assertSetEqual(self.signal_bot.user_chats, expected_user_chats)
+
+    def test_listenUser_invalid_phone_number(self):
+        invalid_number = "49987654321"
+        self.signal_bot.listenUser(invalid_number)
+        expected_user_chats = set()
+        self.assertSetEqual(self.signal_bot.user_chats, expected_user_chats)
+
+    def test_listen_valid_invalid_phone_number(self):
+        invalid_number = "49987654321"
+        valid_number = "+49123454321"
+        self.signal_bot.listen(invalid_number)
+        self.signal_bot.listen(valid_number)
+        expected_user_chats = {valid_number}
+        self.assertSetEqual(self.signal_bot.user_chats, expected_user_chats)
+
+
+class TestListenGroup(BotTestCase):
+    def test_listen_group_id_internal_id_works(self):
+        self.signal_bot.listen(BotTestCase.group_id, BotTestCase.internal_id)
+        expected_group_chats = {BotTestCase.internal_id: BotTestCase.group_id}
+        self.assertDictEqual(self.signal_bot.group_chats, expected_group_chats)
+
+    def test_listen_group_id_internal_id_swapped_works(self):
+        self.signal_bot.listen(BotTestCase.internal_id, BotTestCase.group_id)
+        expected_group_chats = {BotTestCase.internal_id: BotTestCase.group_id}
+        self.assertDictEqual(self.signal_bot.group_chats, expected_group_chats)
+
+    def test_listenGroup_group_id_internal_id_works(self):
+        self.signal_bot.listenGroup(BotTestCase.group_id, BotTestCase.internal_id)
+        expected_group_chats = {BotTestCase.internal_id: BotTestCase.group_id}
+        self.assertDictEqual(self.signal_bot.group_chats, expected_group_chats)
+
+    def test_listenGroup_group_id_internal_id_swapped_doesnt_work(self):
+        self.signal_bot.listenGroup(BotTestCase.internal_id, BotTestCase.group_id)
+        self.assertDictEqual(self.signal_bot.group_chats, {})
+
+    def test_listen_invalid_input_doesnt_work(self):
+        self.signal_bot.listen("asdf", "qwer")
+        self.assertDictEqual(self.signal_bot.group_chats, {})
+
+
+class TestRegisterCommand(BotTestCase):
+    def test_register_one_command(self):
+        self.signal_bot.register(Command())
+        self.assertEqual(len(self.signal_bot.commands), 1)
+
+    def test_register_three_commands(self):
+        self.signal_bot.register(Command())
+        self.signal_bot.register(Command())
+        self.signal_bot.register(Command())
+        self.assertEqual(len(self.signal_bot.commands), 3)
+
+    def test_register_calls_setup_of_command(self):
+        class SomeTestCommand(Command):
+            def __init__(self):
+                self.state = False
+
+            def setup(self):
+                self.state = True
+
+        cmd = SomeTestCommand()
+        self.assertEqual(cmd.state, False)
+
+        self.signal_bot.register(cmd)
+        self.assertEqual(cmd.state, True)
+
+
+class TestRecipients(BotTestCase):
+    def test_recipient_is_phone_number(self):
+        recipient = "+49987654321"
+        new_recipient = self.signal_bot._resolve_receiver(recipient)
+        self.assertEqual(recipient, new_recipient)
+
+    def test_recipient_is_group_interal_id(self):
+        self.signal_bot.listen(BotTestCase.group_id, BotTestCase.internal_id)
+        resolved_recipient = self.signal_bot._resolve_receiver(BotTestCase.internal_id)
+        self.assertEqual(resolved_recipient, BotTestCase.group_id)

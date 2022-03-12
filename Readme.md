@@ -10,7 +10,8 @@ The package provides methods to easily listen for incoming messages and respondi
 
 ### Signalbot
 
-- `bot.listen(id, internal_id)`: Listen for messages in a group. `id` must be prefixed with `group.`
+- `bot.listen(group_id, internal_id)`: Listen for messages in a group chat. `id` must be prefixed with `group.`
+- `bot.listen(phone_number)`: Listen for messages in a user chat.
 - `bot.register(command)`: Register a new command
 - `bot.start()`: Start the bot
 - `bot.send(receiver, text, listen=False)`: Send a new message
@@ -86,7 +87,7 @@ curl -X GET 'http://127.0.0.1:8080/v1/groups/+49123456789' | python -m json.tool
 7. Install `signalbot` and start `bot.py`. You need to pass following environment variables to make the example run:
 - `SIGNAL_SERVICE`: Address of the signal service without protocol, e.g. `127.0.0.1:8080`
 - `PHONE_NUMBER`: Phone number of the bot, e.g. `+49123456789`
-- `GROUP_ID`: Group that the bot should listen to. Currently, only groups are supported. Prefixed with `group.`
+- `GROUP_ID`: Group that the bot should listen to. Prefixed with `group.`
 - `GROUP_INTERNAL_ID`: Group's `internal_id`
 
 ```bash

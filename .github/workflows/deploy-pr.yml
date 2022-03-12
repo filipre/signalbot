@@ -36,5 +36,11 @@ jobs:
           poetry version $pr_version
       - name: Confirm new version
         run: poetry version
+      - name: Build package
+        run: poetry build
+      - name: Add test.pypi.org to Poetry
+        run: |
+          poetry config repositories.testpypi https://test.pypi.org/legacy/
+          poetry config pypi-token.testpypi ${{ secrets.TEST_PYPI_TOKEN }}
       - name: Publish package
-        run: echo TODO
+        run: poetry publish -r testpypi

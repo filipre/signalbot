@@ -128,10 +128,18 @@ pong
 
 ```
 poetry install
+
 poetry run pre-commit install
+
 poetry shell
+
 poetry version
 poetry version <new_version>
-poetry build
+
+poetry config repositories.testpypi https://test.pypi.org/legacy/
+poetry config http-basic.testpypi __token__ <token>
+poetry config http-basic.pypi __token__ <token>
+
+poetry publish -r testpypi
 poetry publish
 ```

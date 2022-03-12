@@ -10,7 +10,7 @@ jobs:
   #   uses: filipre/renebot-signal/.github/workflows/run-tests.yml@master
 
   publish-package:
-    name: Publish Pull Request on test.pypi.org
+    name: Publish Pull Request
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
@@ -32,7 +32,7 @@ jobs:
           echo github.event.issue.number = ${{ github.event.issue.number }}
       - name: Create custom version
         run: |
-          pr_version=$(poetry version -s)-pr.${{ github.event.number }}
+          pr_version=$(poetry version -s)a${{ github.event.number }}
           poetry version $pr_version
       - name: Confirm new version
         run: poetry version

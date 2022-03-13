@@ -10,7 +10,7 @@ jobs:
     uses: filipre/signalbot/.github/workflows/run-tests.yaml@master
 
   publish-test-pypi:
-    name: Publish on test.pypi.org
+    name: Publish (test.pypi.org)
     runs-on: ubuntu-latest
     needs: run-tests
     environment:
@@ -42,7 +42,7 @@ jobs:
         run: poetry publish -r testpypi
 
   publish-pypi:
-    name: Publish Package
+    name: Publish (pypi.org)
     runs-on: ubuntu-latest
     needs: publish-test-pypi
     environment:
@@ -66,5 +66,8 @@ jobs:
         run: echo "::set-output name=package_version::$(poetry version -s)"
       - name: Build package
         run: poetry build
+      - name: Add pypi.org to Poetry
+        run: |
+          poetry config pypi-token.pypi ${{ secrets.API_TOKEN }}
       - name: Publish package
         run: poetry publish

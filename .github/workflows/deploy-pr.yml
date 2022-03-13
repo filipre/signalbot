@@ -30,12 +30,9 @@ jobs:
         run: poetry install --no-dev
       - name: Create custom version
         id: create-custom-version
-        run: |
-          pr_vesion="$(poetry version -s)a$(date +%s)"
-          echo "pr_version=$pr_version" >> $GITHUB_ENV
-          echo "::set-output name=pr_version::$pr_vesion"
-      - name: Set new version ${{ env.pr_version }}
-        run: poetry version ${{ env.pr_version }}
+        run: echo "::set-output name=pr_version::$(poetry version -s)a$(date +%s)"
+      - name: Set new version
+        run: poetry version ${{ steps.create-custom-version.outputs.pr_version }}
       - name: Build package
         run: poetry build
       - name: Add test.pypi.org to Poetry

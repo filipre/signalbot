@@ -28,15 +28,10 @@ jobs:
           poetry-version: 1.1.13
       - name: Install dependencies
         run: poetry install --no-dev
-      - name: Print some basic stats
-        run: |
-          echo ${{ github.run_attempt }}
       - name: Create custom version
-        run: |
-          pr_version=$(poetry version -s)a${{ github.run_attempt }}
-          poetry version $pr_version
-      - name: Confirm new version
-        run: poetry version
+        run: echo "pr_version=$(poetry version -s)a$(date +%s)" >> $GITHUB_ENV
+      - name: Set new version
+        run: poetry version ${{ env.pr_version }}
       - name: Build package
         run: poetry build
       - name: Add test.pypi.org to Poetry
@@ -45,3 +40,10 @@ jobs:
           poetry config pypi-token.testpypi ${{ secrets.API_TOKEN }}
       - name: Publish package
         run: poetry publish -r testpypi
+      - name: "Write comment in Pull Request #${{ github.event.pull_request.number }}"
+        uses: peter-evans/create-or-update-comment@v1
+        with:
+          issue-number: ${{ github.event.pull_request.number }}
+          body: |
+            This is a multi-line test comment
+            - With GitHub **Markdown** :sparkles: ${{ env.pr_version }}

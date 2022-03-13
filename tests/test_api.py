@@ -2,7 +2,7 @@ import unittest
 import aiohttp
 from unittest.mock import patch, AsyncMock
 
-from src.signalbot import SignalAPI
+from signalbot import SignalAPI
 
 
 class TestAPI(unittest.IsolatedAsyncioTestCase):

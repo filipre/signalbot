@@ -35,9 +35,9 @@ In many cases, we can mock receiving and sending messages to speed up developmen
 class PingChatTest(ChatTestCase):
     def setUp(self):
         # initialize self.singal_bot
-        super().setUp() 
-        # all that is left to do is to register the commands that you want to test 
-        self.signal_bot.register(PingCommand()) 
+        super().setUp()
+        # all that is left to do is to register the commands that you want to test
+        self.signal_bot.register(PingCommand())
 
     @chat("ping", "ping")
     async def test_ping(self, query, replies, reactions):
@@ -124,9 +124,22 @@ pong
 
 ## Local development and package
 
-Increase version in `setup.cfg`, then
+*Section WIP*
 
 ```
-python -m build
-python -m twine upload dist/*
+poetry install
+
+poetry run pre-commit install
+
+poetry shell
+
+poetry version
+poetry version <new_version>
+
+poetry config repositories.testpypi https://test.pypi.org/legacy/
+poetry config http-basic.testpypi __token__ <token>
+poetry config http-basic.pypi __token__ <token>
+
+poetry publish -r testpypi
+poetry publish
 ```

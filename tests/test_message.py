@@ -1,5 +1,5 @@
 import unittest
-from src.signalbot import Message, MessageType
+from signalbot import Message, MessageType
 
 
 class TestMessage(unittest.TestCase):

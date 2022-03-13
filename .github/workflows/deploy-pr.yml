@@ -1,0 +1,52 @@
+name: Deploy Pull Request
+
+on:
+  pull_request:
+    branches: [master]
+
+jobs:
+  # run-tests:
+  #   name: Run Tests
+  #   uses: filipre/renebot-signal/.github/workflows/run-tests.yml@master
+
+  publish-package:
+    name: Publish Pull Request
+    runs-on: ubuntu-latest
+    environment:
+      name: test.pypi.org
+      url: https://test.pypi.org/project/signalbot/${{ steps.create-custom-version.outputs.pr_version }}/
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v2
+      - name: Set up Python 3.9
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.9
+      - name: Install Poetry
+        uses: abatilo/actions-poetry@v2.0.0
+        with:
+          poetry-version: 1.1.13
+      - name: Install dependencies
+        run: poetry install --no-dev
+      - name: Create custom version
+        id: create-custom-version
+        run: echo "::set-output name=pr_version::$(poetry version -s)a$(date +%s)"
+      - name: Set new version
+        run: poetry version ${{ steps.create-custom-version.outputs.pr_version }}
+      - name: Build package
+        run: poetry build
+      - name: Add test.pypi.org to Poetry
+        run: |
+          poetry config repositories.testpypi https://test.pypi.org/legacy/
+          poetry config pypi-token.testpypi ${{ secrets.API_TOKEN }}
+      - name: Publish package
+        run: poetry publish -r testpypi
+      - name: "Write comment in Pull Request"
+        uses: peter-evans/create-or-update-comment@v1
+        with:
+          issue-number: ${{ github.event.pull_request.number }}
+          body: |
+            Pull Request has been deployed on test.pypi.org: [${{ steps.create-custom-version.outputs.pr_version }}](https://test.pypi.org/project/signalbot/${{ steps.create-custom-version.outputs.pr_version }}/) :rocket: If `poetry` uses test.pypi.org, you can update the package with
+            ```bash
+            poetry add signalbot==${{ steps.create-custom-version.outputs.pr_version }}
+            ```

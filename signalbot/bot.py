@@ -22,24 +22,21 @@ class SignalBot:
         storage:
             redis_host: "redis"
             redis_port: 6379
-        scheduler:
-            enable_jobstore: true
         """
         self.config = config
-        self.commands = []
-        self.groups = {}
 
-        # Signal API (required)
+        self.commands = []  # populated by .register()
+
+        self.user_chats = set()  # populated by .listenUser()
+        self.group_chats = {}  # populated by .listenGroup()
+
+        # Required
         self._init_api()
-
-        # Event loop (required)
         self._init_event_loop()
-
-        # Storage (optional)
-        self._init_storage()
-
-        # Scheduler settings (jobstore)
         self._init_scheduler()
+
+        # Optional
+        self._init_storage()
 
     def _init_api(self):
         try:
@@ -61,43 +58,80 @@ class SignalBot:
             self.storage = RedisStorage(self._redis_host, self._redis_port)
         except Exception:
             self.storage = InMemoryStorage()
-            logging.warn(
+            logging.warning(
                 "[Bot] Could not initialize Redis. In-memory storage will be used. "
                 "Restarting will delete the storage!"
             )
 
     def _init_scheduler(self):
-        # required: scheduler
         try:
             self.scheduler = AsyncIOScheduler(event_loop=self._event_loop)
         except Exception as e:
             raise SignalBotError(f"Could not initialize scheduler: {e}")
 
-        # optional: jobstore option
-        # TODO: do not use jobstore because it does not work with coroutines
-        # try:
-        #     enable_jobstore = self.config["scheduler"]["enable_jobstore"]
-        #     if enable_jobstore is False:
-        #         return
-        #     if not isinstance(self.storage, RedisStorage):
-        #         raise Exception("Scheduler is not Redis Storage")
-        #     host, port = self._redis_host, self._redis_port
-        #     self.scheduler.add_jobstore(
-        #         "redis",
-        #         jobs_key="Signalbot:scheduler:jobs",
-        #         run_times_key="Signalbot:scheduler:run_times",
-        #         host=host,
-        #         port=port,
-        #     )
-        # except Exception as e:
-        #     logging.warn(
-        #         "[Bot] Could not enable scheduler's job store, despite setting "
-        #         f"`enable_jobstore` to True: {e}"
-        #     )
-        #     return
+    def listen(self, required_id: str, optional_id: str = None):
+        # Case 1: required id is a phone number, optional_id is not being used
+        if self._is_phone_number(required_id):
+            phone_number = required_id
+            self.listenUser(phone_number)
+            return
 
-    def listen(self, group: str, secret: str):
-        self.groups[group] = secret
+        # Case 2: required id is a group id
+        if self._is_group_id(required_id) and self._is_internal_id(optional_id):
+            group_id = required_id
+            internal_id = optional_id
+            self.listenGroup(group_id, internal_id)
+            return
+
+        # Case 3: optional_id is a group id (Case 2 swapped)
+        if self._is_internal_id(required_id) and self._is_group_id(optional_id):
+            group_id = optional_id
+            internal_id = required_id
+            self.listenGroup(group_id, internal_id)
+            return
+
+        logging.warning(
+            "[Bot] Can't listen for user/group because input does not look valid"
+        )
+
+    def listenUser(self, phone_number: str):
+        if not self._is_phone_number(phone_number):
+            logging.warning(
+                "[Bot] Can't listen for user because phone number does not look valid"
+            )
+            return
+
+        self.user_chats.add(phone_number)
+
+    def listenGroup(self, group_id: str, internal_id: str):
+        if not (self._is_group_id(group_id) and self._is_internal_id(internal_id)):
+            logging.warning(
+                "[Bot] Can't listen for group because group id and "
+                "internal id do not look valid"
+            )
+            return
+
+        self.group_chats[internal_id] = group_id
+
+    def _is_phone_number(self, phone_number: str) -> bool:
+        if phone_number is None:
+            return False
+        return phone_number[0] == "+"
+
+    def _is_group_id(self, group_id: str) -> bool:
+        if group_id is None:
+            return False
+        prefix = "group."
+        if group_id[: len(prefix)] != prefix:
+            return False
+        if group_id[-1] != "=":
+            return False
+        return True
+
+    def _is_internal_id(self, internal_id: str) -> bool:
+        if internal_id is None:
+            return False
+        return internal_id[-1] == "="
 
     def register(self, command: Command):
         command.bot = self
@@ -121,50 +155,66 @@ class SignalBot:
         base64_attachments: list = None,
         listen: bool = False,
     ) -> int:
-        receiver_secret = self._resolve_receiver(receiver)
+        resolved_receiver = self._resolve_receiver(receiver)
         resp = await self._signal.send(
-            receiver_secret, text, base64_attachments=base64_attachments
+            resolved_receiver, text, base64_attachments=base64_attachments
         )
         resp_payload = await resp.json()
         timestamp = resp_payload["timestamp"]
         logging.info(f"[Bot] New message {timestamp} sent:\n{text}")
 
         if listen:
-            sent_message = Message(
-                source=self._phone_number,
-                timestamp=timestamp,
-                type=MessageType.SYNC_MESSAGE,
-                text=text,
-                base64_attachments=base64_attachments,
-                group=receiver,
-            )
+            if self._is_phone_number(receiver):
+                sent_message = Message(
+                    source=receiver,  # otherwise we can't respond in the right chat
+                    timestamp=timestamp,
+                    type=MessageType.SYNC_MESSAGE,
+                    text=text,
+                    base64_attachments=base64_attachments,
+                    group=None,
+                )
+            else:
+                sent_message = Message(
+                    source=self._phone_number,  # no need to pretend
+                    timestamp=timestamp,
+                    type=MessageType.SYNC_MESSAGE,
+                    text=text,
+                    base64_attachments=base64_attachments,
+                    group=receiver,
+                )
             await self._ask_commands_to_handle(sent_message)
 
         return timestamp
 
     async def react(self, message: Message, emoji: str):
         # TODO: check that emoji is really an emoji
-        recipient = self._resolve_receiver(message.group)
+        recipient = self._resolve_receiver(message.recipient())
         target_author = message.source
         timestamp = message.timestamp
         await self._signal.react(recipient, emoji, target_author, timestamp)
         logging.info(f"[Bot] New reaction: {emoji}")
 
     async def start_typing(self, receiver: str):
-        receiver_secret = self._resolve_receiver(receiver)
-        await self._signal.start_typing(receiver_secret)
+        receiver = self._resolve_receiver(receiver)
+        await self._signal.start_typing(receiver)
 
     async def stop_typing(self, receiver: str):
-        receiver_secret = self._resolve_receiver(receiver)
-        await self._signal.stop_typing(receiver_secret)
+        receiver = self._resolve_receiver(receiver)
+        await self._signal.stop_typing(receiver)
 
     def _resolve_receiver(self, receiver: str) -> str:
-        # resolve receiver group id by using group secrets
-        if receiver not in self.groups:
-            raise SignalBotError("receiver is not in self.groups")
-        receiver_secret = self.groups[receiver]
+        if self._is_phone_number(receiver):
+            return receiver
 
-        return receiver_secret
+        if receiver in self.group_chats:
+            internal_id = receiver
+            group_id = self.group_chats[internal_id]
+            return group_id
+
+        raise SignalBotError(
+            f"receiver {receiver} is not a phone number and not in self.group_chats. "
+            "This should never happen."
+        )
 
     async def _produce_consume_messages(self, producers=1, consumers=3) -> None:
         producers = [
@@ -189,8 +239,7 @@ class SignalBot:
                 except UnknownMessageFormatError:
                     continue
 
-                group = message.group
-                if group not in self.groups:
+                if not self._should_react(message):
                     continue
 
                 await self._ask_commands_to_handle(message)
@@ -198,6 +247,17 @@ class SignalBot:
         except ReceiveMessagesError as e:
             # TODO: retry strategy
             raise SignalBotError(f"Cannot receive messages: {e}")
+
+    def _should_react(self, message: Message) -> bool:
+        group = message.group
+        if group in self.group_chats:
+            return True
+
+        source = message.source
+        if source in self.user_chats:
+            return True
+
+        return False
 
     async def _ask_commands_to_handle(self, message: Message):
         for command in self.commands:

@@ -10,7 +10,8 @@ The package provides methods to easily listen for incoming messages and respondi
 
 ### Signalbot
 
-- `bot.listen(group_id, group_secret)`: Listen for messages in a group. `group_secret` must be prefixed with `group.`
+- `bot.listen(group_id, internal_id)`: Listen for messages in a group chat. `group_id` must be prefixed with `group.`
+- `bot.listen(phone_number)`: Listen for messages in a user chat.
 - `bot.register(command)`: Register a new command
 - `bot.start()`: Start the bot
 - `bot.send(receiver, text, listen=False)`: Send a new message
@@ -50,7 +51,7 @@ In `signalbot.utils`, check out `ReceiveMessagesMock`, `SendMessagesMock` and `R
 
 ## Getting Started
 
-*Todo, see https://github.com/filipre/signalbot-example*
+Please see https://github.com/filipre/signalbot-example for an example how to use the package and how to build a simple bot.
 
 ## Troubleshooting
 
@@ -64,27 +65,16 @@ In `signalbot.utils`, check out `ReceiveMessagesMock`, `SendMessagesMock` and `R
 
 ## Local development and package
 
-*Section WIP*
+*Section work in progress. Feel free to open an issue for questions.*
 
 ```
 poetry install
-
 poetry run pre-commit install
-
-poetry shell
-
-poetry version
-poetry version <new_version>
-
-poetry config repositories.testpypi https://test.pypi.org/legacy/
-poetry config http-basic.testpypi __token__ <token>
-poetry config http-basic.pypi __token__ <token>
-
-poetry publish -r testpypi
-poetry publish
 ```
 
 ## Other Projects
+
+There are a few other related projects similar to this one. You may want to check them out and see if it fits your needs.
 
 |Project|Description|Language|Status|
 |-------|-----------|--------|------|

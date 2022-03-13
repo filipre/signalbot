@@ -14,7 +14,7 @@ jobs:
     runs-on: ubuntu-latest
     environment:
       name: test.pypi.org
-      url: https://test.pypi.org/project/signalbot
+      url: https://test.pypi.org/project/signalbot/${{ steps.create-custom-version.outputs.pr_version }}/
     steps:
       - name: Checkout Code
         uses: actions/checkout@v2
@@ -29,7 +29,11 @@ jobs:
       - name: Install dependencies
         run: poetry install --no-dev
       - name: Create custom version
-        run: echo "pr_version=$(poetry version -s)a$(date +%s)" >> $GITHUB_ENV
+        id: create-custom-version
+        run: |
+          $pr_vesion=$(poetry version -s)a$(date +%s)
+          echo "pr_version=$pr_version" >> $GITHUB_ENV
+          echo "::set-output name=pr_version::$pr_vesion"
       - name: Set new version ${{ env.pr_version }}
         run: poetry version ${{ env.pr_version }}
       - name: Build package
@@ -40,9 +44,9 @@ jobs:
           poetry config pypi-token.testpypi ${{ secrets.API_TOKEN }}
       - name: Publish package
         run: poetry publish -r testpypi
-      - name: "Write comment in Pull Request #${{ github.event.pull_request.number }}"
-        uses: peter-evans/create-or-update-comment@v1
-        with:
-          issue-number: ${{ github.event.pull_request.number }}
-          body: |
-            Pull Request has been deployed on test.pypi.org: [${{ env.pr_version }}](https://test.pypi.org/manage/project/signalbot/release/${{ env.pr_version }}/) :rocket:
+      # - name: "Write comment in Pull Request #${{ github.event.pull_request.number }}"
+      #   uses: peter-evans/create-or-update-comment@v1
+      #   with:
+      #     issue-number: ${{ github.event.pull_request.number }}
+      #     body: |
+      #       Pull Request has been deployed on test.pypi.org: [${{ env.pr_version }}](https://test.pypi.org/project/signalbot/${{ env.pr_version }}/) :rocket:

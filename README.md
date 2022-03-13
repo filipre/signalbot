@@ -2,6 +2,10 @@
 
 Python package to build your own Signal bots. To run the the bot you need to start the [signal-cli-rest-api](https://github.com/bbernhard/signal-cli-rest-api) service and link your device with it. Please refer to that project for more details. The API server must run in `json-rpc` mode.
 
+## Getting Started
+
+Please see https://github.com/filipre/signalbot-example for an example how to use the package and how to build a simple bot.
+
 ## Classes and API
 
 *Documentation work in progress. Feel free to open an issue for questions.*
@@ -48,10 +52,6 @@ class PingChatTest(ChatTestCase):
             self.assertEqual(message, "pong")
 ```
 In `signalbot.utils`, check out `ReceiveMessagesMock`, `SendMessagesMock` and `ReactMessageMock` to learn more about their API.
-
-## Getting Started
-
-Please see https://github.com/filipre/signalbot-example for an example how to use the package and how to build a simple bot.
 
 ## Troubleshooting
 

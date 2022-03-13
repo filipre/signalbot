@@ -41,9 +41,12 @@ jobs:
           poetry config pypi-token.testpypi ${{ secrets.API_TOKEN }}
       - name: Publish package
         run: poetry publish -r testpypi
-      # - name: "Write comment in Pull Request #${{ github.event.pull_request.number }}"
-      #   uses: peter-evans/create-or-update-comment@v1
-      #   with:
-      #     issue-number: ${{ github.event.pull_request.number }}
-      #     body: |
-      #       Pull Request has been deployed on test.pypi.org: [${{ env.pr_version }}](https://test.pypi.org/project/signalbot/${{ env.pr_version }}/) :rocket:
+      - name: "Write comment in Pull Request"
+        uses: peter-evans/create-or-update-comment@v1
+        with:
+          issue-number: ${{ github.event.pull_request.number }}
+          body: |
+            Pull Request has been deployed on test.pypi.org: [${{ steps.create-custom-version.outputs.pr_version }}](https://test.pypi.org/project/signalbot/${{ steps.create-custom-version.outputs.pr_version }}/) :rocket: If `poetry` uses test.pypi.org, you can update the package with
+            ```bash
+            poetry add signalbot==${{ steps.create-custom-version.outputs.pr_version }}
+            ```

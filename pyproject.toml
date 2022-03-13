@@ -6,18 +6,19 @@ classifiers = [
   "Operating System :: OS Independent",
 ]
 description = "Framework to create your own Signal bots"
-exclude = ["example/", "tests/"]
+exclude = ["tests/"]
 keywords = [
   "Signal",
   "Bot",
   "Framework",
+  "Home Automation",
 ]
 license = "MIT"
 maintainers = ["René Filip"]
 name = "signalbot"
 readme = "README.md"
 repository = "https://github.com/filipre/signalbot"
-version = "0.5.1"
+version = "0.5.2"
 
 [tool.poetry.dependencies]
 APScheduler = "^3.9.1"

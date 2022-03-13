@@ -12,6 +12,9 @@ jobs:
   publish-package:
     name: Publish Pull Request
     runs-on: ubuntu-latest
+    environment:
+      name: test.pypi.org
+      url: https://test.pypi.org/project/signalbot
     steps:
       - name: Checkout Code
         uses: actions/checkout@v2
@@ -41,6 +44,6 @@ jobs:
       - name: Add test.pypi.org to Poetry
         run: |
           poetry config repositories.testpypi https://test.pypi.org/legacy/
-          poetry config pypi-token.testpypi ${{ secrets.TEST_PYPI_TOKEN }}
+          poetry config pypi-token.testpypi ${{ secrets.API_TOKEN }}
       - name: Publish package
         run: poetry publish -r testpypi

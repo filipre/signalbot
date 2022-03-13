@@ -1,6 +1,37 @@
-[build-system]
-requires = [
-    "setuptools>=42",
-    "wheel"
+[tool.poetry]
+authors = ["René Filip"]
+classifiers = [
+  "Programming Language :: Python :: 3",
+  "License :: OSI Approved :: MIT License",
+  "Operating System :: OS Independent",
 ]
-build-backend = "setuptools.build_meta"
+description = "Framework to create your own Signal bots"
+exclude = ["tests/"]
+keywords = [
+  "Signal",
+  "Bot",
+  "Framework",
+  "Home Automation",
+]
+license = "MIT"
+maintainers = ["René Filip"]
+name = "signalbot"
+readme = "README.md"
+repository = "https://github.com/filipre/signalbot"
+version = "0.6.0"
+
+[tool.poetry.dependencies]
+APScheduler = "^3.9.1"
+aiohttp = "^3.8.1"
+python = "^3.9"
+redis = "^4.1.4"
+websockets = "^10.2"
+
+[tool.poetry.dev-dependencies]
+black = "^22.1.0"
+flake8 = "^4.0.1"
+pre-commit = "^2.17.0"
+
+[build-system]
+build-backend = "poetry.core.masonry.api"
+requires = ["poetry-core>=1.0.0"]

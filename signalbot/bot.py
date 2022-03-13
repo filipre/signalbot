@@ -91,13 +91,13 @@ class SignalBot:
             return
 
         logging.warning(
-            f"[Bot] Can't listen for user/group because input does not look valid"
+            "[Bot] Can't listen for user/group because input does not look valid"
         )
 
     def listenUser(self, phone_number: str):
         if not self._is_phone_number(phone_number):
             logging.warning(
-                f"[Bot] Can't listen for user because phone number does not look valid"
+                "[Bot] Can't listen for user because phone number does not look valid"
             )
             return
 
@@ -106,7 +106,8 @@ class SignalBot:
     def listenGroup(self, group_id: str, internal_id: str):
         if not (self._is_group_id(group_id) and self._is_internal_id(internal_id)):
             logging.warning(
-                f"[Bot] Can't listen for group because group id and internal id do not look valid"
+                "[Bot] Can't listen for group because group id and "
+                "internal id do not look valid"
             )
             return
 
@@ -174,7 +175,7 @@ class SignalBot:
                 )
             else:
                 sent_message = Message(
-                    source=self._phone_number,  # no need to pretend who sent the message
+                    source=self._phone_number,  # no need to pretend
                     timestamp=timestamp,
                     type=MessageType.SYNC_MESSAGE,
                     text=text,

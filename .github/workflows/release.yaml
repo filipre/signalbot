@@ -1,0 +1,73 @@
+name: Release Package
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  run-tests:
+    name: Run Tests
+    uses: filipre/signalbot/.github/workflows/run-tests.yaml@master
+
+  publish-test-pypi:
+    name: Publish (test.pypi.org)
+    runs-on: ubuntu-latest
+    needs: run-tests
+    environment:
+      name: test.pypi.org
+      url: https://test.pypi.org/project/signalbot/${{ steps.get-version.outputs.package_version }}/
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v2
+      - name: Set up Python 3.9
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.9
+      - name: Install Poetry
+        uses: abatilo/actions-poetry@v2.0.0
+        with:
+          poetry-version: 1.1.13
+      - name: Install dependencies
+        run: poetry install --no-dev
+      - name: Get Package Version
+        id: get-version
+        run: echo "::set-output name=package_version::$(poetry version -s)"
+      - name: Build package
+        run: poetry build
+      - name: Add test.pypi.org to Poetry
+        run: |
+          poetry config repositories.testpypi https://test.pypi.org/legacy/
+          poetry config pypi-token.testpypi ${{ secrets.API_TOKEN }}
+      - name: Publish package
+        run: poetry publish -r testpypi
+
+  publish-pypi:
+    name: Publish (pypi.org)
+    runs-on: ubuntu-latest
+    needs: publish-test-pypi
+    environment:
+      name: pypi.org
+      url: https://pypi.org/project/signalbot/${{ steps.get-version.outputs.package_version }}/
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v2
+      - name: Set up Python 3.9
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.9
+      - name: Install Poetry
+        uses: abatilo/actions-poetry@v2.0.0
+        with:
+          poetry-version: 1.1.13
+      - name: Install dependencies
+        run: poetry install --no-dev
+      - name: Get Package Version
+        id: get-version
+        run: echo "::set-output name=package_version::$(poetry version -s)"
+      - name: Build package
+        run: poetry build
+      - name: Add pypi.org to Poetry
+        run: |
+          poetry config pypi-token.pypi ${{ secrets.API_TOKEN }}
+      - name: Publish package
+        run: poetry publish

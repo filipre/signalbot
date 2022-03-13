@@ -2,8 +2,8 @@ import unittest
 from unittest.mock import patch
 import asyncio
 import logging
-from src.signalbot import Message, MessageType, Command, Context
-from src.signalbot.utils import (
+from signalbot import Command, Context
+from signalbot.utils import (
     ChatTestCase,
     SendMessagesMock,
     ReceiveMessagesMock,
@@ -39,8 +39,8 @@ class EnabledListenChatTest(ChatTestCase):
         super().setUp()
         self.signal_bot.register(ChingChangChongCommand(listen=True))
 
-    @patch("src.signalbot.SignalAPI.send", new_callable=SendMessagesMock)
-    @patch("src.signalbot.SignalAPI.receive", new_callable=ReceiveMessagesMock)
+    @patch("signalbot.SignalAPI.send", new_callable=SendMessagesMock)
+    @patch("signalbot.SignalAPI.receive", new_callable=ReceiveMessagesMock)
     async def test_chat(self, receive_mock, send_mock):
         receive_mock.define(["ching"])
         await self.run_bot()
@@ -52,8 +52,8 @@ class DisabledListenChatTest(ChatTestCase):
         super().setUp()
         self.signal_bot.register(ChingChangChongCommand(listen=False))
 
-    @patch("src.signalbot.SignalAPI.send", new_callable=SendMessagesMock)
-    @patch("src.signalbot.SignalAPI.receive", new_callable=ReceiveMessagesMock)
+    @patch("signalbot.SignalAPI.send", new_callable=SendMessagesMock)
+    @patch("signalbot.SignalAPI.receive", new_callable=ReceiveMessagesMock)
     async def test_chat(self, receive_mock, send_mock):
         receive_mock.define(["ching"])
         await self.run_bot()

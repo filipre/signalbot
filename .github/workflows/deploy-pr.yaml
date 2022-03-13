@@ -7,7 +7,7 @@ on:
 jobs:
   run-tests:
     name: Run Tests
-    uses: filipre/signalbot/.github/workflows/run-tests.yml@master
+    uses: filipre/signalbot/.github/workflows/run-tests.yaml@master
 
   publish-package:
     name: Publish Package

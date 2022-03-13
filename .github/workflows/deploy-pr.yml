@@ -10,7 +10,7 @@ jobs:
     uses: filipre/signalbot/.github/workflows/run-tests.yml@master
 
   publish-package:
-    name: Publish Pull Request
+    name: Publish Package
     runs-on: ubuntu-latest
     needs: run-tests
     environment:

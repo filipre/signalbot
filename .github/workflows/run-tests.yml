@@ -1,9 +1,9 @@
-name: Run Code Checks and Tests
+name: Run Tests
 
 on:
+  workflow_call:
   push:
     branches: [master]
-  workflow_call:
 
 jobs:
   pre-commit:

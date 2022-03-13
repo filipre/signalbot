@@ -5,13 +5,14 @@ on:
     branches: [master]
 
 jobs:
-  # run-tests:
-  #   name: Run Tests
-  #   uses: filipre/renebot-signal/.github/workflows/run-tests.yml@master
+  run-tests:
+    name: Run Tests
+    uses: filipre/signalbot/.github/workflows/run-tests.yml@master
 
   publish-package:
-    name: Publish Pull Request
+    name: Publish Package
     runs-on: ubuntu-latest
+    needs: run-tests
     environment:
       name: test.pypi.org
       url: https://test.pypi.org/project/signalbot/${{ steps.create-custom-version.outputs.pr_version }}/

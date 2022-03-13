@@ -20,6 +20,7 @@ class SignalAPI:
             async with self.connection as websocket:
                 async for raw_message in websocket:
                     yield raw_message
+
         except Exception as e:
             raise ReceiveMessagesError(e)
 

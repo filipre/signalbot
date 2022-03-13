@@ -30,12 +30,10 @@ jobs:
         run: poetry install --no-dev
       - name: Print some basic stats
         run: |
-          echo github.event.number = ${{ github.event.number }}
-          echo github.event.pull_request.number = ${{ github.event.pull_request.number }}
-          echo github.event.issue.number = ${{ github.event.issue.number }}
+          echo ${{ github.run_attempt }}
       - name: Create custom version
         run: |
-          pr_version=$(poetry version -s)a${{ github.event.number }}
+          pr_version=$(poetry version -s)a${{ github.run_attempt }}
           poetry version $pr_version
       - name: Confirm new version
         run: poetry version

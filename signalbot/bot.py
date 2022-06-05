@@ -235,7 +235,7 @@ class SignalBot:
                 logging.info(f"[Raw Message] {raw_message}")
 
                 try:
-                    message = Message.parse(raw_message)
+                    message = await Message.parse(self._signal, raw_message)
                 except UnknownMessageFormatError:
                     continue
 

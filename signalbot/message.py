@@ -27,8 +27,7 @@ class Message:
         self.type = type
         self.text = text
         # optional
-        if base64_attachments is None:
-            self.base64_attachments = []
+        self.base64_attachments = base64_attachments or []
         self.group = group
         self.reaction = reaction
 

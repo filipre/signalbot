@@ -14,54 +14,56 @@ class TestMessage(unittest.TestCase):
     expected_group = "<groupid>"
 
     # Own Message
-    def test_parse_source_own_message(self):
-        message = Message.parse(TestMessage.raw_sync_message)
+    async def test_parse_source_own_message(self):
+        message = await Message.parse(self.signal_api, TestMessage.raw_sync_message)
         self.assertEqual(message.timestamp, TestMessage.expected_timestamp)
 
-    def test_parse_timestamp_own_message(self):
-        message = Message.parse(TestMessage.raw_sync_message)
+    async def test_parse_timestamp_own_message(self):
+        message = await Message.parse(self.signal_api, TestMessage.raw_sync_message)
         self.assertEqual(message.source, TestMessage.expected_source)
 
-    def test_parse_type_own_message(self):
-        message = Message.parse(TestMessage.raw_sync_message)
+    async def test_parse_type_own_message(self):
+        message = await Message.parse(self.signal_api, TestMessage.raw_sync_message)
         self.assertEqual(message.type, MessageType.SYNC_MESSAGE)
 
-    def test_parse_text_own_message(self):
-        message = Message.parse(TestMessage.raw_sync_message)
+    async def test_parse_text_own_message(self):
+        message = await Message.parse(self.signal_api, TestMessage.raw_sync_message)
         self.assertEqual(message.text, TestMessage.expected_text)
 
-    def test_parse_group_own_message(self):
-        message = Message.parse(TestMessage.raw_sync_message)
+    async def test_parse_group_own_message(self):
+        message = await Message.parse(self.signal_api, TestMessage.raw_sync_message)
         self.assertEqual(message.group, TestMessage.expected_group)
 
     # Foreign Messages
-    def test_parse_source_foreign_message(self):
-        message = Message.parse(TestMessage.raw_data_message)
+    async def test_parse_source_foreign_message(self):
+        message = await Message.parse(self.signal_api, TestMessage.raw_data_message)
         self.assertEqual(message.timestamp, TestMessage.expected_timestamp)
 
-    def test_parse_timestamp_foreign_message(self):
-        message = Message.parse(TestMessage.raw_data_message)
+    async def test_parse_timestamp_foreign_message(self):
+        message = await Message.parse(self.signal_api, TestMessage.raw_data_message)
         self.assertEqual(message.source, TestMessage.expected_source)
 
-    def test_parse_type_foreign_message(self):
-        message = Message.parse(TestMessage.raw_data_message)
+    async def test_parse_type_foreign_message(self):
+        message = await Message.parse(self.signal_api, TestMessage.raw_data_message)
         self.assertEqual(message.type, MessageType.DATA_MESSAGE)
 
-    def test_parse_text_foreign_message(self):
-        message = Message.parse(TestMessage.raw_data_message)
+    async def test_parse_text_foreign_message(self):
+        message = await Message.parse(self.signal_api, TestMessage.raw_data_message)
         self.assertEqual(message.text, TestMessage.expected_text)
 
-    def test_parse_group_foreign_message(self):
-        message = Message.parse(TestMessage.raw_data_message)
+    async def test_parse_group_foreign_message(self):
+        message = await Message.parse(self.signal_api, TestMessage.raw_data_message)
         self.assertEqual(message.group, TestMessage.expected_group)
 
-    def test_read_reaction(self):
-        message = Message.parse(TestMessage.raw_reaction_message)
+    async def test_read_reaction(self):
+        message = await Message.parse(self.signal_api, TestMessage.raw_reaction_message)
         self.assertEqual(message.reaction, "👍")
 
     # User Chats
-    def test_parse_user_chat_message(self):
-        message = Message.parse(TestMessage.raw_user_chat_message)
+    async def test_parse_user_chat_message(self):
+        message = await Message.parse(
+            self.signal_api, TestMessage.raw_user_chat_message
+        )
         self.assertEqual(message.source, TestMessage.expected_source)
         self.assertEqual(message.text, TestMessage.expected_text)
         self.assertEqual(message.timestamp, TestMessage.expected_timestamp)

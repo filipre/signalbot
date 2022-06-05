@@ -1,3 +1,5 @@
+import base64
+
 import aiohttp
 import websockets
 
@@ -101,6 +103,26 @@ class SignalAPI:
         ):
             raise StopTypingError
 
+    async def get_attachment(self, attachment_id: str) -> str:
+        """Fetch attachment by given id and encode to base64."""
+        uri = self._attachment_rest_uri() + attachment_id
+        try:
+            async with aiohttp.ClientSession() as session:
+                resp_bytes = await session.get(uri)
+        except (
+            aiohttp.ClientError,
+            aiohttp.http_exceptions.HttpProcessingError,
+        ):
+            raise GetAttachmentError
+
+        base64_bytes = base64.b64encode(resp_bytes)
+        base64_string = str(base64_bytes, encoding="utf-8")
+
+        return base64_string
+
+    def _attachment_rest_uri(self):
+        return f"http://{self.signal_service}/v1/attachments"
+
     def _receive_ws_uri(self):
         return f"ws://{self.signal_service}/v1/receive/{self.phone_number}"
 
@@ -135,4 +157,8 @@ class StopTypingError(TypingError):
 
 
 class ReactionError(Exception):
+    pass
+
+
+class GetAttachmentError(Exception):
     pass

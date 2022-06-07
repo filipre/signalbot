@@ -105,17 +105,19 @@ class SignalAPI:
 
     async def get_attachment(self, attachment_id: str) -> str:
         """Fetch attachment by given id and encode to base64."""
-        uri = self._attachment_rest_uri() + attachment_id
+        uri = f"{self._attachment_rest_uri()}/{attachment_id}"
         try:
             async with aiohttp.ClientSession() as session:
-                resp_bytes = await session.get(uri)
+                resp = await session.get(uri)
+                resp.raise_for_status()
+                content = await resp.content.read()
         except (
             aiohttp.ClientError,
             aiohttp.http_exceptions.HttpProcessingError,
         ):
             raise GetAttachmentError
 
-        base64_bytes = base64.b64encode(resp_bytes)
+        base64_bytes = base64.b64encode(content)
         base64_string = str(base64_bytes, encoding="utf-8")
 
         return base64_string

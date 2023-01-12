@@ -17,6 +17,7 @@ class Message:
         base64_attachments: list = None,
         group: str = None,
         reaction: str = None,
+        mentions: list = None,
         raw_message: str = None,
     ):
         # required
@@ -29,7 +30,7 @@ class Message:
             self.base64_attachments = []
         self.group = group
         self.reaction = reaction
-
+        self.mentions = mentions
         self.raw_message = raw_message
 
     def recipient(self) -> str:
@@ -71,6 +72,7 @@ class Message:
             text = cls._parse_data_message(raw_message["envelope"]["dataMessage"])
             group = cls._parse_group_information(raw_message["envelope"]["dataMessage"])
             reaction = cls._parse_reaction(raw_message["envelope"]["dataMessage"])
+            mentions = cls._parse_mentions(raw_message["envelope"]["dataMessage"])
 
         else:
             raise UnknownMessageFormatError
@@ -78,7 +80,7 @@ class Message:
         # TODO: base64_attachments
         base64_attachments = []
 
-        return cls(source, timestamp, type, text, base64_attachments, group, reaction)
+        return cls(source, timestamp, type, text, base64_attachments, group, reaction, mentions, raw_message)
 
     @classmethod
     def _parse_sync_message(cls, sync_message: dict) -> str:
@@ -101,6 +103,14 @@ class Message:
         try:
             group = message["groupInfo"]["groupId"]
             return group
+        except Exception:
+            return None
+
+    @classmethod
+    def _parse_mentions(cls, data_message: dict) -> str:
+        try:
+            mentions = data_message["mentions"]
+            return mentions
         except Exception:
             return None
 

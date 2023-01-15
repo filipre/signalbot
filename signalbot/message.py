@@ -83,7 +83,17 @@ class Message:
         # TODO: base64_attachments
         base64_attachments = []
 
-        return cls(source, timestamp, type, text, base64_attachments, group, reaction, mentions, raw_message)
+        return cls(
+            source,
+            timestamp,
+            type,
+            text,
+            base64_attachments,
+            group,
+            reaction,
+            mentions,
+            raw_message,
+        )
 
     @classmethod
     def _parse_sync_message(cls, sync_message: dict) -> str:

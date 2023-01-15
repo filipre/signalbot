@@ -79,7 +79,11 @@ There are a few other related projects similar to this one. You may want to chec
 |Project|Description|Language|Status|
 |-------|-----------|--------|------|
 |https://github.com/signalapp/libsignal-service-java|Signal Library|Java|Last change 12 Nov 2019|
-|https://github.com/AsamK/signal-cli|A CLI and D-Bus interface for Signal|Java|active, build on top of https://github.com/signalapp/libsignal-service-java|
-|https://github.com/bbernhard/signal-cli-rest-api|REST API Wrapper for Signal CLI|Go|active, build on top of https://github.com/AsamK/signal-cli|
+|https://github.com/AsamK/signal-cli|A CLI and D-Bus interface for Signal|Java|Active, build on top of https://github.com/signalapp/libsignal-service-java|
+|https://github.com/bbernhard/signal-cli-rest-api|REST API Wrapper for Signal CLI|Go|Active, build on top of https://github.com/AsamK/signal-cli|
 |https://github.com/aaronetz/signal-bot|Bot Framework|Java|Last change 18 Feb 2021|
 |https://github.com/signal-bot/signal-bot|Bot Framework|Python|Last change 6 Jul 2018|
+|https://github.com/mh-g/python-signal-cli|Python Wrapper for Signal CLI|Python|Last change 24 Sep 2017|
+|https://fabiobarbero.eu/posts/signalbot/|Bot tutorial using python-signal-cli|Python|Published 6 Apr 2021|
+|https://gitlab.com/signald/signald|Signal Deamon|Java|Active|
+|https://github.com/lwesterhof/semaphore|Bot Framework|Python|Active, build on top of https://gitlab.com/signald/signald|

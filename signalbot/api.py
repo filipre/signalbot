@@ -46,7 +46,7 @@ class SignalAPI:
             aiohttp.http_exceptions.HttpProcessingError,
             KeyError,
         ):
-            raise SendMessageError
+            raise SendMessageError()
 
     async def react(
         self, recipient: str, reaction: str, target_author: str, timestamp: int
@@ -67,7 +67,7 @@ class SignalAPI:
             aiohttp.ClientError,
             aiohttp.http_exceptions.HttpProcessingError,
         ):
-            raise ReactionError
+            raise ReactionError()
 
     async def start_typing(self, receiver: str):
         uri = self._typing_indicator_uri()
@@ -83,7 +83,7 @@ class SignalAPI:
             aiohttp.ClientError,
             aiohttp.http_exceptions.HttpProcessingError,
         ):
-            raise StartTypingError
+            raise StartTypingError()
 
     async def stop_typing(self, receiver: str):
         uri = self._typing_indicator_uri()
@@ -99,7 +99,33 @@ class SignalAPI:
             aiohttp.ClientError,
             aiohttp.http_exceptions.HttpProcessingError,
         ):
-            raise StopTypingError
+            raise StopTypingError()
+
+    async def list_identities(self) -> list:
+        uri = self._identities_uri()
+        try:
+            async with aiohttp.ClientSession() as session:
+                async with session.get(uri) as resp:
+                    json_resp = await resp.json()
+                    return json_resp
+        except (
+            aiohttp.ClientError,
+            aiohttp.http_exceptions.HttpProcessingError,
+        ):
+            raise ListIdentitiesError
+
+    async def list_groups(self) -> list:
+        uri = self._groups_uri()
+        try:
+            async with aiohttp.ClientSession() as session:
+                async with session.get(uri) as resp:
+                    json_resp = await resp.json()
+                    return json_resp
+        except (
+            aiohttp.ClientError,
+            aiohttp.http_exceptions.HttpProcessingError,
+        ):
+            raise ListGroupsError
 
     def _receive_ws_uri(self):
         return f"ws://{self.signal_service}/v1/receive/{self.phone_number}"
@@ -112,6 +138,12 @@ class SignalAPI:
 
     def _typing_indicator_uri(self):
         return f"http://{self.signal_service}/v1/typing-indicator/{self.phone_number}"
+
+    def _identities_uri(self):
+        return f"http://{self.signal_service}/v1/identities/{self.phone_number}"
+
+    def _groups_uri(self):
+        return f"http://{self.signal_service}/v1/groups/{self.phone_number}"
 
 
 class ReceiveMessagesError(Exception):
@@ -135,4 +167,12 @@ class StopTypingError(TypingError):
 
 
 class ReactionError(Exception):
+    pass
+
+
+class ListIdentitiesError(Exception):
+    pass
+
+
+class ListGroupsError(Exception):
     pass

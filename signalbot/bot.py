@@ -28,7 +28,10 @@ class SignalBot:
         self.commands = []  # populated by .register()
 
         self.user_chats = set()  # populated by .listenUser()
+        self.listening_all_users = False
+
         self.group_chats = {}  # populated by .listenGroup()
+        self.listening_all_groups = False
 
         # Required
         self._init_api()
@@ -37,6 +40,10 @@ class SignalBot:
 
         # Optional
         self._init_storage()
+
+        # TODO
+        self._event_loop.create_task(self._refresh_groups())
+        # asyncio.run(self._refresh_groups())
 
     def _init_api(self):
         try:
@@ -69,6 +76,10 @@ class SignalBot:
         except Exception as e:
             raise SignalBotError(f"Could not initialize scheduler: {e}")
 
+    async def _refresh_groups(self):
+        groups_json = await self._signal.list_groups()
+        self._groups = {g["id"]: g["internal_id"] for g in groups_json}
+
     def listen(self, required_id: str, optional_id: str = None):
         # Case 1: required id is a phone number, optional_id is not being used
         if self._is_phone_number(required_id):
@@ -77,17 +88,13 @@ class SignalBot:
             return
 
         # Case 2: required id is a group id
-        if self._is_group_id(required_id) and self._is_internal_id(optional_id):
-            group_id = required_id
-            internal_id = optional_id
-            self.listenGroup(group_id, internal_id)
+        if self._is_group_id(required_id):
+            self.listenGroup(required_id)
             return
 
         # Case 3: optional_id is a group id (Case 2 swapped)
         if self._is_internal_id(required_id) and self._is_group_id(optional_id):
-            group_id = optional_id
-            internal_id = required_id
-            self.listenGroup(group_id, internal_id)
+            self.listenGroup(optional_id)
             return
 
         logging.warning(
@@ -100,18 +107,24 @@ class SignalBot:
                 "[Bot] Can't listen for user because phone number does not look valid"
             )
             return
-
         self.user_chats.add(phone_number)
 
-    def listenGroup(self, group_id: str, internal_id: str):
-        if not (self._is_group_id(group_id) and self._is_internal_id(internal_id)):
+    def listenAllUsers(self):
+        self.listening_all_users = True
+
+    def listenGroup(self, group_id: str):
+        if group_id not in self._groups:
             logging.warning(
-                "[Bot] Can't listen for group because group id and "
-                "internal id do not look valid"
+                "[Bot] Can't listen for group because group id does not seem valid"
             )
             return
-
+        internal_id = self._groups[group_id]
         self.group_chats[internal_id] = group_id
+
+    def listenAllGroups(self):
+        self.listening_all_groups = True
+        for group_id in self._groups:
+            self.listenGroup(group_id)
 
     def _is_phone_number(self, phone_number: str) -> bool:
         if phone_number is None:
@@ -239,7 +252,7 @@ class SignalBot:
                 except UnknownMessageFormatError:
                     continue
 
-                if not self._should_react(message):
+                if not await self._should_handle(message):
                     continue
 
                 await self._ask_commands_to_handle(message)
@@ -248,13 +261,34 @@ class SignalBot:
             # TODO: retry strategy
             raise SignalBotError(f"Cannot receive messages: {e}")
 
-    def _should_react(self, message: Message) -> bool:
-        group = message.group
-        if group in self.group_chats:
+    async def _should_handle(self, message: Message) -> bool:
+        # Case 1: Message is a group message
+        if message.group:
+            if message.group in self.group_chats:
+                return True
+
+            if not self.listening_all_groups:
+                return False
+
+            # we are listening to all groups
+            # but we found a group internal_id that is not in self.group_chats
+            # that means, it must have been created after the bots initialization
+            # and we need to refresh self.group_chats
+            # this should not happen very often and we can even sync groups every
+            # hour to prevent delays further
+            await self._refresh_groups()
+            self.listenAllGroups()
+            if message.group in self.group_chats:
+                return True
+
+            logging.info("[Bot] Something went horribly wrong with group listening")
+            return False
+
+        # Case 2: Message is a user message
+        if self.listening_all_users:
             return True
 
-        source = message.source
-        if source in self.user_chats:
+        if message.source in self.user_chats:
             return True
 
         return False

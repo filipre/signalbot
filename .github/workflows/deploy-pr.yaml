@@ -8,11 +8,12 @@ jobs:
   deploy-check:
     runs-on: ubuntu-latest
     steps:
-      - name: Check user permissions
-        id: checkUser
-        uses: actions-cool/check-user-permission@main
+      - name: "Check if user has write access"
+        uses: "lannonbr/repo-permission-check-action@2.0.0"
         with:
-          require: "write"
+          permission: "write"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Acknowledge deployment request to commenter
         if: steps.checkUser.outputs.check-result == 'false'
         id: checkCommand

@@ -42,10 +42,6 @@ jobs:
         env:
           GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
 
-      - name: Create custom version
-        id: create-custom-version
-        run: echo "::set-output name=pr_version::$(poetry version -s)a$(date +%s)"
-
       - name: create deployment
         id: create_deployment
         uses: octokit/request-action@v2.x
@@ -66,7 +62,6 @@ jobs:
           repository: ${{ github.repository }}
           deployment: ${{ fromJson(steps.create_deployment.outputs.data).id }}
           environment: test.pypi.org
-          environment_url: https://test.pypi.org/project/signalbot/${{ steps.create-custom-version.outputs.pr_version }}/
           log_url: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
           state: in_progress
         env:
@@ -89,6 +84,10 @@ jobs:
 
       - name: Install dependencies
         run: poetry install --no-dev
+
+      - name: Create custom version
+        id: create-custom-version
+        run: echo "::set-output name=pr_version::$(poetry version -s)a$(date +%s)"
 
       - name: Set new version
         run: poetry version ${{ steps.create-custom-version.outputs.pr_version }}

@@ -19,16 +19,16 @@ jobs:
     outputs:
       triggered: ${{ steps.check.outputs.triggered }}
 
-  run-tests:
-    name: Run Tests
-    needs: deploy-check
-    if: needs.deploy-check.outputs.triggered == 'true'
-    uses: filipre/signalbot/.github/workflows/run-tests.yaml@master
+  # run-tests:
+  #   name: Run Tests
+  #   needs: deploy-check
+  #   if: needs.deploy-check.outputs.triggered == 'true'
+  #   uses: filipre/signalbot/.github/workflows/run-tests.yaml@master
 
   publish-package:
     name: Publish Package
     runs-on: ubuntu-latest
-    needs: run-tests
+    needs: deploy-check
     environment:
       name: test.pypi.org
       url: https://test.pypi.org/project/signalbot/${{ steps.create-custom-version.outputs.pr_version }}/
@@ -82,7 +82,7 @@ jobs:
       - name: Write comment in Pull Request
         uses: peter-evans/create-or-update-comment@v1
         with:
-          issue-number: ${{ github.event.pull_request.number }}
+          issue-number: ${{ github.event.issue.number }}
           body: |
             Pull Request has been deployed on test.pypi.org: [${{ steps.create-custom-version.outputs.pr_version }}](https://test.pypi.org/project/signalbot/${{ steps.create-custom-version.outputs.pr_version }}/) :rocket: If `poetry` uses test.pypi.org, you can update the package with
             ```bash

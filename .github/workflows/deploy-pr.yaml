@@ -29,9 +29,8 @@ jobs:
     name: Publish Package
     runs-on: ubuntu-latest
     needs: deploy-check
-    # environment:
-    #   name: test.pypi.org
-    #   url: https://test.pypi.org/project/signalbot/${{ steps.create-custom-version.outputs.pr_version }}/
+    environment:
+      name: test.pypi.org
     steps:
       - name: get pull request ref
         id: get_pull_request_ref
@@ -42,6 +41,10 @@ jobs:
           issue_id: ${{ github.event.issue.number }}
         env:
           GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+
+      - name: Create custom version
+        id: create-custom-version
+        run: echo "::set-output name=pr_version::$(poetry version -s)a$(date +%s)"
 
       - name: create deployment
         id: create_deployment
@@ -66,7 +69,6 @@ jobs:
           environment_url: https://test.pypi.org/project/signalbot/${{ steps.create-custom-version.outputs.pr_version }}/
           log_url: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
           state: in_progress
-          # mediaType: '{"previews": ["flash", "ant-man"]}'
         env:
           GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
 
@@ -87,10 +89,6 @@ jobs:
 
       - name: Install dependencies
         run: poetry install --no-dev
-
-      - name: Create custom version
-        id: create-custom-version
-        run: echo "::set-output name=pr_version::$(poetry version -s)a$(date +%s)"
 
       - name: Set new version
         run: poetry version ${{ steps.create-custom-version.outputs.pr_version }}
@@ -126,7 +124,6 @@ jobs:
           environment: test.pypi.org
           environment_url: https://test.pypi.org/project/signalbot/${{ steps.create-custom-version.outputs.pr_version }}/
           log_url: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
-          # mediaType: '{"previews": ["ant-man"]}'
           state: success
         env:
           GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
@@ -142,7 +139,6 @@ jobs:
           environment: test.pypi.org
           environment_url: https://test.pypi.org/project/signalbot/${{ steps.create-custom-version.outputs.pr_version }}/
           log_url: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
-          # mediaType: '{"previews": ["ant-man"]}'
           state: failure
         env:
           GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"

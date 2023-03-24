@@ -15,7 +15,6 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Acknowledge deployment request to commenter
-        if: steps.checkUser.outputs.check-result == 'false'
         id: checkCommand
         uses: khan/pull-request-comment-trigger@master
         with:

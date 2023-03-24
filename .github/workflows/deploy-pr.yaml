@@ -1,48 +1,85 @@
 name: Deploy Pull Request
 
 on:
-  workflow_dispatch:
+  issue_comment:
+    types: [created]
 
 jobs:
+  deploy-check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: acknowledge deployment request to commenter
+        id: check
+        uses: khan/pull-request-comment-trigger@master
+        with:
+          trigger: "/deploy"
+          reaction: rocket
+        env:
+          GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+    outputs:
+      triggered: ${{ steps.check.outputs.triggered }}
+
   run-tests:
     name: Run Tests
+    needs: deploy-check
+    if: needs.deploy-check.outputs.triggered == 'true'
     uses: filipre/signalbot/.github/workflows/run-tests.yaml@master
 
   publish-package:
     name: Publish Package
-    if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
     needs: run-tests
     environment:
       name: test.pypi.org
       url: https://test.pypi.org/project/signalbot/${{ steps.create-custom-version.outputs.pr_version }}/
     steps:
+      - name: get pull request ref
+        id: get_pull_request_ref
+        uses: octokit/request-action@v2.x
+        with:
+          route: GET /repos/:repository/pulls/:issue_id
+          repository: ${{ github.repository }}
+          issue_id: ${{ github.event.issue.number }}
+        env:
+          GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+
       - name: Checkout Code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
+        with:
+          ref: ${{ fromJson(steps.get_pull_request_ref.outputs.data).head.ref }}
+
       - name: Set up Python 3.9
         uses: actions/setup-python@v2
         with:
           python-version: 3.9
+
       - name: Install Poetry
         uses: abatilo/actions-poetry@v2.0.0
         with:
           poetry-version: 1.1.13
+
       - name: Install dependencies
         run: poetry install --no-dev
+
       - name: Create custom version
         id: create-custom-version
         run: echo "::set-output name=pr_version::$(poetry version -s)a$(date +%s)"
+
       - name: Set new version
         run: poetry version ${{ steps.create-custom-version.outputs.pr_version }}
+
       - name: Build package
         run: poetry build
+
       - name: Add test.pypi.org to Poetry
         run: |
           poetry config repositories.testpypi https://test.pypi.org/legacy/
           poetry config pypi-token.testpypi ${{ secrets.API_TOKEN }}
+
       - name: Publish package
         run: poetry publish -r testpypi
-      - name: "Write comment in Pull Request"
+
+      - name: Write comment in Pull Request
         uses: peter-evans/create-or-update-comment@v1
         with:
           issue-number: ${{ github.event.pull_request.number }}

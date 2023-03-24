@@ -29,9 +29,9 @@ jobs:
     name: Publish Package
     runs-on: ubuntu-latest
     needs: deploy-check
-    environment:
-      name: test.pypi.org
-      url: https://test.pypi.org/project/signalbot/${{ steps.create-custom-version.outputs.pr_version }}/
+    # environment:
+    #   name: test.pypi.org
+    #   url: https://test.pypi.org/project/signalbot/${{ steps.create-custom-version.outputs.pr_version }}/
     steps:
       - name: get pull request ref
         id: get_pull_request_ref
@@ -40,6 +40,33 @@ jobs:
           route: GET /repos/:repository/pulls/:issue_id
           repository: ${{ github.repository }}
           issue_id: ${{ github.event.issue.number }}
+        env:
+          GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+
+      - name: create deployment
+        id: create_deployment
+        uses: octokit/request-action@v2.x
+        with:
+          route: POST /repos/:repository/deployments
+          repository: ${{ github.repository }}
+          ref: ${{ fromJson(steps.get_pull_request_ref.outputs.data).head.ref }}
+          environment: test.pypi.org
+          auto_merge: false
+        env:
+          GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+
+      - name: set deployment status to in progress
+        id: start_deployment
+        uses: octokit/request-action@v2.x
+        with:
+          route: POST /repos/:repository/deployments/:deployment/statuses
+          repository: ${{ github.repository }}
+          deployment: ${{ fromJson(steps.create_deployment.outputs.data).id }}
+          environment: test.pypi.org
+          environment_url: https://test.pypi.org/project/signalbot/${{ steps.create-custom-version.outputs.pr_version }}/
+          log_url: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          state: in_progress
+          # mediaType: '{"previews": ["flash", "ant-man"]}'
         env:
           GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
 
@@ -88,3 +115,34 @@ jobs:
             ```bash
             poetry add signalbot==${{ steps.create-custom-version.outputs.pr_version }}
             ```
+
+      - name: set deployment status to success
+        id: successful_deployment
+        uses: octokit/request-action@v2.x
+        with:
+          route: POST /repos/:repository/deployments/:deployment/statuses
+          repository: ${{ github.repository }}
+          deployment: ${{ fromJson(steps.create_deployment.outputs.data).id }}
+          environment: test.pypi.org
+          environment_url: https://test.pypi.org/project/signalbot/${{ steps.create-custom-version.outputs.pr_version }}/
+          log_url: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          # mediaType: '{"previews": ["ant-man"]}'
+          state: success
+        env:
+          GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+
+      - name: set deployment status to failure
+        id: failed_deployment
+        uses: octokit/request-action@v2.x
+        if: failure()
+        with:
+          route: POST /repos/:repository/deployments/:deployment/statuses
+          repository: ${{ github.repository }}
+          deployment: ${{ fromJson(steps.create_deployment.outputs.data).id }}
+          environment: test.pypi.org
+          environment_url: https://test.pypi.org/project/signalbot/${{ steps.create-custom-version.outputs.pr_version }}/
+          log_url: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          # mediaType: '{"previews": ["ant-man"]}'
+          state: failure
+        env:
+          GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"

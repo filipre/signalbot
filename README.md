@@ -67,7 +67,7 @@ In `signalbot.utils`, check out `ReceiveMessagesMock`, `SendMessagesMock` and `R
 
 *Section work in progress. Feel free to open an issue for questions.*
 
-```
+```bash
 poetry install
 poetry run pre-commit install
 ```

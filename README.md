@@ -76,10 +76,11 @@ poetry run pre-commit install
 
 There are a few other related projects similar to this one. You may want to check them out and see if it fits your needs.
 
-|Project|Description|Language|Status|
-|-------|-----------|--------|------|
-|https://github.com/signalapp/libsignal-service-java|Signal Library|Java|Last change 12 Nov 2019|
-|https://github.com/AsamK/signal-cli|A CLI and D-Bus interface for Signal|Java|active, build on top of https://github.com/signalapp/libsignal-service-java|
-|https://github.com/bbernhard/signal-cli-rest-api|REST API Wrapper for Signal CLI|Go|active, build on top of https://github.com/AsamK/signal-cli|
-|https://github.com/aaronetz/signal-bot|Bot Framework|Java|Last change 18 Feb 2021|
-|https://github.com/signal-bot/signal-bot|Bot Framework|Python|Last change 6 Jul 2018|
+|Project|Description|Language|
+|-------|-----------|--------|
+|https://github.com/lwesterhof/semaphore|Bot Framework|Python|
+|https://github.com/signalapp/libsignal-service-java|Signal Library|Java|
+|https://github.com/AsamK/signal-cli|A CLI and D-Bus interface for Signal|Java|
+|https://github.com/bbernhard/signal-cli-rest-api|REST API Wrapper for Signal CLI|
+|https://github.com/aaronetz/signal-bot|Bot Framework|Java|
+|https://github.com/signal-bot/signal-bot|Bot Framework|Python|

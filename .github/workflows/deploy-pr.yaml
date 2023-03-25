@@ -111,7 +111,7 @@ jobs:
           body: |
             Pull Request has been deployed on test.pypi.org: [${{ steps.create-custom-version.outputs.pr_version }}](https://test.pypi.org/project/signalbot/${{ steps.create-custom-version.outputs.pr_version }}/) :rocket: You can test the package by running
             ```bash
-            pip install -i https://test.pypi.org/simple/ signalbot==${{ steps.create-custom-version.outputs.pr_version }}
+            pip install -i https://test.pypi.org/simple/ --extra-index-url https://pypi.org/simple signalbot==${{ steps.create-custom-version.outputs.pr_version }}
             ```
 
       - name: Set deployment status to success

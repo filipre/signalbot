@@ -9,12 +9,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: "Check if user has write access"
-        uses: "lannonbr/repo-permission-check-action@2.0.0"
+        uses: actions-cool/check-user-permission@main
+        id: checkUser
         with:
-          permission: "write"
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          require: "write"
       - name: Acknowledge deployment request to commenter
+        if: steps.checkUser.outputs.check-result == 'false'
         id: checkCommand
         uses: khan/pull-request-comment-trigger@master
         with:

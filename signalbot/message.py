@@ -25,12 +25,20 @@ class Message:
         self.timestamp = timestamp
         self.type = type
         self.text = text
+
         # optional
-        if base64_attachments is None:
+        self.base64_attachments = base64_attachments
+        if self.base64_attachments is None:
             self.base64_attachments = []
+
         self.group = group
+
         self.reaction = reaction
+
         self.mentions = mentions
+        if self.mentions is None:
+            self.mentions = []
+
         self.raw_message = raw_message
 
     def recipient(self) -> str:
@@ -120,12 +128,12 @@ class Message:
             return None
 
     @classmethod
-    def _parse_mentions(cls, data_message: dict) -> str:
+    def _parse_mentions(cls, data_message: dict) -> list:
         try:
             mentions = data_message["mentions"]
             return mentions
         except Exception:
-            return None
+            return []
 
     @classmethod
     def _parse_reaction(self, message: dict) -> str:

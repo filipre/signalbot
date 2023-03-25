@@ -17,6 +17,7 @@ class Message:
         base64_attachments: list = None,
         group: str = None,
         reaction: str = None,
+        mentions: list = None,
         raw_message: str = None,
     ):
         # required
@@ -24,11 +25,19 @@ class Message:
         self.timestamp = timestamp
         self.type = type
         self.text = text
+
         # optional
-        if base64_attachments is None:
+        self.base64_attachments = base64_attachments
+        if self.base64_attachments is None:
             self.base64_attachments = []
+
         self.group = group
+
         self.reaction = reaction
+
+        self.mentions = mentions
+        if self.mentions is None:
+            self.mentions = []
 
         self.raw_message = raw_message
 
@@ -64,6 +73,9 @@ class Message:
             reaction = cls._parse_reaction(
                 raw_message["envelope"]["syncMessage"]["sentMessage"]
             )
+            mentions = cls._parse_mentions(
+                raw_message["envelope"]["syncMessage"]["sentMessage"]
+            )
 
         # Option 2: dataMessage
         elif "dataMessage" in raw_message["envelope"]:
@@ -71,6 +83,7 @@ class Message:
             text = cls._parse_data_message(raw_message["envelope"]["dataMessage"])
             group = cls._parse_group_information(raw_message["envelope"]["dataMessage"])
             reaction = cls._parse_reaction(raw_message["envelope"]["dataMessage"])
+            mentions = cls._parse_mentions(raw_message["envelope"]["dataMessage"])
 
         else:
             raise UnknownMessageFormatError
@@ -78,7 +91,17 @@ class Message:
         # TODO: base64_attachments
         base64_attachments = []
 
-        return cls(source, timestamp, type, text, base64_attachments, group, reaction)
+        return cls(
+            source,
+            timestamp,
+            type,
+            text,
+            base64_attachments,
+            group,
+            reaction,
+            mentions,
+            raw_message,
+        )
 
     @classmethod
     def _parse_sync_message(cls, sync_message: dict) -> str:
@@ -103,6 +126,14 @@ class Message:
             return group
         except Exception:
             return None
+
+    @classmethod
+    def _parse_mentions(cls, data_message: dict) -> list:
+        try:
+            mentions = data_message["mentions"]
+            return mentions
+        except Exception:
+            return []
 
     @classmethod
     def _parse_reaction(self, message: dict) -> str:

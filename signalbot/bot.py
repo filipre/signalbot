@@ -116,7 +116,11 @@ class SignalBot:
     def _is_phone_number(self, phone_number: str) -> bool:
         if phone_number is None:
             return False
-        return phone_number[0] == "+"
+        if phone_number[0] != "+":
+            return False
+        if len(phone_number[1:]) > 15:
+            return False
+        return True
 
     def _is_group_id(self, group_id: str) -> bool:
         if group_id is None:

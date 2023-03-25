@@ -14,7 +14,7 @@ jobs:
         with:
           require: "write"
       - name: Acknowledge deployment request to commenter
-        if: steps.checkUser.outputs.check-result == 'false'
+        if: steps.checkUser.outputs.check-result == 'true'
         id: checkCommand
         uses: khan/pull-request-comment-trigger@master
         with:

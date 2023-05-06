@@ -11,8 +11,6 @@ class SignalAPI:
         self.signal_service = signal_service
         self.phone_number = phone_number
 
-        # self.session = aiohttp.ClientSession()
-
     async def receive(self):
         try:
             uri = self._receive_ws_uri()
@@ -25,7 +23,11 @@ class SignalAPI:
             raise ReceiveMessagesError(e)
 
     async def send(
-        self, receiver: str, message: str, base64_attachments: list = None
+        self,
+        receiver: str,
+        message: str,
+        sticker: str = None,
+        base64_attachments: list = None,
     ) -> aiohttp.ClientResponse:
         uri = self._send_rest_uri()
         if base64_attachments is None:
@@ -35,6 +37,7 @@ class SignalAPI:
             "message": message,
             "number": self.phone_number,
             "recipients": [receiver],
+            "sticker": sticker,
         }
         try:
             async with aiohttp.ClientSession() as session:

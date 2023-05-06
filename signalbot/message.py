@@ -14,6 +14,7 @@ class Message:
         timestamp: int,
         type: MessageType,
         text: str,
+        sticker: str = None,
         base64_attachments: list = None,
         group: str = None,
         reaction: str = None,
@@ -25,6 +26,7 @@ class Message:
         self.timestamp = timestamp
         self.type = type
         self.text = text
+        self.sticker = sticker
 
         # optional
         self.base64_attachments = base64_attachments
@@ -96,6 +98,7 @@ class Message:
             timestamp,
             type,
             text,
+            None,
             base64_attachments,
             group,
             reaction,

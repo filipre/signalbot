@@ -48,11 +48,11 @@ jobs:
         uses: octokit/request-action@v2.x
         with:
           route: POST /repos/:repository/deployments
-          repository: ${{ github.repository }}
-          ref: ${{ fromJson(steps.get_pull_request_ref.outputs.data).head.ref }}
-          environment: test.pypi.org
-          auto_merge: false
         env:
+          INPUT_REPOSITORY: ${{ github.repository }}
+          INPUT_REF: ${{ fromJson(steps.get_pull_request_ref.outputs.data).head.ref }}
+          INPUT_ENVIRONMENT: test.pypi.org
+          INPUT_AUTO_MERGE: false
           GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
 
       - name: Set deployment status to in progress

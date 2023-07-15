@@ -138,10 +138,10 @@ class SignalBot:
             return False
         return internal_id[-1] == "="
 
-    def register(self, command: Command):
+    def register(self, command: Command, listenTo: list = None):
         command.bot = self
         command.setup()
-        self.commands.append(command)
+        self.commands.append((command, listenTo))
 
     def start(self):
         self._event_loop.create_task(self._produce_consume_messages())
@@ -160,9 +160,8 @@ class SignalBot:
         base64_attachments: list = None,
         listen: bool = False,
     ) -> int:
-        resolved_receiver = self._resolve_receiver(receiver)
         resp = await self._signal.send(
-            resolved_receiver, text, base64_attachments=base64_attachments
+            receiver, text, base64_attachments=base64_attachments
         )
         resp_payload = await resp.json()
         timestamp = resp_payload["timestamp"]
@@ -193,33 +192,34 @@ class SignalBot:
 
     async def react(self, message: Message, emoji: str):
         # TODO: check that emoji is really an emoji
-        recipient = self._resolve_receiver(message.recipient())
+        recipient = message.recipient()
         target_author = message.source
         timestamp = message.timestamp
         await self._signal.react(recipient, emoji, target_author, timestamp)
         logging.info(f"[Bot] New reaction: {emoji}")
 
     async def start_typing(self, receiver: str):
-        receiver = self._resolve_receiver(receiver)
         await self._signal.start_typing(receiver)
 
     async def stop_typing(self, receiver: str):
-        receiver = self._resolve_receiver(receiver)
         await self._signal.stop_typing(receiver)
 
     def _resolve_receiver(self, receiver: str) -> str:
-        if self._is_phone_number(receiver):
-            return receiver
+        return receiver
 
-        if receiver in self.group_chats:
-            internal_id = receiver
-            group_id = self.group_chats[internal_id]
-            return group_id
+        # deprecated
+        # if self._is_phone_number(receiver):
+        #     return receiver
 
-        raise SignalBotError(
-            f"receiver {receiver} is not a phone number and not in self.group_chats. "
-            "This should never happen."
-        )
+        # if receiver in self.group_chats:
+        #     internal_id = receiver
+        #     group_id = self.group_chats[internal_id]
+        #     return group_id
+
+        # raise SignalBotError(
+        #     f"receiver {receiver} is not a phone number and not in self.group_chats. "
+        #     "This should never happen."
+        # )
 
     # see https://stackoverflow.com/questions/55184226/catching-exceptions-in-individual-tasks-and-restarting-them
     @classmethod
@@ -272,29 +272,50 @@ class SignalBot:
                 except UnknownMessageFormatError:
                     continue
 
-                if not self._should_react(message):
-                    continue
-
                 await self._ask_commands_to_handle(message)
 
         except ReceiveMessagesError as e:
             # TODO: retry strategy
             raise SignalBotError(f"Cannot receive messages: {e}")
 
-    def _should_react(self, message: Message) -> bool:
-        group = message.group
-        if group in self.group_chats:
-            return True
+    # def _should_react(self, message: Message, listenTo: list):
+    #     # TODO: this is not 100% correct
 
-        source = message.source
-        if source in self.user_chats:
-            return True
+    #     group = message.group
+    #     source = message.source
 
-        return False
+    #     # Case 1: Listen to groups / users registered by bot.listen() method
+    #     if listenTo is None:
+    #         return group in self.group_chats or source in self.user_chats
+
+    #     # Case 2: Only listen to provided list "listenTo"
+    #     return group in listenTo or source in listenTo
+
+    def _respond_to(self, message: Message, listenTo: list):
+        if listenTo is None:
+            if message.group in self.group_chats and message.is_group():
+                return self.group_chats[message.group]
+
+            if message.source in self.user_chats and message.is_private():
+                return message.source
+
+            return None
+
+        for listen in listenTo:
+            if isinstance(listen, tuple):  # group
+                group_id, internal_id = listen
+                if message.group == group_id and message.is_group():
+                    return internal_id
+
+            if isinstance(listen, str):
+                if message.source == listen and message.is_private():
+                    return message.source
 
     async def _ask_commands_to_handle(self, message: Message):
-        for command in self.commands:
-            await self._q.put((command, message, time.perf_counter()))
+        for command, listenTo in self.commands:
+            recipient = self._respond_to(message, listenTo)
+            if recipient:
+                await self._q.put((command, message, recipient, time.perf_counter()))
 
     async def _consume(self, name: int) -> None:
         logging.info(f"[Bot] Consumer #{name} started")
@@ -305,13 +326,13 @@ class SignalBot:
                 continue
 
     async def _consume_new_item(self, name: int) -> None:
-        command, message, t = await self._q.get()
+        command, message, recipient, t = await self._q.get()
         now = time.perf_counter()
         logging.info(f"[Bot] Consumer #{name} got new job in {now-t:0.5f} seconds")
 
         # handle Command
         try:
-            context = Context(self, message)
+            context = Context(self, message, recipient)
             await command.handle(context)
         except Exception as e:
             logging.error(f"[{command.__class__.__name__}] Error: {e}")

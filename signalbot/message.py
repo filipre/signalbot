@@ -48,6 +48,15 @@ class Message:
 
         # Case 2: User chat
         return self.source
+        # TODO... only reply to source . when listenTo is set to number, check its not a group
+        # then reply in private chat
+        # when it is a group, reply in group
+
+    def is_private(self) -> bool:
+        return not bool(self.group)
+
+    def is_group(self) -> bool:
+        return bool(self.group)
 
     @classmethod
     def parse(cls, raw_message: str):

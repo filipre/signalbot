@@ -18,7 +18,7 @@ maintainers = ["René Filip"]
 name = "signalbot"
 readme = "README.md"
 repository = "https://github.com/filipre/signalbot"
-version = "0.7.0"
+version = "0.8.0"
 
 [tool.poetry.dependencies]
 APScheduler = "^3.9.1"

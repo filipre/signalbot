@@ -29,7 +29,10 @@ class SignalBot:
         self.commands = []  # populated by .register()
 
         self.user_chats = set()  # populated by .listenUser()
-        self.group_chats = {}  # populated by .listenGroup()
+        self.group_chats = set()  # populated by .listenGroup()
+
+        self._internal_id_to_group_id = dict()
+        self._group_id_to_internal_id = dict()
 
         # Required
         self._init_api()
@@ -112,7 +115,9 @@ class SignalBot:
             )
             return
 
-        self.group_chats[internal_id] = group_id
+        self._internal_id_to_group_id[internal_id] = group_id
+        self._group_id_to_internal_id[group_id] = internal_id
+        self.group_chats.add(internal_id)
 
     def _is_phone_number(self, phone_number: str) -> bool:
         if phone_number is None:
@@ -141,6 +146,15 @@ class SignalBot:
     def register(self, command: Command, listenTo: list = None):
         command.bot = self
         command.setup()
+
+        # group lookup
+        if listenTo:
+            for listen in listenTo:
+                if isinstance(listen, tuple):
+                    group_id, internal_id = listen
+                    self._internal_id_to_group_id[internal_id] = group_id
+                    self._group_id_to_internal_id[group_id] = internal_id
+
         self.commands.append((command, listenTo))
 
     def start(self):
@@ -160,6 +174,7 @@ class SignalBot:
         base64_attachments: list = None,
         listen: bool = False,
     ) -> int:
+        receiver = self._resolve_receiver(receiver)
         resp = await self._signal.send(
             receiver, text, base64_attachments=base64_attachments
         )
@@ -167,6 +182,7 @@ class SignalBot:
         timestamp = resp_payload["timestamp"]
         logging.info(f"[Bot] New message {timestamp} sent:\n{text}")
 
+        # TODO: buggy
         if listen:
             if self._is_phone_number(receiver):
                 sent_message = Message(
@@ -193,33 +209,34 @@ class SignalBot:
     async def react(self, message: Message, emoji: str):
         # TODO: check that emoji is really an emoji
         recipient = message.recipient()
+        recipient = self._resolve_receiver(recipient)
         target_author = message.source
         timestamp = message.timestamp
         await self._signal.react(recipient, emoji, target_author, timestamp)
         logging.info(f"[Bot] New reaction: {emoji}")
 
     async def start_typing(self, receiver: str):
+        receiver = self._resolve_receiver(receiver)
         await self._signal.start_typing(receiver)
 
     async def stop_typing(self, receiver: str):
+        receiver = self._resolve_receiver(receiver)
         await self._signal.stop_typing(receiver)
 
     def _resolve_receiver(self, receiver: str) -> str:
-        return receiver
+        if self._is_phone_number(receiver):
+            return receiver
 
-        # deprecated
-        # if self._is_phone_number(receiver):
-        #     return receiver
+        if self._is_group_id(receiver):
+            return receiver
 
-        # if receiver in self.group_chats:
-        #     internal_id = receiver
-        #     group_id = self.group_chats[internal_id]
-        #     return group_id
+        if self._is_internal_id(receiver):
+            return self._internal_id_to_group_id[receiver]
 
-        # raise SignalBotError(
-        #     f"receiver {receiver} is not a phone number and not in self.group_chats. "
-        #     "This should never happen."
-        # )
+        raise SignalBotError(
+            f"receiver {receiver} is not a phone number and not in self.group_chats. "
+            "This should never happen."
+        )
 
     # see https://stackoverflow.com/questions/55184226/catching-exceptions-in-individual-tasks-and-restarting-them
     @classmethod
@@ -278,44 +295,33 @@ class SignalBot:
             # TODO: retry strategy
             raise SignalBotError(f"Cannot receive messages: {e}")
 
-    # def _should_react(self, message: Message, listenTo: list):
-    #     # TODO: this is not 100% correct
-
-    #     group = message.group
-    #     source = message.source
-
-    #     # Case 1: Listen to groups / users registered by bot.listen() method
-    #     if listenTo is None:
-    #         return group in self.group_chats or source in self.user_chats
-
-    #     # Case 2: Only listen to provided list "listenTo"
-    #     return group in listenTo or source in listenTo
-
-    def _respond_to(self, message: Message, listenTo: list):
+    def _should_react(self, message: Message, listenTo: list):
+        # Case 1: Listen to groups / users registered by bot.listen() method
         if listenTo is None:
             if message.group in self.group_chats and message.is_group():
-                return self.group_chats[message.group]
+                return True
 
             if message.source in self.user_chats and message.is_private():
-                return message.source
+                return True
 
-            return None
+            return False
 
+        # Case 2: Only listen to provided list "listenTo"
         for listen in listenTo:
-            if isinstance(listen, tuple):  # group
-                group_id, internal_id = listen
-                if message.group == group_id and message.is_group():
-                    return internal_id
+            if self._is_group_id(listen):
+                listen = self._group_id_to_internal_id[listen]
+                if message.group == listen and message.is_group():
+                    return True
 
-            if isinstance(listen, str):
-                if message.source == listen and message.is_private():
-                    return message.source
+            if message.source == listen and message.is_private():
+                return True
+
+        return False
 
     async def _ask_commands_to_handle(self, message: Message):
         for command, listenTo in self.commands:
-            recipient = self._respond_to(message, listenTo)
-            if recipient:
-                await self._q.put((command, message, recipient, time.perf_counter()))
+            if self._should_react(message, listenTo):
+                await self._q.put((command, message, time.perf_counter()))
 
     async def _consume(self, name: int) -> None:
         logging.info(f"[Bot] Consumer #{name} started")
@@ -326,13 +332,13 @@ class SignalBot:
                 continue
 
     async def _consume_new_item(self, name: int) -> None:
-        command, message, recipient, t = await self._q.get()
+        command, message, t = await self._q.get()
         now = time.perf_counter()
         logging.info(f"[Bot] Consumer #{name} got new job in {now-t:0.5f} seconds")
 
         # handle Command
         try:
-            context = Context(self, message, recipient)
+            context = Context(self, message)
             await command.handle(context)
         except Exception as e:
             logging.error(f"[{command.__class__.__name__}] Error: {e}")

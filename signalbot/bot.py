@@ -2,6 +2,7 @@ import asyncio
 import time
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 import logging
+import traceback
 
 
 from .api import SignalAPI, ReceiveMessagesError
@@ -220,17 +221,45 @@ class SignalBot:
             "This should never happen."
         )
 
+    # see https://stackoverflow.com/questions/55184226/catching-exceptions-in-individual-tasks-and-restarting-them
+    @classmethod
+    async def _rerun_on_exception(cls, coro, *args, **kwargs):
+        """Restart coroutine by waiting an exponential time deplay"""
+        max_sleep = 5 * 60  # sleep for at most 5 mins until rerun
+        reset = 3 * 60  # reset after 3 minutes running successfully
+        init_sleep = 1  # always start with sleeping for 1 second
+
+        next_sleep = init_sleep
+        while True:
+            start_t = int(time.monotonic())  # seconds
+
+            try:
+                await coro(*args, **kwargs)
+            except asyncio.CancelledError:
+                raise
+            except Exception:
+                traceback.print_exc()
+
+            end_t = int(time.monotonic())  # seconds
+
+            if end_t - start_t < reset:
+                sleep_t = next_sleep
+                next_sleep = min(max_sleep, next_sleep * 2)  # double sleep time
+            else:
+                next_sleep = init_sleep  # reset sleep time
+                sleep_t = next_sleep
+
+            logging.warning(f"Restarting coroutine in {sleep_t} seconds")
+            await asyncio.sleep(sleep_t)
+
     async def _produce_consume_messages(self, producers=1, consumers=3) -> None:
-        producers = [
-            asyncio.create_task(self._produce(n)) for n in range(1, producers + 1)
-        ]
-        consumers = [
-            asyncio.create_task(self._consume(n)) for n in range(1, consumers + 1)
-        ]
-        await asyncio.gather(*producers)
-        await self._q.join()
-        for c in consumers:
-            c.cancel()
+        for n in range(1, producers + 1):
+            produce_task = self._rerun_on_exception(self._produce, n)
+            asyncio.create_task(produce_task)
+
+        for n in range(1, consumers + 1):
+            consume_task = self._rerun_on_exception(self._consume, n)
+            asyncio.create_task(consume_task)
 
     async def _produce(self, name: int) -> None:
         logging.info(f"[Bot] Producer #{name} started")

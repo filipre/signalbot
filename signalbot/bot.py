@@ -248,7 +248,7 @@ class SignalBot:
 
         next_sleep = init_sleep
         while True:
-            start_t = int(time.time())  # seconds
+            start_t = int(time.monotonic())  # seconds
 
             try:
                 await coro(*args, **kwargs)
@@ -257,7 +257,7 @@ class SignalBot:
             except Exception:
                 traceback.print_exc()
 
-            end_t = int(time.time())  # seconds
+            end_t = int(time.monotonic())  # seconds
 
             if end_t - start_t < reset:
                 sleep_t = next_sleep
@@ -267,7 +267,7 @@ class SignalBot:
                 sleep_t = next_sleep
 
             logging.warning(f"Restarting coroutine in {sleep_t} seconds")
-            await asyncio.sleep(sleep_t)  # TODO
+            await asyncio.sleep(sleep_t)
 
     async def _produce_consume_messages(self, producers=1, consumers=3) -> None:
         for n in range(1, producers + 1):

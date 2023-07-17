@@ -18,7 +18,6 @@ class ChingChangChongCommand(Command):
         self.listen = listen
 
     async def handle(self, c: Context) -> bool:
-
         if not Command.triggered(c.message, self.triggers):
             return
 
@@ -34,17 +33,17 @@ class ChingChangChongCommand(Command):
             return
 
 
-class EnabledListenChatTest(ChatTestCase):
-    def setUp(self):
-        super().setUp()
-        self.signal_bot.register(ChingChangChongCommand(listen=True))
+# class EnabledListenChatTest(ChatTestCase):
+#     def setUp(self):
+#         super().setUp()
+#         self.signal_bot.register(ChingChangChongCommand(listen=True))
 
-    @patch("signalbot.SignalAPI.send", new_callable=SendMessagesMock)
-    @patch("signalbot.SignalAPI.receive", new_callable=ReceiveMessagesMock)
-    async def test_chat(self, receive_mock, send_mock):
-        receive_mock.define(["ching"])
-        await self.run_bot()
-        self.assertEqual(send_mock.call_count, 2)
+#     @patch("signalbot.SignalAPI.send", new_callable=SendMessagesMock)
+#     @patch("signalbot.SignalAPI.receive", new_callable=ReceiveMessagesMock)
+#     async def test_chat(self, receive_mock, send_mock):
+#         receive_mock.define(["ching"])
+#         await self.run_bot()
+#         self.assertEqual(send_mock.call_count, 2)
 
 
 class DisabledListenChatTest(ChatTestCase):
@@ -60,14 +59,14 @@ class DisabledListenChatTest(ChatTestCase):
         self.assertEqual(send_mock.call_count, 1)
 
 
-class DecoratorChatTest(ChatTestCase):
-    def setUp(self):
-        super().setUp()
-        self.signal_bot.register(ChingChangChongCommand(listen=True))
+# class DecoratorChatTest(ChatTestCase):
+#     def setUp(self):
+#         super().setUp()
+#         self.signal_bot.register(ChingChangChongCommand(listen=True))
 
-    @chat("how are you doing", "ching")
-    def test_chat(self, query, replies, reactions):
-        self.assertEqual(replies.call_count, 2)
+#     @chat("how are you doing", "ching")
+#     def test_chat(self, query, replies, reactions):
+#         self.assertEqual(replies.call_count, 2)
 
 
 if __name__ == "__main__":

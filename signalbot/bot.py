@@ -31,6 +31,11 @@ class SignalBot:
         self.user_chats = set()  # populated by .listenUser()
         self.group_chats = set()  # populated by .listenGroup()
 
+        self._listen_all_users = False  # enabled by .listenAllUsers()
+        self._listen_all_groups = (
+            False  # enabled by .listenAllGroups(), not implemented yet
+        )
+
         self._internal_id_to_group_id = dict()
         self._group_id_to_internal_id = dict()
 
@@ -107,6 +112,12 @@ class SignalBot:
 
         self.user_chats.add(phone_number)
 
+    def listenAllUsers(self):
+        self._listen_all_users = True
+
+    def listenAllGroups(self):
+        raise NotImplementedError
+
     def listenGroup(self, group_id: str, internal_id: str):
         if not (self._is_group_id(group_id) and self._is_internal_id(internal_id)):
             logging.warning(
@@ -143,19 +154,10 @@ class SignalBot:
             return False
         return internal_id[-1] == "="
 
-    def register(self, command: Command, listenTo: list = None):
+    def register(self, command: Command, users="all", groups="all"):
         command.bot = self
         command.setup()
-
-        # group lookup
-        if listenTo:
-            for listen in listenTo:
-                if isinstance(listen, tuple):
-                    group_id, internal_id = listen
-                    self._internal_id_to_group_id[internal_id] = group_id
-                    self._group_id_to_internal_id[group_id] = internal_id
-
-        self.commands.append((command, listenTo))
+        self.commands.append((command, users, groups))
 
     def start(self):
         self._event_loop.create_task(self._produce_consume_messages())
@@ -295,32 +297,42 @@ class SignalBot:
             # TODO: retry strategy
             raise SignalBotError(f"Cannot receive messages: {e}")
 
-    def _should_react(self, message: Message, listenTo: list):
-        # Case 1: Listen to groups / users registered by bot.listen() method
-        if listenTo is None:
-            if message.group in self.group_chats and message.is_group():
+    def _should_react(self, message: Message, users, groups):
+        # Message defines where to respond to
+        # Case 1: Group message
+        if message.is_group():
+            # .listenAllGroups()
+            if groups == "all" and self._listen_all_groups:
                 return True
 
-            if message.source in self.user_chats and message.is_private():
+            # .listen(group_id, internal_id), .listenGroup(group_id, internal_id)
+            if groups == "all" and message.group in self.group_chats:
                 return True
 
-            return False
+            # listen and .register(..., groups=[...])
+            if message.group not in self._internal_id_to_group_id:
+                return False
+            group_id = self._internal_id_to_group_id[message.group]
+            return group_id in groups
 
-        # Case 2: Only listen to provided list "listenTo"
-        for listen in listenTo:
-            if self._is_group_id(listen):
-                listen = self._group_id_to_internal_id[listen]
-                if message.group == listen and message.is_group():
-                    return True
-
-            if message.source == listen and message.is_private():
+        # Case 2: Private message
+        if message.is_private():
+            # .listenAllUsers()
+            if users == "all" and self._listen_all_users:
                 return True
+
+            # .listen(phone_number)
+            if users == "all" and message.source in self.user_chats:
+                return True
+
+            # listen and .register(..., users=[...])
+            return message.source in users and message.source in self.user_chats
 
         return False
 
     async def _ask_commands_to_handle(self, message: Message):
-        for command, listenTo in self.commands:
-            if self._should_react(message, listenTo):
+        for command, user_filter, group_filter in self.commands:
+            if self._should_react(message, user_filter, group_filter):
                 await self._q.put((command, message, time.perf_counter()))
 
     async def _consume(self, name: int) -> None:

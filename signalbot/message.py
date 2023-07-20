@@ -44,7 +44,7 @@ class Message:
     def recipient(self) -> str:
         # Case 1: Group chat
         if self.group:
-            return self.group  # internal ID?
+            return self.group  # internal ID
 
         # Case 2: User chat
         return self.source

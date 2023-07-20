@@ -101,6 +101,19 @@ class SignalAPI:
         ):
             raise StopTypingError
 
+    async def get_groups(self):
+        uri = self._groups_uri()
+        try:
+            async with aiohttp.ClientSession() as session:
+                resp = await session.get(uri)
+                resp.raise_for_status()
+                return await resp.json()
+        except (
+            aiohttp.ClientError,
+            aiohttp.http_exceptions.HttpProcessingError,
+        ):
+            raise GroupsError
+
     def _receive_ws_uri(self):
         return f"ws://{self.signal_service}/v1/receive/{self.phone_number}"
 
@@ -112,6 +125,9 @@ class SignalAPI:
 
     def _typing_indicator_uri(self):
         return f"http://{self.signal_service}/v1/typing-indicator/{self.phone_number}"
+
+    def _groups_uri(self):
+        return f"http://{self.signal_service}/v1/groups/{self.phone_number}"
 
 
 class ReceiveMessagesError(Exception):
@@ -135,4 +151,8 @@ class StopTypingError(TypingError):
 
 
 class ReactionError(Exception):
+    pass
+
+
+class GroupsError(Exception):
     pass

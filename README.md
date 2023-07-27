@@ -4,7 +4,91 @@ Python package to build your own Signal bots. To run the the bot you need to sta
 
 ## Getting Started
 
-Please see https://github.com/filipre/signalbot-example for an example how to use the package and how to build a simple bot.
+Below you can find a minimal example on how to use the package. There is also a bigger example in the `example` folder.
+
+```python
+import os
+from signalbot import SignalBot, Command, Context
+from commands import PingCommand
+
+
+class PingCommand(Command):
+    async def handle(self, c: Context):
+        if c.message.text == "Ping":
+            await c.send("Pong")
+
+
+if __name__ == "__main__":
+    bot = SignalBot({
+        "signal_service": os.environ["SIGNAL_SERVICE"],
+        "phone_number": os.environ["PHONE_NUMBER"]
+    })
+    bot.register(PingCommand()) # all contacts and groups
+    bot.start()
+```
+
+Please check out https://github.com/bbernhard/signal-cli-rest-api#getting-started to learn about [signal-cli-rest-api](https://github.com/bbernhard/signal-cli-rest-api) and [signal-cli](https://github.com/AsamK/signal-cli). A good first step is to make the example above work.
+
+1. Run signal-cli-rest-api in `normal` mode first.
+```bash
+docker run -p 8080:8080 \
+    -v $(PWD)/signal-cli-config:/home/.local/share/signal-cli \
+    -e 'MODE=normal' bbernhard/signal-cli-rest-api:0.57
+```
+
+2. Open http://127.0.0.1:8080/v1/qrcodelink?device_name=local to link your account with the signal-cli-rest-api server
+
+3. In your Signal app, open settings and scan the QR code. The server can now receive and send messages. The access key will be stored in `$(PWD)/signal-cli-config`.
+
+4. Restart the server in `json-rpc` mode.
+```bash
+docker run -p 8080:8080 \
+    -v $(PWD)/signal-cli-config:/home/.local/share/signal-cli \
+    -e 'MODE=json-rpc' bbernhard/signal-cli-rest-api:0.57
+```
+
+5. The logs should show something like this. You can also confirm that the server is running in the correct mode by visiting http://127.0.0.1:8080/v1/about.
+```
+...
+time="2022-03-07T13:02:22Z" level=info msg="Found number +491234567890 and added it to jsonrpc2.yml"
+...
+time="2022-03-07T13:02:24Z" level=info msg="Started Signal Messenger REST API"
+```
+
+6. The bot needs to listen to a group. Use the following snippet to get a group's `id` and `internal_id`:
+```bash
+curl -X GET 'http://127.0.0.1:8080/v1/groups/+49123456789' | python -m json.tool
+```
+
+7. Install `signalbot` and start your python script. You need to pass following environment variables to make the example run:
+- `SIGNAL_SERVICE`: Address of the signal service without protocol, e.g. `127.0.0.1:8080`
+- `PHONE_NUMBER`: Phone number of the bot, e.g. `+49123456789`
+
+```bash
+export SIGNAL_SERVICE="127.0.0.1"
+export PHONE_NUMBER="+49123456789"
+pip install signalbot
+python bot.py
+```
+
+8. The logs should indicate that one "producer" and three "consumers" have started. The producer checks for new messages sent to the linked account using a web socket connection. It creates a task for every registered command and the consumers work off the tasks. In case you are working with many blocking function calls, you may need to adjust the number of consumers such that the bot stays reactive.
+```
+INFO:root:[Bot] Producer #1 started
+INFO:root:[Bot] Consumer #1 started
+INFO:root:[Bot] Consumer #2 started
+INFO:root:[Bot] Consumer #3 started
+```
+
+9. Send the message `Ping` (case sensitive) to the group that the bot is listening to. The bot (i.e. the linked account) should respond with a `Pong`. Confirm that the bot received a raw message, that the consumer worked on the message and that a new message has been sent.
+```
+INFO:root:[Raw Message] {"envelope":{"source":"+49123456789","sourceNumber":"+49123456789","sourceUuid":"fghjkl-asdf-asdf-asdf-dfghjkl","sourceName":"René","sourceDevice":3,"timestamp":1646000000000,"syncMessage":{"sentMessage":{"destination":null,"destinationNumber":null,"destinationUuid":null,"timestamp":1646000000000,"message":"Pong","expiresInSeconds":0,"viewOnce":false,"groupInfo":{"groupId":"asdasdfweasdfsdfcvbnmfghjkl=","type":"DELIVER"}}}},"account":"+49123456789","subscription":0}
+INFO:root:[Bot] Consumer #2 got new job in 0.00046 seconds
+INFO:root:[Bot] Consumer #2 got new job in 0.00079 seconds
+INFO:root:[Bot] Consumer #2 got new job in 0.00093 seconds
+INFO:root:[Bot] Consumer #2 got new job in 0.00106 seconds
+INFO:root:[Bot] New message 1646000000000 sent:
+Pong
+```
 
 ## Classes and API
 
@@ -14,11 +98,10 @@ The package provides methods to easily listen for incoming messages and respondi
 
 ### Signalbot
 
-- `bot.listen(group_id, internal_id)`: Listen for messages in a group chat. `group_id` must be prefixed with `group.`
-- `bot.listen(phone_number)`: Listen for messages in a user chat.
-- `bot.register(command)`: Register a new command
+- `bot.register(command, contacts=True, groups=True)`: Register a new command, listen in all contacts and groups, default
+- `bot.register(command, contacts=False, groups=["Hello World"])`: Only reply in the "Hello World" group
 - `bot.start()`: Start the bot
-- `bot.send(receiver, text, listen=False)`: Send a new message
+- `bot.send(receiver, text)`: Send a new message
 - `bot.react(message, emoji)`: React to a message
 - `bot.start_typing(receiver)`: Start typing
 - `bot.stop_typing(receiver)`: Stop typing

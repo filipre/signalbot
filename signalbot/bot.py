@@ -3,6 +3,7 @@ import time
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 import logging
 import traceback
+from typing import Union, List
 
 from .api import SignalAPI, ReceiveMessagesError
 from .command import Command
@@ -29,6 +30,7 @@ class SignalBot:
 
         self.user_chats = set()  # deprecated
         self.group_chats = set()  # deprecated
+        self._listen_mode_activated = False
 
         self.groups = []  # populated by .register()
         self._groups_by_id = {}
@@ -100,6 +102,7 @@ class SignalBot:
 
     # deprecated
     def _listenUser(self, phone_number: str):
+        self._listen_mode_activated = True
         if not self._is_phone_number(phone_number):
             logging.warning(
                 "[Bot] Can't listen for user because phone number does not look valid"
@@ -116,6 +119,7 @@ class SignalBot:
 
     # deprecated
     def _listenGroup(self, group_id: str, internal_id: str = None):
+        self._listen_mode_activated = True
         if not (self._is_group_id(group_id) and self._is_internal_id(internal_id)):
             logging.warning(
                 "[Bot] Can't listen for group because group id and "
@@ -128,8 +132,8 @@ class SignalBot:
     def register(
         self,
         command: Command,
-        contacts: list[str] | bool = False,
-        groups: list[str] | bool = False,
+        contacts: Union[List[str], bool] = True,
+        groups: Union[List[str], bool] = True,
     ):
         command.bot = self
         command.setup()
@@ -298,6 +302,17 @@ class SignalBot:
         groups: list[str] | bool,
     ):
         """Is the command activated for a certain chat or group?"""
+
+        # Deprected Case: Listen Mode
+        if self._listen_mode_activated:
+            if message.is_private() and message.source in self.user_chats:
+                return True
+
+            if message.is_group() and message.group in self.group_chats:
+                return True
+
+            return False
+
         # Case 1: Private message
         if message.is_private():
             # a) registered for all numbers
@@ -306,10 +321,6 @@ class SignalBot:
 
             # b) whitelisted numbers
             if isinstance(contacts, list) and message.source in contacts:
-                return True
-
-            # c) .listenUser (deprecated)
-            if message.source in self.user_chats:
                 return True
 
         # Case 2: Group message
@@ -321,10 +332,6 @@ class SignalBot:
             # b) whitelisted group ids
             group_name = self._groups_by_internal_id.get(message.group, {}).get("name")
             if isinstance(groups, list) and group_name and group_name in groups:
-                return True
-
-            # c) .listenGroup (deprecated)
-            if message.group in self.group_chats:
                 return True
 
         return False

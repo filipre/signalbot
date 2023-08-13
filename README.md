@@ -162,8 +162,12 @@ There are a few other related projects similar to this one. You may want to chec
 |Project|Description|Language|
 |-------|-----------|--------|
 |https://github.com/lwesterhof/semaphore|Bot Framework|Python|
-|https://github.com/signalapp/libsignal-service-java|Signal Library|Java|
+|https://git.sr.ht/~nicoco/aiosignald|signald Library / Bot Framework|Python|
+|https://gitlab.com/stavros/pysignald/|signald Library / Bot Framework|Python|
+|https://gitlab.com/signald/signald-go|signald Library|Go|
+|https://github.com/signal-bot/signal-bot|Bot Framework using Signal CLI|Python|
+|https://github.com/bbernhard/signal-cli-rest-api|REST API Wrapper for Signal CLI|Go|
+|https://github.com/bbernhard/pysignalclirestapi|Python Wrapper for REST API|Python|
 |https://github.com/AsamK/signal-cli|A CLI and D-Bus interface for Signal|Java|
-|https://github.com/bbernhard/signal-cli-rest-api|REST API Wrapper for Signal CLI|
+|https://github.com/signalapp/libsignal-service-java|Signal Library|Java|
 |https://github.com/aaronetz/signal-bot|Bot Framework|Java|
-|https://github.com/signal-bot/signal-bot|Bot Framework|Python|

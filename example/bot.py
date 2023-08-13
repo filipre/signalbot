@@ -1,6 +1,12 @@
 import os
 from signalbot import SignalBot
-from commands import PingCommand, FridayCommand, TypingCommand, TriggeredCommand
+from commands import (
+    PingCommand,
+    FridayCommand,
+    TypingCommand,
+    TriggeredCommand,
+    ReplyCommand,
+)
 import logging
 
 logging.getLogger().setLevel(logging.INFO)
@@ -20,6 +26,7 @@ def main():
 
     # enable a chat command for all contacts and all groups
     bot.register(PingCommand())
+    bot.register(ReplyCommand())
 
     # enable a chat command only for groups
     bot.register(FridayCommand(), contacts=False, groups=True)

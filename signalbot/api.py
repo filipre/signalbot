@@ -25,17 +25,35 @@ class SignalAPI:
             raise ReceiveMessagesError(e)
 
     async def send(
-        self, receiver: str, message: str, base64_attachments: list = None
+        self,
+        receiver: str,
+        message: str,
+        base64_attachments: list = None,
+        quote_author: str = None,
+        quote_mentions: list = None,
+        quote_message: str = None,
+        quote_timestamp: str = None,
     ) -> aiohttp.ClientResponse:
         uri = self._send_rest_uri()
         if base64_attachments is None:
             base64_attachments = []
+
         payload = {
             "base64_attachments": base64_attachments,
             "message": message,
             "number": self.phone_number,
             "recipients": [receiver],
         }
+
+        if quote_author:
+            payload["quote_author"] = quote_author
+        if quote_mentions:
+            payload["quote_mentions"] = quote_mentions
+        if quote_message:
+            payload["quote_message"] = quote_message
+        if quote_timestamp:
+            payload["quote_timestamp"] = quote_timestamp
+
         try:
             async with aiohttp.ClientSession() as session:
                 resp = await session.post(uri, json=payload)

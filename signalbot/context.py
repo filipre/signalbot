@@ -8,13 +8,14 @@ class Context:
         self.message = message
 
     async def send(
-        self, text: str, base64_attachments: list = None, listen: bool = False
+        self, text: str, base64_attachments: list = None, listen: bool = False, mentions: list = None
     ):
         await self.bot.send(
             self.message.recipient(),
             text,
             base64_attachments=base64_attachments,
             listen=listen,
+            mentions=mentions  # Pass mentions to bot's send
         )
 
     async def react(self, emoji: str):

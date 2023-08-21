@@ -159,10 +159,11 @@ class SignalBot:
         text: str,
         base64_attachments: list = None,
         listen: bool = False,
+        mentions: list = None  # Added this line
     ) -> int:
         resolved_receiver = self._resolve_receiver(receiver)
         resp = await self._signal.send(
-            resolved_receiver, text, base64_attachments=base64_attachments
+            resolved_receiver, text, base64_attachments=base64_attachments, mentions=mentions  # Added mentions here
         )
         resp_payload = await resp.json()
         timestamp = resp_payload["timestamp"]
@@ -171,25 +172,28 @@ class SignalBot:
         if listen:
             if self._is_phone_number(receiver):
                 sent_message = Message(
-                    source=receiver,  # otherwise we can't respond in the right chat
+                    source=receiver,
                     timestamp=timestamp,
                     type=MessageType.SYNC_MESSAGE,
                     text=text,
                     base64_attachments=base64_attachments,
                     group=None,
+                    mentions=mentions  # Added mentions here
                 )
             else:
                 sent_message = Message(
-                    source=self._phone_number,  # no need to pretend
+                    source=self._phone_number,
                     timestamp=timestamp,
                     type=MessageType.SYNC_MESSAGE,
                     text=text,
                     base64_attachments=base64_attachments,
                     group=receiver,
+                    mentions=mentions  # Added mentions here
                 )
             await self._ask_commands_to_handle(sent_message)
 
         return timestamp
+
 
     async def react(self, message: Message, emoji: str):
         # TODO: check that emoji is really an emoji

@@ -25,11 +25,11 @@ class SignalAPI:
             raise ReceiveMessagesError(e)
 
     async def send(
-        self, 
-        receiver: str, 
-        message: str, 
-        base64_attachments: list = None, 
-        mentions: list = None  # Added this line
+        self,
+        receiver: str,
+        message: str,
+        base64_attachments: list = None,
+        mentions: list = None,  # Added this line
     ) -> aiohttp.ClientResponse:
         uri = self._send_rest_uri()
         if base64_attachments is None:

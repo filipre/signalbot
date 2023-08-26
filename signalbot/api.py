@@ -33,7 +33,7 @@ class SignalAPI:
         quote_mentions: list = None,
         quote_message: str = None,
         quote_timestamp: str = None,
-        mentions: list = None,  # Added this line
+        mentions: list = None,
     ) -> aiohttp.ClientResponse:
         uri = self._send_rest_uri()
         if base64_attachments is None:

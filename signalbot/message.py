@@ -49,6 +49,12 @@ class Message:
         # Case 2: User chat
         return self.source
 
+    def is_mentioning(self, number: str) -> str:
+        for mention in self.mentions:
+            if number == mention["number"]:
+                return True
+        return False
+
     @classmethod
     def parse(cls, raw_message: str):
         try:

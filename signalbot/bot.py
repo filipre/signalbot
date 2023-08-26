@@ -111,6 +111,7 @@ class SignalBot:
 
         self.user_chats.add(phone_number)
 
+    # deprecated
     def listenGroup(self, group_id: str, internal_id: str = None):
         logging.warning(
             "[Deprecation Warning] .listenGroup is deprecated and will be removed in future versions. Please use .register"
@@ -160,6 +161,7 @@ class SignalBot:
         quote_mentions: list = None,
         quote_message: str = None,
         quote_timestamp: str = None,
+        mentions: list = None,
         listen: bool = False,
     ) -> int:
         receiver = self._resolve_receiver(receiver)
@@ -171,6 +173,7 @@ class SignalBot:
             quote_mentions=quote_mentions,
             quote_message=quote_message,
             quote_timestamp=quote_timestamp,
+            mentions=mentions,
         )
         resp_payload = await resp.json()
         timestamp = resp_payload["timestamp"]

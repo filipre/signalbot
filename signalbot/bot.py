@@ -1,9 +1,11 @@
 import asyncio
+from collections import defaultdict
 import time
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 import logging
 import traceback
-from typing import Union, List
+from typing import Optional, Union, List, Callable
+import re
 
 from .api import SignalAPI, ReceiveMessagesError
 from .command import Command
@@ -133,12 +135,28 @@ class SignalBot:
     def register(
         self,
         command: Command,
-        contacts: Union[List[str], bool] = True,
-        groups: Union[List[str], bool] = True,
+        contacts: Optional[Union[List[str], bool]] = True,
+        groups: Optional[Union[List[str], bool]] = True,
+        f: Optional[Callable[[Message], bool]] = None,
     ):
         command.bot = self
         command.setup()
-        self.commands.append((command, contacts, groups))
+
+        group_ids = None
+
+        if isinstance(groups, bool):
+            group_ids = groups
+
+        if isinstance(groups, list):
+            group_ids = []
+            for group in groups:
+                if self._is_group_id(group):  # group is a group id, higher prio
+                    group_ids.append(group)
+                else:  # group is a group name
+                    for matched_group in self._groups_by_name(group):
+                        group_ids.append(matched_group["id"])
+
+        self.commands.append((command, contacts, group_ids))
 
     def start(self):
         # TODO: schedule this every hour or so
@@ -204,12 +222,14 @@ class SignalBot:
     async def _detect_groups(self):
         # reset group lookups to avoid stale data
         self.groups = await self._signal.get_groups()
+
         self._groups_by_id = {}
         self._groups_by_internal_id = {}
-
+        self._groups_by_name = defaultdict(list)
         for group in self.groups:
             self._groups_by_id[group["id"]] = group
             self._groups_by_internal_id[group["internal_id"]] = group
+            self._groups_by_name[group["name"]].append(group)
 
         logging.info(f"[Bot] {len(self.groups)} groups detected")
 
@@ -237,14 +257,18 @@ class SignalBot:
         return True
 
     def _is_group_id(self, group_id: str) -> bool:
+        """Check if group_id has the right format, e.g.
+
+              random string                                              length 66
+              ↓                                                          ↓
+        group.OyZzqio1xDmYiLsQ1VsqRcUFOU4tK2TcECmYt2KeozHJwglMBHAPS7jlkrm=
+        ↑                                                                ↑
+        prefix                                                           suffix
+        """
         if group_id is None:
             return False
-        prefix = "group."
-        if group_id[: len(prefix)] != prefix:
-            return False
-        if group_id[-1] != "=":
-            return False
-        return True
+
+        return re.match(r"^group\.[a-zA-Z0-9]{59}=$", group_id)
 
     def _is_internal_id(self, internal_id: str) -> bool:
         if internal_id is None:
@@ -312,7 +336,7 @@ class SignalBot:
         self,
         message: Message,
         contacts: list[str] | bool,
-        groups: list[str] | bool,
+        group_ids: list[str] | bool,
     ):
         """Is the command activated for a certain chat or group?"""
 
@@ -339,19 +363,19 @@ class SignalBot:
         # Case 2: Group message
         if message.is_group():
             # a) registered for all groups
-            if isinstance(groups, bool) and groups:
+            if isinstance(group_ids, bool) and group_ids:
                 return True
 
             # b) whitelisted group ids
-            group_name = self._groups_by_internal_id.get(message.group, {}).get("name")
-            if isinstance(groups, list) and group_name and group_name in groups:
+            group_id = self._groups_by_internal_id.get(message.group, {}).get("id")
+            if isinstance(group_ids, list) and group_id and group_id in group_ids:
                 return True
 
         return False
 
     async def _ask_commands_to_handle(self, message: Message):
-        for command, contacts, groups in self.commands:
-            if self._should_react(message, contacts, groups):
+        for command, contacts, group_ids in self.commands:
+            if self._should_react(message, contacts, group_ids):
                 await self._q.put((command, message, time.perf_counter()))
 
     async def _consume(self, name: int) -> None:

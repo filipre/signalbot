@@ -156,7 +156,7 @@ class SignalBot:
                     for matched_group in self._groups_by_name(group):
                         group_ids.append(matched_group["id"])
 
-        self.commands.append((command, contacts, group_ids))
+        self.commands.append((command, contacts, group_ids, f))
 
     def start(self):
         # TODO: schedule this every hour or so
@@ -332,7 +332,7 @@ class SignalBot:
             # TODO: retry strategy
             raise SignalBotError(f"Cannot receive messages: {e}")
 
-    def _should_react(
+    def _should_react_for_contact(
         self,
         message: Message,
         contacts: list[str] | bool,
@@ -373,10 +373,25 @@ class SignalBot:
 
         return False
 
+    def _should_react_for_lambda(
+        self,
+        message: Message,
+        f: Callable[[Message], bool] | None,
+    ) -> bool:
+        if f is None:
+            return True
+
+        return f(message)
+
     async def _ask_commands_to_handle(self, message: Message):
-        for command, contacts, group_ids in self.commands:
-            if self._should_react(message, contacts, group_ids):
-                await self._q.put((command, message, time.perf_counter()))
+        for command, contacts, group_ids, f in self.commands:
+            if not self._should_react_for_contact(message, contacts, group_ids):
+                continue
+
+            if not self._should_react_for_lambda(message, f):
+                continue
+
+            await self._q.put((command, message, time.perf_counter()))
 
     async def _consume(self, name: int) -> None:
         logging.info(f"[Bot] Consumer #{name} started")

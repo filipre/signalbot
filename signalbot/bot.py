@@ -37,6 +37,7 @@ class SignalBot:
         self.groups = []  # populated by .register()
         self._groups_by_id = {}
         self._groups_by_internal_id = {}
+        self._groups_by_name = defaultdict(list)
 
         try:
             self._phone_number = self.config["phone_number"]
@@ -153,7 +154,7 @@ class SignalBot:
                 if self._is_group_id(group):  # group is a group id, higher prio
                     group_ids.append(group)
                 else:  # group is a group name
-                    for matched_group in self._groups_by_name(group):
+                    for matched_group in self._groups_by_name:
                         group_ids.append(matched_group["id"])
 
         self.commands.append((command, contacts, group_ids, f))

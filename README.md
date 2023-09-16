@@ -55,7 +55,7 @@ time="2022-03-07T13:02:22Z" level=info msg="Found number +491234567890 and added
 time="2022-03-07T13:02:24Z" level=info msg="Started Signal Messenger REST API"
 ```
 
-6. The bot needs to listen to a group. Use the following snippet to get a group's `id` and `internal_id`:
+6. Use the following snippet to get a group's `id`:
 ```bash
 curl -X GET 'http://127.0.0.1:8080/v1/groups/+49123456789' | python -m json.tool
 ```
@@ -98,8 +98,9 @@ The package provides methods to easily listen for incoming messages and respondi
 
 ### Signalbot
 
-- `bot.register(command, contacts=True, groups=True)`: Register a new command, listen in all contacts and groups, default
-- `bot.register(command, contacts=False, groups=["Hello World"])`: Only reply in the "Hello World" group
+- `bot.register(command, contacts=True, groups=True)`: Register a new command, listen in all contacts and groups, same as `bot.register(command)`
+- `bot.register(command, contacts=False, groups=["Hello World"])`: Only listen in the "Hello World" group
+- `bot.register(command, contacts=["+49123456789"], groups=False)`: Only respond to one contact
 - `bot.start()`: Start the bot
 - `bot.send(receiver, text)`: Send a new message
 - `bot.react(message, emoji)`: React to a message
@@ -114,9 +115,11 @@ To implement your own commands, you need to inherent `Command` and overwrite fol
 
 - `setup(self)`: Start any task that requires to send messages already, optional
 - `describe(self)`: String to describe your command, optional
-- `handle(self, c: Context)`: Handle an incoming message. By default, any command will read any incoming message. `Context` can be used to easily reply (`c.send(text)`), react (`c.react(emoji)`) and to type in a group (`c.start_typing()` and `c.stop_typing()`). You can use the `@triggered` decorator to listen for specific commands or you can inspect `c.message.text`.
+- `handle(self, c: Context)`: Handle an incoming message. By default, any command will read any incoming message. `Context` can be used to easily send (`c.send(text)`), reply (`c.reply(text)`), react (`c.react(emoji)`) and to type in a group (`c.start_typing()` and `c.stop_typing()`). You can use the `@triggered` decorator to listen for specific commands or you can inspect `c.message.text`.
 
 ### Unit Testing
+
+*Note: deprecated, I want to switch to pytest eventually*
 
 In many cases, we can mock receiving and sending messages to speed up development time. To do so, you can use `signalbot.utils.ChatTestCase` which sets up a "skeleton" bot. Then, you can send messages using the `@chat` decorator in `signalbot.utils` like this:
 ```python

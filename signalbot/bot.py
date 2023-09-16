@@ -1,13 +1,15 @@
 import asyncio
+from collections import defaultdict
 import time
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 import logging
 import traceback
-
+from typing import Optional, Union, List, Callable
+import re
 
 from .api import SignalAPI, ReceiveMessagesError
 from .command import Command
-from .message import Message, UnknownMessageFormatError, MessageType
+from .message import Message, UnknownMessageFormatError
 from .storage import RedisStorage, InMemoryStorage
 from .context import Context
 
@@ -28,18 +30,15 @@ class SignalBot:
 
         self.commands = []  # populated by .register()
 
-        self.user_chats = set()  # populated by .listenUser()
-        self.group_chats = {}  # populated by .listenGroup()
+        self.user_chats = set()  # deprecated
+        self.group_chats = set()  # deprecated
+        self._listen_mode_activated = False
 
-        # Required
-        self._init_api()
-        self._init_event_loop()
-        self._init_scheduler()
+        self.groups = []  # populated by .register()
+        self._groups_by_id = {}
+        self._groups_by_internal_id = {}
+        self._groups_by_name = defaultdict(list)
 
-        # Optional
-        self._init_storage()
-
-    def _init_api(self):
         try:
             self._phone_number = self.config["phone_number"]
             self._signal_service = self.config["signal_service"]
@@ -47,11 +46,14 @@ class SignalBot:
         except KeyError:
             raise SignalBotError("Could not initialize SignalAPI with given config")
 
-    def _init_event_loop(self):
         self._event_loop = asyncio.get_event_loop()
         self._q = asyncio.Queue()
 
-    def _init_storage(self):
+        try:
+            self.scheduler = AsyncIOScheduler(event_loop=self._event_loop)
+        except Exception as e:
+            raise SignalBotError(f"Could not initialize scheduler: {e}")
+
         try:
             config_storage = self.config["storage"]
             self._redis_host = config_storage["redis_host"]
@@ -64,38 +66,46 @@ class SignalBot:
                 "Restarting will delete the storage!"
             )
 
-    def _init_scheduler(self):
-        try:
-            self.scheduler = AsyncIOScheduler(event_loop=self._event_loop)
-        except Exception as e:
-            raise SignalBotError(f"Could not initialize scheduler: {e}")
-
+    # deprecated
     def listen(self, required_id: str, optional_id: str = None):
+        logging.warning(
+            "[Deprecation Warning] .listen is deprecated and will be removed in future versions. Please use .register"
+        )
+
         # Case 1: required id is a phone number, optional_id is not being used
         if self._is_phone_number(required_id):
             phone_number = required_id
-            self.listenUser(phone_number)
+            self._listenUser(phone_number)
             return
 
         # Case 2: required id is a group id
         if self._is_group_id(required_id) and self._is_internal_id(optional_id):
             group_id = required_id
             internal_id = optional_id
-            self.listenGroup(group_id, internal_id)
+            self._listenGroup(group_id, internal_id)
             return
 
         # Case 3: optional_id is a group id (Case 2 swapped)
         if self._is_internal_id(required_id) and self._is_group_id(optional_id):
             group_id = optional_id
             internal_id = required_id
-            self.listenGroup(group_id, internal_id)
+            self._listenGroup(group_id, internal_id)
             return
 
         logging.warning(
             "[Bot] Can't listen for user/group because input does not look valid"
         )
 
+    # deprecated
     def listenUser(self, phone_number: str):
+        logging.warning(
+            "[Deprecation Warning] .listenUser is deprecated and will be removed in future versions. Please use .register"
+        )
+        return self._listenUser(phone_number)
+
+    # deprecated
+    def _listenUser(self, phone_number: str):
+        self._listen_mode_activated = True
         if not self._is_phone_number(phone_number):
             logging.warning(
                 "[Bot] Can't listen for user because phone number does not look valid"
@@ -104,7 +114,16 @@ class SignalBot:
 
         self.user_chats.add(phone_number)
 
-    def listenGroup(self, group_id: str, internal_id: str):
+    # deprecated
+    def listenGroup(self, group_id: str, internal_id: str = None):
+        logging.warning(
+            "[Deprecation Warning] .listenGroup is deprecated and will be removed in future versions. Please use .register"
+        )
+        return self._listenGroup(group_id, internal_id)
+
+    # deprecated
+    def _listenGroup(self, group_id: str, internal_id: str = None):
+        self._listen_mode_activated = True
         if not (self._is_group_id(group_id) and self._is_internal_id(internal_id)):
             logging.warning(
                 "[Bot] Can't listen for group because group id and "
@@ -112,38 +131,37 @@ class SignalBot:
             )
             return
 
-        self.group_chats[internal_id] = group_id
+        self.group_chats.add(internal_id)
 
-    def _is_phone_number(self, phone_number: str) -> bool:
-        if phone_number is None:
-            return False
-        if phone_number[0] != "+":
-            return False
-        if len(phone_number[1:]) > 15:
-            return False
-        return True
-
-    def _is_group_id(self, group_id: str) -> bool:
-        if group_id is None:
-            return False
-        prefix = "group."
-        if group_id[: len(prefix)] != prefix:
-            return False
-        if group_id[-1] != "=":
-            return False
-        return True
-
-    def _is_internal_id(self, internal_id: str) -> bool:
-        if internal_id is None:
-            return False
-        return internal_id[-1] == "="
-
-    def register(self, command: Command):
+    def register(
+        self,
+        command: Command,
+        contacts: Optional[Union[List[str], bool]] = True,
+        groups: Optional[Union[List[str], bool]] = True,
+        f: Optional[Callable[[Message], bool]] = None,
+    ):
         command.bot = self
         command.setup()
-        self.commands.append(command)
+
+        group_ids = None
+
+        if isinstance(groups, bool):
+            group_ids = groups
+
+        if isinstance(groups, list):
+            group_ids = []
+            for group in groups:
+                if self._is_group_id(group):  # group is a group id, higher prio
+                    group_ids.append(group)
+                else:  # group is a group name
+                    for matched_group in self._groups_by_name:
+                        group_ids.append(matched_group["id"])
+
+        self.commands.append((command, contacts, group_ids, f))
 
     def start(self):
+        # TODO: schedule this every hour or so
+        self._event_loop.create_task(self._detect_groups())
         self._event_loop.create_task(self._produce_consume_messages())
 
         # Add more scheduler tasks here
@@ -158,48 +176,37 @@ class SignalBot:
         receiver: str,
         text: str,
         base64_attachments: list = None,
+        quote_author: str = None,
+        quote_mentions: list = None,
+        quote_message: str = None,
+        quote_timestamp: str = None,
+        mentions: list = None,
         listen: bool = False,
-        mentions: list = None,  # Added this line
     ) -> int:
-        resolved_receiver = self._resolve_receiver(receiver)
+        receiver = self._resolve_receiver(receiver)
         resp = await self._signal.send(
-            resolved_receiver,
+            receiver,
             text,
             base64_attachments=base64_attachments,
-            mentions=mentions,  # Added mentions here
+            quote_author=quote_author,
+            quote_mentions=quote_mentions,
+            quote_message=quote_message,
+            quote_timestamp=quote_timestamp,
+            mentions=mentions,
         )
         resp_payload = await resp.json()
         timestamp = resp_payload["timestamp"]
         logging.info(f"[Bot] New message {timestamp} sent:\n{text}")
 
         if listen:
-            if self._is_phone_number(receiver):
-                sent_message = Message(
-                    source=receiver,
-                    timestamp=timestamp,
-                    type=MessageType.SYNC_MESSAGE,
-                    text=text,
-                    base64_attachments=base64_attachments,
-                    group=None,
-                    mentions=mentions,  # Added mentions here
-                )
-            else:
-                sent_message = Message(
-                    source=self._phone_number,
-                    timestamp=timestamp,
-                    type=MessageType.SYNC_MESSAGE,
-                    text=text,
-                    base64_attachments=base64_attachments,
-                    group=receiver,
-                    mentions=mentions,  # Added mentions here
-                )
-            await self._ask_commands_to_handle(sent_message)
+            logging.warning(f"[Bot] send(..., listen=True) is not supported anymore")
 
         return timestamp
 
     async def react(self, message: Message, emoji: str):
         # TODO: check that emoji is really an emoji
-        recipient = self._resolve_receiver(message.recipient())
+        recipient = message.recipient()
+        recipient = self._resolve_receiver(recipient)
         target_author = message.source
         timestamp = message.timestamp
         await self._signal.react(recipient, emoji, target_author, timestamp)
@@ -213,19 +220,61 @@ class SignalBot:
         receiver = self._resolve_receiver(receiver)
         await self._signal.stop_typing(receiver)
 
+    async def _detect_groups(self):
+        # reset group lookups to avoid stale data
+        self.groups = await self._signal.get_groups()
+
+        self._groups_by_id = {}
+        self._groups_by_internal_id = {}
+        self._groups_by_name = defaultdict(list)
+        for group in self.groups:
+            self._groups_by_id[group["id"]] = group
+            self._groups_by_internal_id[group["internal_id"]] = group
+            self._groups_by_name[group["name"]].append(group)
+
+        logging.info(f"[Bot] {len(self.groups)} groups detected")
+
     def _resolve_receiver(self, receiver: str) -> str:
         if self._is_phone_number(receiver):
             return receiver
 
-        if receiver in self.group_chats:
-            internal_id = receiver
-            group_id = self.group_chats[internal_id]
+        if self._is_group_id(receiver):
+            return receiver
+
+        try:
+            group_id = self._groups_by_internal_id[receiver]["id"]
             return group_id
 
-        raise SignalBotError(
-            f"receiver {receiver} is not a phone number and not in self.group_chats. "
-            "This should never happen."
-        )
+        except Exception:
+            raise SignalBotError(f"Cannot resolve receiver.")
+
+    def _is_phone_number(self, phone_number: str) -> bool:
+        if phone_number is None:
+            return False
+        if phone_number[0] != "+":
+            return False
+        if len(phone_number[1:]) > 15:
+            return False
+        return True
+
+    def _is_group_id(self, group_id: str) -> bool:
+        """Check if group_id has the right format, e.g.
+
+              random string                                              length 66
+              ↓                                                          ↓
+        group.OyZzqio1xDmYiLsQ1VsqRcUFOU4tK2TcECmYt2KeozHJwglMBHAPS7jlkrm=
+        ↑                                                                ↑
+        prefix                                                           suffix
+        """
+        if group_id is None:
+            return False
+
+        return re.match(r"^group\.[a-zA-Z0-9]{59}=$", group_id)
+
+    def _is_internal_id(self, internal_id: str) -> bool:
+        if internal_id is None:
+            return False
+        return internal_id[-1] == "="
 
     # see https://stackoverflow.com/questions/55184226/catching-exceptions-in-individual-tasks-and-restarting-them
     @classmethod
@@ -278,28 +327,71 @@ class SignalBot:
                 except UnknownMessageFormatError:
                     continue
 
-                if not self._should_react(message):
-                    continue
-
                 await self._ask_commands_to_handle(message)
 
         except ReceiveMessagesError as e:
             # TODO: retry strategy
             raise SignalBotError(f"Cannot receive messages: {e}")
 
-    def _should_react(self, message: Message) -> bool:
-        group = message.group
-        if group in self.group_chats:
-            return True
+    def _should_react_for_contact(
+        self,
+        message: Message,
+        contacts: list[str] | bool,
+        group_ids: list[str] | bool,
+    ):
+        """Is the command activated for a certain chat or group?"""
 
-        source = message.source
-        if source in self.user_chats:
-            return True
+        # Deprected Case: Listen Mode
+        if self._listen_mode_activated:
+            if message.is_private() and message.source in self.user_chats:
+                return True
+
+            if message.is_group() and message.group in self.group_chats:
+                return True
+
+            return False
+
+        # Case 1: Private message
+        if message.is_private():
+            # a) registered for all numbers
+            if isinstance(contacts, bool) and contacts:
+                return True
+
+            # b) whitelisted numbers
+            if isinstance(contacts, list) and message.source in contacts:
+                return True
+
+        # Case 2: Group message
+        if message.is_group():
+            # a) registered for all groups
+            if isinstance(group_ids, bool) and group_ids:
+                return True
+
+            # b) whitelisted group ids
+            group_id = self._groups_by_internal_id.get(message.group, {}).get("id")
+            if isinstance(group_ids, list) and group_id and group_id in group_ids:
+                return True
 
         return False
 
+    def _should_react_for_lambda(
+        self,
+        message: Message,
+        f: Callable[[Message], bool] | None,
+    ) -> bool:
+        if f is None:
+            return True
+
+        return f(message)
+
     async def _ask_commands_to_handle(self, message: Message):
-        for command in self.commands:
+        for command, contacts, group_ids, f in self.commands:
+            if not self._should_react_for_contact(message, contacts, group_ids):
+                continue
+
+            if not self._should_react_for_lambda(message, f):
+                continue
+
             await self._q.put((command, message, time.perf_counter()))
 
     async def _consume(self, name: int) -> None:

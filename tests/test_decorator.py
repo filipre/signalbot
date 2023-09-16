@@ -26,7 +26,9 @@ class TriggeredCaseSensitiveCommand(Command):
 class TriggeredTest(ChatTestCase):
     def setUp(self):
         super().setUp()
-        self.signal_bot.register(TriggeredCommand())
+        group = {"id": "asdf", "name": "Test"}
+        self.signal_bot._groups_by_internal_id = {"group_id1=": group}
+        self.signal_bot.register(TriggeredCommand(), contacts=True, groups=True)
 
     @patch("signalbot.SignalAPI.send", new_callable=SendMessagesMock)
     @patch("signalbot.SignalAPI.receive", new_callable=ReceiveMessagesMock)
@@ -53,6 +55,8 @@ class TriggeredTest(ChatTestCase):
 class TriggeredCaseSensitiveTest(ChatTestCase):
     def setUp(self):
         super().setUp()
+        group = {"id": "asdf", "name": "Test"}
+        self.signal_bot._groups_by_internal_id = {"group_id1=": group}
         self.signal_bot.register(TriggeredCaseSensitiveCommand())
 
     @patch("signalbot.SignalAPI.send", new_callable=SendMessagesMock)

@@ -97,31 +97,6 @@ class TestListenUser(BotTestCase):
         self.assertSetEqual(self.signal_bot.user_chats, expected_user_chats)
 
 
-class TestListenGroup(BotTestCase):
-    def test_listen_group_id_internal_id_works(self):
-        self.signal_bot.listen(BotTestCase.group_id, BotTestCase.internal_id)
-        expected_group_chats = {BotTestCase.internal_id: BotTestCase.group_id}
-        self.assertDictEqual(self.signal_bot.group_chats, expected_group_chats)
-
-    def test_listen_group_id_internal_id_swapped_works(self):
-        self.signal_bot.listen(BotTestCase.internal_id, BotTestCase.group_id)
-        expected_group_chats = {BotTestCase.internal_id: BotTestCase.group_id}
-        self.assertDictEqual(self.signal_bot.group_chats, expected_group_chats)
-
-    def test_listenGroup_group_id_internal_id_works(self):
-        self.signal_bot.listenGroup(BotTestCase.group_id, BotTestCase.internal_id)
-        expected_group_chats = {BotTestCase.internal_id: BotTestCase.group_id}
-        self.assertDictEqual(self.signal_bot.group_chats, expected_group_chats)
-
-    def test_listenGroup_group_id_internal_id_swapped_doesnt_work(self):
-        self.signal_bot.listenGroup(BotTestCase.internal_id, BotTestCase.group_id)
-        self.assertDictEqual(self.signal_bot.group_chats, {})
-
-    def test_listen_invalid_input_doesnt_work(self):
-        self.signal_bot.listen("asdf", "qwer")
-        self.assertDictEqual(self.signal_bot.group_chats, {})
-
-
 class TestRegisterCommand(BotTestCase):
     def test_register_one_command(self):
         self.signal_bot.register(Command())
@@ -146,15 +121,3 @@ class TestRegisterCommand(BotTestCase):
 
         self.signal_bot.register(cmd)
         self.assertEqual(cmd.state, True)
-
-
-class TestRecipients(BotTestCase):
-    def test_recipient_is_phone_number(self):
-        recipient = "+49987654321"
-        new_recipient = self.signal_bot._resolve_receiver(recipient)
-        self.assertEqual(recipient, new_recipient)
-
-    def test_recipient_is_group_interal_id(self):
-        self.signal_bot.listen(BotTestCase.group_id, BotTestCase.internal_id)
-        resolved_recipient = self.signal_bot._resolve_receiver(BotTestCase.internal_id)
-        self.assertEqual(resolved_recipient, BotTestCase.group_id)

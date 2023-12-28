@@ -34,6 +34,7 @@ class SignalAPI:
         quote_message: str = None,
         quote_timestamp: str = None,
         mentions: list = None,
+        text_mode: str = None,
     ) -> aiohttp.ClientResponse:
         uri = self._send_rest_uri()
         if base64_attachments is None:
@@ -56,6 +57,8 @@ class SignalAPI:
             payload["quote_timestamp"] = quote_timestamp
         if mentions:
             payload["mentions"] = mentions
+        if text_mode:
+            payload["text_mode"] = text_mode
 
         try:
             async with aiohttp.ClientSession() as session:

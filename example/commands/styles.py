@@ -7,6 +7,7 @@ class StylesCommand(Command):
             await c.send("**Bold style**", text_mode="styled")
             await c.send("*Italic style*", text_mode="styled")
             await c.send("~Strikethrough style~", text_mode="styled")
+            await c.send("||Spoiler style||", text_mode="styled")            
             await c.send("`Monospaced style`", text_mode="styled")
 
 if __name__ == "__main__":

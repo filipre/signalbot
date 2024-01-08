@@ -13,7 +13,7 @@ class StylesCommand(Command):
 if __name__ == "__main__":
     bot = SignalBot({
         "signal_service": os.environ["SIGNAL_SERVICE"],
-        "phone_number": os.environ["PHONE_NUMBER"]
+        "phone_number": os.environ["PHONE_NUMBER"],
     })
     bot.register(StylesCommand()) # all contacts and groups
     bot.start()

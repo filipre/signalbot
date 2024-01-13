@@ -181,6 +181,7 @@ class SignalBot:
         quote_message: str = None,
         quote_timestamp: str = None,
         mentions: list = None,
+        text_mode: str = None,
         listen: bool = False,
     ) -> int:
         receiver = self._resolve_receiver(receiver)
@@ -193,6 +194,7 @@ class SignalBot:
             quote_message=quote_message,
             quote_timestamp=quote_timestamp,
             mentions=mentions,
+            text_mode=text_mode,
         )
         resp_payload = await resp.json()
         timestamp = resp_payload["timestamp"]

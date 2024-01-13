@@ -12,12 +12,14 @@ class Context:
         text: str,
         base64_attachments: list = None,
         mentions: list = None,
+        text_mode: str = None,
     ):
         return await self.bot.send(
             self.message.recipient(),
             text,
             base64_attachments=base64_attachments,
             mentions=mentions,
+            text_mode=text_mode,
         )
 
     async def reply(
@@ -25,6 +27,7 @@ class Context:
         text: str,
         base64_attachments: list = None,
         mentions: list = None,
+        text_mode: str = None,
     ):
         return await self.bot.send(
             self.message.recipient(),
@@ -35,6 +38,7 @@ class Context:
             quote_message=self.message.text,
             quote_timestamp=self.message.timestamp,
             mentions=mentions,
+            text_mode=text_mode,
         )
 
     async def react(self, emoji: str):

@@ -4,13 +4,25 @@ from typing import Any
 
 
 class Storage:
+    def __init__(self):
+        self.redis = None
+
     def exists(self, key: str) -> bool:
+        raise NotImplementedError
+
+    def delete(self, *keys: str) -> int:
         raise NotImplementedError
 
     def read(self, key: str) -> Any:
         raise NotImplementedError
 
     def save(self, key: str, object: Any):
+        raise NotImplementedError
+
+    def sadd(self, key: str, *values: Any) -> int:
+        raise NotImplementedError
+
+    def smembers(self, key: str) -> set:
         raise NotImplementedError
 
 
@@ -24,6 +36,17 @@ class InMemoryStorage(Storage):
 
     def exists(self, key: str) -> bool:
         return key in self._storage
+
+    def delete(self, *keys: str) -> int:
+        try:
+            deleted_count = 0
+            for key in keys:
+                if key in self._storage:
+                    del self._storage[key]
+                    deleted_count += 1
+            return deleted_count
+        except Exception as e:
+            raise StorageError(f"InMemory delete failed: {e}")
 
     def read(self, key: str) -> Any:
         try:
@@ -43,14 +66,20 @@ class InMemoryStorage(Storage):
 
 class RedisStorage(Storage):
     def __init__(self, host, port):
-        self._redis = redis.Redis(host=host, port=port, db=0)
+        self.redis = redis.Redis(host=host, port=port, db=0)
 
     def exists(self, key: str) -> bool:
-        return self._redis.exists(key)
+        return self.redis.exists(key)
+
+    def delete(self, *keys: str) -> int:
+        try:
+            return self.redis.delete(*keys)
+        except Exception as e:
+            raise StorageError(f"Redis delete failed: {e}")
 
     def read(self, key: str) -> Any:
         try:
-            result_bytes = self._redis.get(key)
+            result_bytes = self.redis.get(key)
             result_str = result_bytes.decode("utf-8")
             result_dict = json.loads(result_str)
             return result_dict
@@ -60,6 +89,7 @@ class RedisStorage(Storage):
     def save(self, key: str, object: Any):
         try:
             object_str = json.dumps(object)
-            self._redis.set(key, object_str)
+            self.redis.set(key, object_str)
         except Exception as e:
-            raise StorageError(f"Redis save failed: {e}")
+            raise StorageError(f"Redis save failed: {e}")  
+

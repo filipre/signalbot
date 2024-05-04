@@ -338,8 +338,8 @@ class SignalBot:
     def _should_react_for_contact(
         self,
         message: Message,
-        contacts: list[str] | bool,
-        group_ids: list[str] | bool,
+        contacts: Union[list[str], bool],
+        group_ids: Union[list[str], bool],
     ):
         """Is the command activated for a certain chat or group?"""
 
@@ -379,7 +379,7 @@ class SignalBot:
     def _should_react_for_lambda(
         self,
         message: Message,
-        f: Callable[[Message], bool] | None,
+        f: Optional[Callable[[Message], bool]] = None,
     ) -> bool:
         if f is None:
             return True

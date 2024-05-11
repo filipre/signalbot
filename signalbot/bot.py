@@ -267,6 +267,19 @@ class SignalBot:
         await self._signal.react(recipient, emoji, target_author, timestamp)
         logging.info(f"[Bot] New reaction: {emoji}")
 
+    async def receipt(self, message: Message, receipt_type: str):
+        recipient = message.recipient()
+
+        # can't do groups yet because not supported in signal-cli
+        if getattr(message, "group"):
+            return
+
+        recipient = self._resolve_receiver(recipient)
+        target_author = message.source
+        timestamp = message.timestamp
+        await self._signal.receipt(recipient, receipt_type, target_author, timestamp)
+        logging.info(f"[Bot] Receipt: {receipt_type}")
+
     async def start_typing(self, receiver: str):
         receiver = self._resolve_receiver(receiver)
         await self._signal.start_typing(receiver)

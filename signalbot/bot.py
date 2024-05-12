@@ -413,8 +413,11 @@ class SignalBot:
         try:
             context = Context(self, message)
             await command.handle(context)
+        except NotImplementedError as e:
+            logging.error(f"[{command.__class__.__name__}] Error: handle() method not implemented")
+            raise e
         except Exception as e:
-            logging.error(f"[{command.__class__.__name__}] Error: {e}")
+            logging.error(f"[{command.__class__.__name__}] {e.__class__} Error: {e}")
             raise e
 
         # done

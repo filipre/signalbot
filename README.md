@@ -32,7 +32,7 @@ Please check out https://github.com/bbernhard/signal-cli-rest-api#getting-starte
 1. Run signal-cli-rest-api in `normal` mode first.
 ```bash
 docker run -p 8080:8080 \
-    -v $(PWD)/signal-cli-config:/home/.local/share/signal-cli \
+    -v $PWD/signal-cli-config:/home/.local/share/signal-cli \
     -e 'MODE=normal' bbernhard/signal-cli-rest-api:0.57
 ```
 

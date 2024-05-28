@@ -6,7 +6,7 @@ import logging
 import traceback
 from typing import Optional, Union, List, Callable
 import re
-
+from uuid import UUID
 from .api import SignalAPI, ReceiveMessagesError
 from .command import Command
 from .message import Message, UnknownMessageFormatError
@@ -242,7 +242,10 @@ class SignalBot:
 
         if self._is_group_id(receiver):
             return receiver
-
+        
+        if self._is_uuid(receiver):
+        	return receiver
+        	
         try:
             group_id = self._groups_by_internal_id[receiver]["id"]
             return group_id
@@ -277,6 +280,13 @@ class SignalBot:
         if internal_id is None:
             return False
         return internal_id[-1] == "="
+    
+    def _is_uuid(self, uuidstr: str) -> bool:
+        try:
+            uuid_obj = UUID(uuidstr, version=4)
+        except ValueError:
+            return False
+        return str(uuid_obj) == uuidstr
 
     # see https://stackoverflow.com/questions/55184226/catching-exceptions-in-individual-tasks-and-restarting-them
     @classmethod

@@ -11,8 +11,8 @@ from signalbot.utils import (
 )
 
 
-class ChingChangChongCommand(Command):
-    triggers = ["ching", "chang"]
+class OneTwoThreeCommand(Command):
+    triggers = ["one", "two"]
 
     def __init__(self, listen):
         self.listen = listen
@@ -22,26 +22,26 @@ class ChingChangChongCommand(Command):
             return
 
         text = c.message.text
-        if text == "ching":
+        if text == "one":
             await asyncio.sleep(1)
-            await c.send("chang", listen=self.listen)
+            await c.send("two", listen=self.listen)
             return
 
-        if text == "chang":
+        if text == "two":
             await asyncio.sleep(1)
-            await c.send("chong")
+            await c.send("three")
             return
 
 
 # class EnabledListenChatTest(ChatTestCase):
 #     def setUp(self):
 #         super().setUp()
-#         self.signal_bot.register(ChingChangChongCommand(listen=True))
+#         self.signal_bot.register(OneTwoThreeCommand(listen=True))
 
 #     @patch("signalbot.SignalAPI.send", new_callable=SendMessagesMock)
 #     @patch("signalbot.SignalAPI.receive", new_callable=ReceiveMessagesMock)
 #     async def test_chat(self, receive_mock, send_mock):
-#         receive_mock.define(["ching"])
+#         receive_mock.define(["one"])
 #         await self.run_bot()
 #         self.assertEqual(send_mock.call_count, 2)
 
@@ -51,12 +51,12 @@ class ChingChangChongCommand(Command):
 #         super().setUp()
 #         group = {"id": "asdf", "name": "Test"}
 #         self.signal_bot._groups_by_internal_id = {"group_id1=": group}
-#         self.signal_bot.register(ChingChangChongCommand(listen=False))
+#         self.signal_bot.register(OneTwoThreeCommand(listen=False))
 
 #     @patch("signalbot.SignalAPI.send", new_callable=SendMessagesMock)
 #     @patch("signalbot.SignalAPI.receive", new_callable=ReceiveMessagesMock)
 #     async def test_chat(self, receive_mock, send_mock):
-#         receive_mock.define(["ching"])
+#         receive_mock.define(["one"])
 #         await self.run_bot()
 #         self.assertEqual(send_mock.call_count, 1)
 
@@ -64,9 +64,9 @@ class ChingChangChongCommand(Command):
 # class DecoratorChatTest(ChatTestCase):
 #     def setUp(self):
 #         super().setUp()
-#         self.signal_bot.register(ChingChangChongCommand(listen=True))
+#         self.signal_bot.register(OneTwoThreeCommand(listen=True))
 
-#     @chat("how are you doing", "ching")
+#     @chat("how are you doing", "one")
 #     def test_chat(self, query, replies, reactions):
 #         self.assertEqual(replies.call_count, 2)
 

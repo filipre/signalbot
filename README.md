@@ -32,7 +32,7 @@ Please check out https://github.com/bbernhard/signal-cli-rest-api#getting-starte
 1. Run signal-cli-rest-api in `normal` mode first.
 ```bash
 docker run -p 8080:8080 \
-    -v $(PWD)/signal-cli-config:/home/.local/share/signal-cli \
+    -v $(pwd)/signal-cli-config:/home/.local/share/signal-cli \
     -e 'MODE=normal' bbernhard/signal-cli-rest-api:0.57
 ```
 
@@ -43,7 +43,7 @@ docker run -p 8080:8080 \
 4. Restart the server in `json-rpc` mode.
 ```bash
 docker run -p 8080:8080 \
-    -v $(PWD)/signal-cli-config:/home/.local/share/signal-cli \
+    -v $(pwd)/signal-cli-config:/home/.local/share/signal-cli \
     -e 'MODE=json-rpc' bbernhard/signal-cli-rest-api:0.57
 ```
 

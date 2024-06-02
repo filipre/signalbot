@@ -10,6 +10,9 @@ class Storage:
     def read(self, key: str) -> Any:
         raise NotImplementedError
 
+    def delete(self, *keys: str) -> int:
+        raise NotImplementedError
+
     def save(self, key: str, object: Any):
         raise NotImplementedError
 
@@ -32,6 +35,17 @@ class InMemoryStorage(Storage):
             return result_dict
         except Exception as e:
             raise StorageError(f"InMemory load failed: {e}")
+
+    def delete(self, *keys: str) -> int:
+        try:
+            deleted_count = 0
+            for key in keys:
+                if key in self._storage:
+                    del self._storage[key]
+                    deleted_count += 1
+            return deleted_count
+        except Exception as e:
+            raise StorageError(f"InMemory delete failed: {e}")
 
     def save(self, key: str, object: Any):
         try:
@@ -56,6 +70,12 @@ class RedisStorage(Storage):
             return result_dict
         except Exception as e:
             raise StorageError(f"Redis load failed: {e}")
+
+    def delete(self, *keys: str) -> int:
+        try:
+            return self._redis.delete(*keys)
+        except Exception as e:
+            raise StorageError(f"Redis delete failed: {e}")
 
     def save(self, key: str, object: Any):
         try:

@@ -6,6 +6,7 @@ import logging
 import traceback
 from typing import Optional, Union, List, Callable
 import re
+import phonenumbers
 
 from .api import SignalAPI, ReceiveMessagesError
 from .command import Command
@@ -251,13 +252,11 @@ class SignalBot:
             raise SignalBotError(f"Cannot resolve receiver.")
 
     def _is_phone_number(self, phone_number: str) -> bool:
-        if phone_number is None:
+        try:
+            parsed_number = phonenumbers.parse(phone_number, None)
+            return phonenumbers.is_valid_number(parsed_number)
+        except phonenumbers.phonenumberutil.NumberParseException:
             return False
-        if phone_number[0] != "+":
-            return False
-        if len(phone_number[1:]) > 15:
-            return False
-        return True
 
     def _is_group_id(self, group_id: str) -> bool:
         """Check if group_id has the right format, e.g.

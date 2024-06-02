@@ -6,6 +6,7 @@ import logging
 import traceback
 from typing import Optional, Union, List, Callable
 import re
+import uuid
 
 from .api import SignalAPI, ReceiveMessagesError
 from .command import Command
@@ -240,6 +241,9 @@ class SignalBot:
         if self._is_phone_number(receiver):
             return receiver
 
+        if self._is_valid_uuid(receiver):
+            return receiver
+
         if self._is_group_id(receiver):
             return receiver
 
@@ -258,6 +262,13 @@ class SignalBot:
         if len(phone_number[1:]) > 15:
             return False
         return True
+
+    def _is_valid_uuid(self, receiver_uuid: str):
+        try:
+            uuid.UUID(str(receiver_uuid))
+            return True
+        except ValueError:
+            return False
 
     def _is_group_id(self, group_id: str) -> bool:
         """Check if group_id has the right format, e.g.

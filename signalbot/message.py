@@ -1,6 +1,6 @@
 import json
 from enum import Enum
-
+from typing import Optional
 
 class MessageType(Enum):
     SYNC_MESSAGE = 1
@@ -11,6 +11,8 @@ class Message:
     def __init__(
         self,
         source: str,
+        source_number: Optional[str],
+        source_uuid: str,
         timestamp: int,
         type: MessageType,
         text: str,
@@ -22,6 +24,8 @@ class Message:
     ):
         # required
         self.source = source
+        self.source_number = source_number
+        self.source_uuid = source_uuid
         self.timestamp = timestamp
         self.type = type
         self.text = text
@@ -65,9 +69,12 @@ class Message:
         # General attributes
         try:
             source = raw_message["envelope"]["source"]
+            source_uuid = raw_message["envelope"]["sourceUuid"]
             timestamp = raw_message["envelope"]["timestamp"]
         except Exception:
             raise UnknownMessageFormatError
+
+        source_number = raw_message["envelope"].get("sourceNumber")
 
         # Option 1: syncMessage
         if "syncMessage" in raw_message["envelope"]:
@@ -99,6 +106,8 @@ class Message:
 
         return cls(
             source,
+            source_number,
+            source_uuid,
             timestamp,
             type,
             text,

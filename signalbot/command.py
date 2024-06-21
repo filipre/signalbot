@@ -1,4 +1,5 @@
 import functools
+from abc import ABC, abstractmethod
 
 from .message import Message
 from .context import Context
@@ -27,7 +28,7 @@ def triggered(*by, case_sensitive=False):
     return decorator_triggered
 
 
-class Command:
+class Command(ABC):
     # optional
     def setup(self):
         pass
@@ -37,8 +38,9 @@ class Command:
         return None
 
     # overwrite
+    @abstractmethod
     async def handle(self, context: Context):
-        raise NotImplementedError
+        pass
 
     # helper method
     # deprecated: please use @triggered

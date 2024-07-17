@@ -2,6 +2,7 @@ import json
 from enum import Enum
 from typing import Optional
 
+
 class MessageType(Enum):
     SYNC_MESSAGE = 1
     DATA_MESSAGE = 2

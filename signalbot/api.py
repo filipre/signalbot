@@ -138,8 +138,8 @@ class SignalAPI:
             aiohttp.ClientError,
             aiohttp.http_exceptions.HttpProcessingError,
         ):
-            raise GroupsError        
-        
+            raise GroupsError
+
     async def get_attachment(self, attachment_id: str) -> str:
         uri = f"{self._attachment_rest_uri()}/{attachment_id}"
         try:

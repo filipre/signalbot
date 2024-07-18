@@ -102,7 +102,9 @@ class Message:
             base64_attachments = await cls._parse_attachments(
                 signal, raw_message["envelope"]["dataMessage"]
             )
-            attachments_filenames = cls._parse_attachments_filenames(raw_message["envelope"]["dataMessage"])
+            attachments_filenames = cls._parse_attachments_filenames(
+                raw_message["envelope"]["dataMessage"]
+            )
 
         else:
             raise UnknownMessageFormatError
@@ -138,7 +140,7 @@ class Message:
             return []
 
         return [attachment["id"] for attachment in data_message["attachments"]]
-    
+
     @classmethod
     def _parse_sync_message(cls, sync_message: dict) -> str:
         try:

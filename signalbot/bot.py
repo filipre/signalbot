@@ -6,6 +6,7 @@ import logging
 import traceback
 from typing import Optional, Union, List, Callable
 import re
+import uuid
 import phonenumbers
 
 from .api import SignalAPI, ReceiveMessagesError
@@ -241,6 +242,9 @@ class SignalBot:
         if self._is_phone_number(receiver):
             return receiver
 
+        if self._is_valid_uuid(receiver):
+            return receiver
+
         if self._is_group_id(receiver):
             return receiver
 
@@ -256,6 +260,13 @@ class SignalBot:
             parsed_number = phonenumbers.parse(phone_number, None)
             return phonenumbers.is_valid_number(parsed_number)
         except phonenumbers.phonenumberutil.NumberParseException:
+            return False
+
+    def _is_valid_uuid(self, receiver_uuid: str):
+        try:
+            uuid.UUID(str(receiver_uuid))
+            return True
+        except ValueError:
             return False
 
     def _is_group_id(self, group_id: str) -> bool:

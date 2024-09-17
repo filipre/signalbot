@@ -26,6 +26,7 @@ aiohttp = "^3.8.1"
 python = "^3.9"
 redis = "^4.1.4"
 websockets = "^10.2"
+phonenumbers = "^8.13.37"
 
 [tool.poetry.dev-dependencies]
 black = "^22.1.0"

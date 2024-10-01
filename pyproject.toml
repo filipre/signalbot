@@ -23,7 +23,7 @@ version = "0.11.0"
 [tool.poetry.dependencies]
 APScheduler = "3.10.4"
 aiohttp = "3.10.5"
-python = "3.12.6"
+python = "3.11.10"
 redis = "5.0.8"
 websockets = "13.0.1"
 

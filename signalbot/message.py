@@ -1,5 +1,6 @@
 import json
 from enum import Enum
+from typing import Optional
 
 
 from signalbot.api import SignalAPI
@@ -91,6 +92,7 @@ class Message:
                 raw_message["envelope"]["syncMessage"]["sentMessage"]
             )
             base64_attachments = None
+            attachments_filenames = None
 
         # Option 2: dataMessage
         elif "dataMessage" in raw_message["envelope"]:

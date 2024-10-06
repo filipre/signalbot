@@ -6,7 +6,7 @@ import functools
 import aiohttp
 from unittest.mock import AsyncMock, MagicMock
 
-from ..bot import SignalBot
+from ..bot import SignalBot, Command, Context
 
 from unittest.mock import patch
 
@@ -131,3 +131,8 @@ class ReactMessageMock(AsyncMock):
         for args in self.call_args_list:
             results.append(args[0])
         return results
+
+
+class DummyCommand(Command):
+    async def handle(self, context: Context):
+        pass

@@ -2,6 +2,8 @@ import unittest
 import asyncio
 from unittest.mock import patch, AsyncMock
 from signalbot import SignalBot, Command, SignalAPI
+from signalbot.context import Context
+from signalbot.utils import DummyCommand
 
 
 class BotTestCase(unittest.IsolatedAsyncioTestCase):
@@ -35,8 +37,8 @@ class TestProducer(BotTestCase):
         )
         self.signal_bot.listen(TestProducer.group_id, TestProducer.internal_id)
         # Any two commands
-        self.signal_bot.register(Command())
-        self.signal_bot.register(Command())
+        self.signal_bot.register(DummyCommand())
+        self.signal_bot.register(DummyCommand())
 
         await self.signal_bot._produce(1337)
 
@@ -99,13 +101,13 @@ class TestListenUser(BotTestCase):
 
 class TestRegisterCommand(BotTestCase):
     def test_register_one_command(self):
-        self.signal_bot.register(Command())
+        self.signal_bot.register(DummyCommand())
         self.assertEqual(len(self.signal_bot.commands), 1)
 
     def test_register_three_commands(self):
-        self.signal_bot.register(Command())
-        self.signal_bot.register(Command())
-        self.signal_bot.register(Command())
+        self.signal_bot.register(DummyCommand())
+        self.signal_bot.register(DummyCommand())
+        self.signal_bot.register(DummyCommand())
         self.assertEqual(len(self.signal_bot.commands), 3)
 
     def test_register_calls_setup_of_command(self):
@@ -115,6 +117,9 @@ class TestRegisterCommand(BotTestCase):
 
             def setup(self):
                 self.state = True
+
+            def handle(self, context: Context):
+                pass
 
         cmd = SomeTestCommand()
         self.assertEqual(cmd.state, False)

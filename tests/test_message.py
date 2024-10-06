@@ -1,9 +1,10 @@
 import base64
 import unittest
-from unittest.mock import AsyncMock, patch
-
+from unittest.mock import AsyncMock, patch, Mock
+import aiohttp
 from signalbot import Message, MessageType
 from signalbot.api import SignalAPI
+from signalbot.utils import ChatTestCase, SendMessagesMock, ReceiveMessagesMock
 
 
 class TestMessage(unittest.IsolatedAsyncioTestCase):
@@ -77,9 +78,16 @@ class TestMessage(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(message.reaction, "👍")
 
     @patch("aiohttp.ClientSession.get", new_callable=AsyncMock)
-    async def test_attachments(self, mock):
-        mock.return_value = b"test"
-        expected_base64_bytes = base64.b64encode(mock.return_value)
+    async def test_attachments(self, mock_get):
+        attachment_bytes_str = b"test"
+
+        mock_response = AsyncMock(spec=aiohttp.ClientResponse)
+        mock_response.raise_for_status = Mock()
+        mock_response.content.read = AsyncMock(return_value=attachment_bytes_str)
+
+        mock_get.return_value = mock_response
+
+        expected_base64_bytes = base64.b64encode(attachment_bytes_str)
         expected_base64_str = str(expected_base64_bytes, encoding="utf-8")
 
         message = await Message.parse(

@@ -1,12 +1,13 @@
 import base64
 import unittest
-from unittest.mock import AsyncMock, patch
-
+from unittest.mock import AsyncMock, patch, Mock
+import aiohttp
 from signalbot import Message, MessageType
 from signalbot.api import SignalAPI
+from signalbot.utils import ChatTestCase, SendMessagesMock, ReceiveMessagesMock
 
 
-class TestMessage(unittest.TestCase):
+class TestMessage(unittest.IsolatedAsyncioTestCase):
     raw_sync_message = '{"envelope":{"source":"+490123456789","sourceNumber":"+490123456789","sourceUuid":"<uuid>","sourceName":"<name>","sourceDevice":1,"timestamp":1632576001632,"syncMessage":{"sentMessage":{"timestamp":1632576001632,"message":"Uhrzeit","expiresInSeconds":0,"viewOnce":false,"mentions":[],"attachments":[],"contacts":[],"groupInfo":{"groupId":"<groupid>","type":"DELIVER"},"destination":null,"destinationNumber":null,"destinationUuid":null}}}}'  # noqa
     raw_data_message = '{"envelope":{"source":"+490123456789","sourceNumber":"+490123456789","sourceUuid":"<uuid>","sourceName":"<name>","sourceDevice":1,"timestamp":1632576001632,"dataMessage":{"timestamp":1632576001632,"message":"Uhrzeit","expiresInSeconds":0,"viewOnce":false,"mentions":[],"attachments":[],"contacts":[],"groupInfo":{"groupId":"<groupid>","type":"DELIVER"}}}}'  # noqa
     raw_reaction_message = '{"envelope":{"source":"<source>","sourceNumber":"<source>","sourceUuid":"<uuid>","sourceName":"<name>","sourceDevice":1,"timestamp":1632576001632,"syncMessage":{"sentMessage":{"timestamp":1632576001632,"message":null,"expiresInSeconds":0,"viewOnce":false,"reaction":{"emoji":"👍","targetAuthor":"<target>","targetAuthorNumber":"<target>","targetAuthorUuid":"<uuid>","targetSentTimestamp":1632576001632,"isRemove":false},"mentions":[],"attachments":[],"contacts":[],"groupInfo":{"groupId":"<groupid>","type":"DELIVER"},"destination":null,"destinationNumber":null,"destinationUuid":null}}}}'  # noqa
@@ -77,9 +78,16 @@ class TestMessage(unittest.TestCase):
         self.assertEqual(message.reaction, "👍")
 
     @patch("aiohttp.ClientSession.get", new_callable=AsyncMock)
-    async def test_attachments(self, mock):
-        mock.return_value = b"test"
-        expected_base64_bytes = base64.b64encode(mock.return_value)
+    async def test_attachments(self, mock_get):
+        attachment_bytes_str = b"test"
+
+        mock_response = AsyncMock(spec=aiohttp.ClientResponse)
+        mock_response.raise_for_status = Mock()
+        mock_response.content.read = AsyncMock(return_value=attachment_bytes_str)
+
+        mock_get.return_value = mock_response
+
+        expected_base64_bytes = base64.b64encode(attachment_bytes_str)
         expected_base64_str = str(expected_base64_bytes, encoding="utf-8")
 
         message = await Message.parse(

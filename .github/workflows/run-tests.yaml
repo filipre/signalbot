@@ -18,10 +18,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - name: Set up Python 3.12
+      - name: Set up Python
         uses: actions/setup-python@v2
         with:
-          python-version: 3.12.7
+          python-version: 3.13.1
       - uses: pre-commit/action@v2.0.3
 
   unittest:
@@ -29,14 +29,14 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - name: Set up Python 3.12
+      - name: Set up Python
         uses: actions/setup-python@v2
         with:
-          python-version: 3.12.7
+          python-version: 3.13.1
       - name: Install Poetry
         uses: abatilo/actions-poetry@v2.0.0
         with:
-          poetry-version: 1.8.3
+          poetry-version: 1.8.4
       - name: Install dependencies
         run: poetry install --no-dev
       - name: Run unit tests

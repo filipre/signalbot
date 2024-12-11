@@ -3,6 +3,9 @@ from enum import Enum
 from typing import Optional
 
 
+from signalbot.api import SignalAPI
+
+
 class MessageType(Enum):
     SYNC_MESSAGE = 1
     DATA_MESSAGE = 2
@@ -61,7 +64,7 @@ class Message:
         return bool(self.group)
 
     @classmethod
-    def parse(cls, raw_message: str):
+    async def parse(cls, signal: SignalAPI, raw_message: str):
         try:
             raw_message = json.loads(raw_message)
         except Exception:
@@ -90,6 +93,7 @@ class Message:
             mentions = cls._parse_mentions(
                 raw_message["envelope"]["syncMessage"]["sentMessage"]
             )
+            base64_attachments = None
 
         # Option 2: dataMessage
         elif "dataMessage" in raw_message["envelope"]:
@@ -98,12 +102,12 @@ class Message:
             group = cls._parse_group_information(raw_message["envelope"]["dataMessage"])
             reaction = cls._parse_reaction(raw_message["envelope"]["dataMessage"])
             mentions = cls._parse_mentions(raw_message["envelope"]["dataMessage"])
+            base64_attachments = await cls._parse_attachments(
+                signal, raw_message["envelope"]["dataMessage"]
+            )
 
         else:
             raise UnknownMessageFormatError
-
-        # TODO: base64_attachments
-        base64_attachments = []
 
         return cls(
             source,
@@ -118,6 +122,17 @@ class Message:
             mentions,
             raw_message,
         )
+
+    @classmethod
+    async def _parse_attachments(cls, signal: SignalAPI, data_message: dict) -> str:
+
+        if "attachments" not in data_message:
+            return []
+
+        return [
+            await signal.get_attachment(attachment["id"])
+            for attachment in data_message["attachments"]
+        ]
 
     @classmethod
     def _parse_sync_message(cls, sync_message: dict) -> str:

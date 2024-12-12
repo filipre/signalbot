@@ -44,6 +44,9 @@ class Context:
     async def react(self, emoji: str):
         await self.bot.react(self.message, emoji)
 
+    async def receipt(self, receipt_type: str):
+        await self.bot.receipt(self.message, receipt_type)
+
     async def start_typing(self):
         await self.bot.start_typing(self.message.recipient())
 

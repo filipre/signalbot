@@ -93,6 +93,26 @@ class SignalAPI:
         ):
             raise ReactionError
 
+    async def receipt(
+        self, recipient: str, receipt_type: str, target_author: str, timestamp: int
+    ) -> aiohttp.ClientResponse:
+        uri = self._receipt_rest_uri()
+        payload = {
+            "recipient": recipient,
+            "receipt_type": receipt_type,
+            "timestamp": timestamp,
+        }
+        try:
+            async with aiohttp.ClientSession() as session:
+                resp = await session.post(uri, json=payload)
+                resp.raise_for_status()
+                return resp
+        except (
+            aiohttp.ClientError,
+            aiohttp.http_exceptions.HttpProcessingError,
+        ):
+            raise ReactionError
+
     async def start_typing(self, receiver: str):
         uri = self._typing_indicator_uri()
         payload = {
@@ -149,6 +169,9 @@ class SignalAPI:
 
     def _typing_indicator_uri(self):
         return f"http://{self.signal_service}/v1/typing-indicator/{self.phone_number}"
+
+    def _receipt_rest_uri(self):
+        return f"http://{self.signal_service}/v1/receipts/{self.phone_number}"
 
     def _groups_uri(self):
         return f"http://{self.signal_service}/v1/groups/{self.phone_number}"

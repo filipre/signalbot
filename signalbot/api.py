@@ -2,6 +2,7 @@ import base64
 
 import aiohttp
 import websockets
+from typing import Any
 
 
 class SignalAPI:
@@ -35,7 +36,7 @@ class SignalAPI:
         quote_mentions: list = None,
         quote_message: str = None,
         quote_timestamp: str = None,
-        mentions: list = None,
+        mentions: list[dict[str, Any]] | None = None,
         text_mode: str = None,
     ) -> aiohttp.ClientResponse:
         uri = self._send_rest_uri()

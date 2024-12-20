@@ -1,5 +1,6 @@
 from .chat_testing import (
     ChatTestCase,
+    DummyCommand,
     SendMessagesMock,
     ReceiveMessagesMock,
     ReactMessageMock,
@@ -8,6 +9,7 @@ from .chat_testing import (
 
 __all__ = [
     "ChatTestCase",
+    "DummyCommand",
     "SendMessagesMock",
     "ReceiveMessagesMock",
     "ReactMessageMock",

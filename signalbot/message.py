@@ -21,6 +21,7 @@ class Message:
         type: MessageType,
         text: str,
         base64_attachments: list = None,
+        attachments_local_filenames: Optional[list] = None,
         group: str = None,
         reaction: str = None,
         mentions: list = None,
@@ -38,6 +39,10 @@ class Message:
         self.base64_attachments = base64_attachments
         if self.base64_attachments is None:
             self.base64_attachments = []
+
+        self.attachments_local_filenames = attachments_local_filenames
+        if self.attachments_local_filenames is None:
+            self.attachments_local_filenames = []
 
         self.group = group
 
@@ -94,6 +99,7 @@ class Message:
                 raw_message["envelope"]["syncMessage"]["sentMessage"]
             )
             base64_attachments = None
+            attachments_local_filenames = None
 
         # Option 2: dataMessage
         elif "dataMessage" in raw_message["envelope"]:
@@ -104,6 +110,9 @@ class Message:
             mentions = cls._parse_mentions(raw_message["envelope"]["dataMessage"])
             base64_attachments = await cls._parse_attachments(
                 signal, raw_message["envelope"]["dataMessage"]
+            )
+            attachments_local_filenames = cls._parse_attachments_local_filenames(
+                raw_message["envelope"]["dataMessage"]
             )
 
         else:
@@ -117,6 +126,7 @@ class Message:
             type,
             text,
             base64_attachments,
+            attachments_local_filenames,
             group,
             reaction,
             mentions,
@@ -133,6 +143,15 @@ class Message:
             await signal.get_attachment(attachment["id"])
             for attachment in data_message["attachments"]
         ]
+
+    @classmethod
+    def _parse_attachments_local_filenames(cls, data_message: dict) -> list[str]:
+
+        if "attachments" not in data_message:
+            return []
+
+        # The ["id"] is the local filename and the ["filename"] is the remote filename
+        return [attachment["id"] for attachment in data_message["attachments"]]
 
     @classmethod
     def _parse_sync_message(cls, sync_message: dict) -> str:

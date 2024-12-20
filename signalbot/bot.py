@@ -181,8 +181,9 @@ class SignalBot:
         quote_mentions: list = None,
         quote_message: str = None,
         quote_timestamp: str = None,
-        mentions: list[dict[str, Any]]
-        | None = None,  # [{ "author": "uuid" , "start": 0, "length": 1 }]
+        mentions: (
+            list[dict[str, Any]] | None
+        ) = None,  # [{ "author": "uuid" , "start": 0, "length": 1 }]
         text_mode: str = None,
         listen: bool = False,
     ) -> int:

@@ -27,8 +27,9 @@ class Context:
         self,
         text: str,
         base64_attachments: list = None,
-        mentions: list[dict[str, Any]]
-        | None = None,  # [{ "author": "uuid" , "start": 0, "length": 1 }]
+        mentions: (
+            list[dict[str, Any]] | None
+        ) = None,  # [{ "author": "uuid" , "start": 0, "length": 1 }]
         text_mode: str = None,
     ):
         return await self.bot.send(

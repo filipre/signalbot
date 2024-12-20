@@ -1,5 +1,6 @@
 # from .bot import Signalbot # TODO: figure out how to enable this for typing
 from .message import Message
+from typing import Any
 
 
 class Context:
@@ -26,7 +27,8 @@ class Context:
         self,
         text: str,
         base64_attachments: list = None,
-        mentions: list = None,
+        mentions: list[dict[str, Any]]
+        | None = None,  # [{ "author": "uuid" , "start": 0, "length": 1 }]
         text_mode: str = None,
     ):
         return await self.bot.send(

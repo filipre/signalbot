@@ -59,6 +59,11 @@ class TestAPI(unittest.IsolatedAsyncioTestCase):
         actual_uri = self.signal_api._send_rest_uri()
         self.assertEqual(actual_uri, expected_uri)
 
+    def test_attachment_rest_uri(self):
+        expected_uri = f"http://{self.signal_service}/v1/attachments"
+        actual_uri = self.signal_api._attachment_rest_uri()
+        self.assertEqual(actual_uri, expected_uri)
+
 
 if __name__ == "__main__":
     unittest.main()

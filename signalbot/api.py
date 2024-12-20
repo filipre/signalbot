@@ -1,3 +1,5 @@
+import base64
+
 import aiohttp
 import websockets
 from typing import Any
@@ -139,6 +141,27 @@ class SignalAPI:
         ):
             raise GroupsError
 
+    async def get_attachment(self, attachment_id: str) -> str:
+        uri = f"{self._attachment_rest_uri()}/{attachment_id}"
+        try:
+            async with aiohttp.ClientSession() as session:
+                resp = await session.get(uri)
+                resp.raise_for_status()
+                content = await resp.content.read()
+        except (
+            aiohttp.ClientError,
+            aiohttp.http_exceptions.HttpProcessingError,
+        ):
+            raise GetAttachmentError
+
+        base64_bytes = base64.b64encode(content)
+        base64_string = str(base64_bytes, encoding="utf-8")
+
+        return base64_string
+
+    def _attachment_rest_uri(self):
+        return f"http://{self.signal_service}/v1/attachments"
+
     def _receive_ws_uri(self):
         return f"ws://{self.signal_service}/v1/receive/{self.phone_number}"
 
@@ -180,4 +203,8 @@ class ReactionError(Exception):
 
 
 class GroupsError(Exception):
+    pass
+
+
+class GetAttachmentError(Exception):
     pass

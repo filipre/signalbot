@@ -1,4 +1,5 @@
 import unittest
+import aiohttp
 import asyncio
 from unittest.mock import patch, AsyncMock
 from signalbot import SignalBot, Command, SignalAPI
@@ -21,8 +22,9 @@ class BotTestCase(unittest.IsolatedAsyncioTestCase):
 
 
 class TestProducer(BotTestCase):
+    @patch("aiohttp.ClientSession.get", new_callable=AsyncMock)
     @patch("websockets.connect")
-    async def test_produce(self, mock):
+    async def test_produce(self, mock, get_group_mock):
         # Two messages
         message1 = '{"envelope":{"source":"+4901234567890","sourceNumber":"+4901234567890","sourceUuid":"asdf","sourceName":"name","sourceDevice":1,"timestamp":1633169000000,"syncMessage":{"sentMessage":{"timestamp":1633169000000,"message":"Message 1","expiresInSeconds":0,"viewOnce":false,"mentions":[],"attachments":[],"contacts":[],"groupInfo":{"groupId":"group_id1=","type":"DELIVER"},"destination":null,"destinationNumber":null,"destinationUuid":null}}}}'  # noqa
         message2 = '{"envelope":{"source":"+4901234567890","sourceNumber":"+4901234567890","sourceUuid":"asdf","sourceName":"name","sourceDevice":1,"timestamp":1633169000000,"syncMessage":{"sentMessage":{"timestamp":1633169000000,"message":"Message 2","expiresInSeconds":0,"viewOnce":false,"mentions":[],"attachments":[],"contacts":[],"groupInfo":{"groupId":"group_id1=","type":"DELIVER"},"destination":null,"destinationNumber":null,"destinationUuid":null}}}}'  # noqa
@@ -30,6 +32,18 @@ class TestProducer(BotTestCase):
         mock_iterator = AsyncMock()
         mock_iterator.__aiter__.return_value = messages
         mock.return_value.__aenter__.return_value = mock_iterator
+
+        group_mock = AsyncMock()
+        group_mock.return_value = [
+            {
+                "name": "mocked group",
+                "id": self.group_id,
+                "internal_id": self.internal_id,
+            }
+        ]
+        get_group_mock.return_value = AsyncMock(
+            spec=aiohttp.ClientResponse, status_code=200, json=group_mock
+        )
 
         self.signal_bot._q = asyncio.Queue()
         self.signal_bot._signal = SignalAPI(

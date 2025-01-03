@@ -2,7 +2,7 @@ import base64
 
 import aiohttp
 import websockets
-from typing import Any
+from typing import Any, Optional
 
 
 class SignalAPI:
@@ -159,6 +159,34 @@ class SignalAPI:
 
         return base64_string
 
+    async def update_contact(
+        self,
+        receiver: str,
+        expiration_in_seconds: Optional[int] = None,
+        name: Optional[str] = None,
+    ):
+        uri = self._contacts_uri() + "/" + receiver
+        payload = {}
+        if expiration_in_seconds is not None:
+            payload["expiration_in_seconds"] = expiration_in_seconds
+
+        if name is not None:
+            payload["name"] = name
+
+        if payload == {}:
+            raise ContactUpdateError("Empty contact update")
+
+        try:
+            async with aiohttp.ClientSession() as session:
+                resp = await session.put(uri, json=payload)
+                resp.raise_for_status()
+                return resp
+        except (
+            aiohttp.ClientError,
+            aiohttp.http_exceptions.HttpProcessingError,
+        ):
+            raise ContactUpdateError
+
     def _attachment_rest_uri(self):
         return f"http://{self.signal_service}/v1/attachments"
 
@@ -176,6 +204,9 @@ class SignalAPI:
 
     def _groups_uri(self):
         return f"http://{self.signal_service}/v1/groups/{self.phone_number}"
+
+    def _contacts_uri(self):
+        return f"http://{self.signal_service}/v1/contacts"
 
 
 class ReceiveMessagesError(Exception):
@@ -207,4 +238,8 @@ class GroupsError(Exception):
 
 
 class GetAttachmentError(Exception):
+    pass
+
+
+class ContactUpdateError(Exception):
     pass

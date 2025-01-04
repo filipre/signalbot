@@ -165,8 +165,8 @@ class SignalAPI:
         expiration_in_seconds: Optional[int] = None,
         name: Optional[str] = None,
     ) -> None:
-        uri = self._contacts_uri(receiver)
-        payload = {}
+        uri = self._contacts_uri()
+        payload = {"recipient": receiver}
         if expiration_in_seconds is not None:
             payload["expiration_in_seconds"] = expiration_in_seconds
 
@@ -205,8 +205,8 @@ class SignalAPI:
     def _groups_uri(self):
         return f"http://{self.signal_service}/v1/groups/{self.phone_number}"
 
-    def _contacts_uri(self, receiver: str):
-        return f"http://{self.signal_service}/v1/contacts/{receiver}"
+    def _contacts_uri(self):
+        return f"http://{self.signal_service}/v1/contacts/{self.phone_number}"
 
 
 class ReceiveMessagesError(Exception):

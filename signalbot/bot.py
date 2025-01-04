@@ -225,6 +225,17 @@ class SignalBot:
         receiver = self._resolve_receiver(receiver)
         await self._signal.stop_typing(receiver)
 
+    async def update_contact(
+        self,
+        receiver: str,
+        expiration_in_seconds: Optional[int] = None,
+        name: Optional[str] = None,
+    ) -> None:
+        receiver = self._resolve_receiver(receiver)
+        await self._signal.update_contact(
+            receiver, expiration_in_seconds=expiration_in_seconds, name=name
+        )
+
     async def _detect_groups(self):
         # reset group lookups to avoid stale data
         self.groups = await self._signal.get_groups()

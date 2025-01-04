@@ -236,6 +236,23 @@ class SignalBot:
             receiver, expiration_in_seconds=expiration_in_seconds, name=name
         )
 
+    async def update_group(
+        self,
+        group_id: str,
+        base64_avatar: Optional[str] = None,
+        description: Optional[str] = None,
+        expiration_in_seconds: Optional[int] = None,
+        name: Optional[str] = None,
+    ) -> None:
+        group_id = self._resolve_receiver(group_id)
+        await self._signal.update_group(
+            group_id,
+            base64_avatar=base64_avatar,
+            description=description,
+            expiration_in_seconds=expiration_in_seconds,
+            name=name,
+        )
+
     async def _detect_groups(self):
         # reset group lookups to avoid stale data
         self.groups = await self._signal.get_groups()

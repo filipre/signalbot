@@ -167,14 +167,12 @@ class SignalAPI:
     ) -> None:
         uri = self._contacts_uri()
         payload = {"recipient": receiver}
+
         if expiration_in_seconds is not None:
             payload["expiration_in_seconds"] = expiration_in_seconds
 
         if name is not None:
             payload["name"] = name
-
-        if payload == {}:
-            raise ContactUpdateError("Empty contact update")
 
         try:
             async with aiohttp.ClientSession() as session:

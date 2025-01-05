@@ -370,6 +370,13 @@ class SignalBot:
                 except UnknownMessageFormatError:
                     continue
 
+                # Update groups if message is from an unknown group
+                if (
+                    message.is_group()
+                    and self._groups_by_internal_id.get(message.group) is None
+                ):
+                    await self._detect_groups()
+
                 await self._ask_commands_to_handle(message)
 
         except ReceiveMessagesError as e:

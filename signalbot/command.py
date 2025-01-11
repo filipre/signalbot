@@ -1,12 +1,13 @@
 import functools
 import re
 from abc import ABC, abstractmethod
+from typing import Pattern
 
 from .message import Message
 from .context import Context
 
 
-def regex_triggered(*by):
+def regex_triggered(*by: str | Pattern[str]):
     def decorator_regex_triggered(func):
         @functools.wraps(func)
         async def wrapper_regex_triggered(*args, **kwargs):

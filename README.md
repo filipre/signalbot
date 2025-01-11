@@ -115,7 +115,7 @@ To implement your own commands, you need to inherent `Command` and overwrite fol
 
 - `setup(self)`: Start any task that requires to send messages already, optional
 - `describe(self)`: String to describe your command, optional
-- `handle(self, c: Context)`: Handle an incoming message. By default, any command will read any incoming message. `Context` can be used to easily send (`c.send(text)`), reply (`c.reply(text)`), react (`c.react(emoji)`) and to type in a group (`c.start_typing()` and `c.stop_typing()`). You can use the `@triggered` decorator to listen for specific commands or you can inspect `c.message.text`.
+- `handle(self, c: Context)`: Handle an incoming message. By default, any command will read any incoming message. `Context` can be used to easily send (`c.send(text)`), reply (`c.reply(text)`), react (`c.react(emoji)`) and to type in a group (`c.start_typing()` and `c.stop_typing()`). You can use the `@triggered` decorator to listen for specific commands, the `@regex_triggered` decorator to listen for regular expressions, or you can inspect `c.message.text`.
 
 ### Unit Testing
 

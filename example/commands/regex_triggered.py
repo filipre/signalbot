@@ -1,9 +1,9 @@
 from signalbot import Command, Context, regex_triggered
 
 
-class TriggeredCommand(Command):
+class RegexTriggeredCommand(Command):
     def describe(self) -> str:
-        return "Regex 😤 Decorator example, matches sha1 OR md5 checksums"
+        return "😤 RegexTriggered Command: Regular Expression Decorator Example"
 
     @regex_triggered(r"^[a-f0-9]{40}$", r"^[a-f0-9]{32}$")
     async def handle(self, c: Context):

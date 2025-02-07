@@ -69,9 +69,9 @@ class Message:
         return bool(self.group)
 
     @classmethod
-    async def parse(cls, signal: SignalAPI, raw_message: str):
+    async def parse(cls, signal: SignalAPI, raw_message_str: str):
         try:
-            raw_message = json.loads(raw_message)
+            raw_message = json.loads(raw_message_str)
         except Exception:
             raise UnknownMessageFormatError
 
@@ -130,7 +130,7 @@ class Message:
             group,
             reaction,
             mentions,
-            raw_message,
+            raw_message_str,
         )
 
     @classmethod

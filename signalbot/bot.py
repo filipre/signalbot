@@ -278,12 +278,19 @@ class SignalBot:
         if self._is_group_id(receiver):
             return receiver
 
-        try:
-            group_id = self._groups_by_internal_id[receiver]["id"]
-            return group_id
+        group = self._groups_by_internal_id.get(receiver)
+        if group is not None:
+            return group["id"]
 
-        except Exception:
-            raise SignalBotError(f"Cannot resolve receiver.")
+        groups = self._groups_by_name.get(receiver)
+        if groups is not None:
+            if len(groups) > 1:
+                logging.warning(
+                    f"[Bot] There is more than one group named '{receiver}', using the first one."
+                )
+            return groups[0]["id"]
+
+        raise SignalBotError(f"Cannot resolve receiver.")
 
     def _is_phone_number(self, phone_number: str) -> bool:
         try:

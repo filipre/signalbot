@@ -1,6 +1,7 @@
 # from .bot import Signalbot # TODO: figure out how to enable this for typing
 from .message import Message
 from typing import Any
+from copy import deepcopy
 
 
 class Context:
@@ -32,12 +33,15 @@ class Context:
         ) = None,  # [{ "author": "uuid" , "start": 0, "length": 1 }]
         text_mode: str = None,
     ):
+        send_mentions = self._convert_receive_mentions_into_send_mentions(
+            self.message.mentions
+        )
         return await self.bot.send(
             self.message.recipient(),
             text,
             base64_attachments=base64_attachments,
             quote_author=self.message.source,
-            quote_mentions=self.message.mentions,
+            quote_mentions=send_mentions,
             quote_message=self.message.text,
             quote_timestamp=self.message.timestamp,
             mentions=mentions,
@@ -52,3 +56,15 @@ class Context:
 
     async def stop_typing(self):
         await self.bot.stop_typing(self.message.recipient())
+
+    def _convert_receive_mentions_into_send_mentions(
+        self, mentions: list[dict[str, Any]] | None = None
+    ):
+        if mentions is None:
+            return None
+
+        send_mentions = deepcopy(mentions)
+        for mention in send_mentions:
+            if "author" not in mention:
+                mention["author"] = mention["uuid"]
+        return send_mentions

@@ -287,7 +287,7 @@ class SignalBot:
 
     def _is_phone_number(self, phone_number: str) -> bool:
         try:
-            parsed_number = phonenumbers.parse(phone_number, None)
+            parsed_number = phonenumbers.parse(phone_number, region=None)
             return phonenumbers.is_valid_number(parsed_number)
         except phonenumbers.phonenumberutil.NumberParseException:
             return False

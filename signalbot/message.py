@@ -3,6 +3,9 @@ from enum import Enum
 from typing import Optional
 
 
+from signalbot.api import SignalAPI
+
+
 class MessageType(Enum):
     SYNC_MESSAGE = 1
     DATA_MESSAGE = 2
@@ -18,6 +21,7 @@ class Message:
         type: MessageType,
         text: str,
         base64_attachments: list = None,
+        attachments_local_filenames: Optional[list] = None,
         group: str = None,
         reaction: str = None,
         mentions: list = None,
@@ -35,6 +39,10 @@ class Message:
         self.base64_attachments = base64_attachments
         if self.base64_attachments is None:
             self.base64_attachments = []
+
+        self.attachments_local_filenames = attachments_local_filenames
+        if self.attachments_local_filenames is None:
+            self.attachments_local_filenames = []
 
         self.group = group
 
@@ -61,9 +69,9 @@ class Message:
         return bool(self.group)
 
     @classmethod
-    def parse(cls, raw_message: str):
+    async def parse(cls, signal: SignalAPI, raw_message_str: str):
         try:
-            raw_message = json.loads(raw_message)
+            raw_message = json.loads(raw_message_str)
         except Exception:
             raise UnknownMessageFormatError
 
@@ -90,6 +98,12 @@ class Message:
             mentions = cls._parse_mentions(
                 raw_message["envelope"]["syncMessage"]["sentMessage"]
             )
+            base64_attachments = await cls._parse_attachments(
+                signal, raw_message["envelope"]["syncMessage"]["sentMessage"]
+            )
+            attachments_local_filenames = cls._parse_attachments_local_filenames(
+                raw_message["envelope"]["syncMessage"]["sentMessage"]
+            )
 
         # Option 2: dataMessage
         elif "dataMessage" in raw_message["envelope"]:
@@ -98,12 +112,15 @@ class Message:
             group = cls._parse_group_information(raw_message["envelope"]["dataMessage"])
             reaction = cls._parse_reaction(raw_message["envelope"]["dataMessage"])
             mentions = cls._parse_mentions(raw_message["envelope"]["dataMessage"])
+            base64_attachments = await cls._parse_attachments(
+                signal, raw_message["envelope"]["dataMessage"]
+            )
+            attachments_local_filenames = cls._parse_attachments_local_filenames(
+                raw_message["envelope"]["dataMessage"]
+            )
 
         else:
             raise UnknownMessageFormatError
-
-        # TODO: base64_attachments
-        base64_attachments = []
 
         return cls(
             source,
@@ -113,11 +130,32 @@ class Message:
             type,
             text,
             base64_attachments,
+            attachments_local_filenames,
             group,
             reaction,
             mentions,
-            raw_message,
+            raw_message_str,
         )
+
+    @classmethod
+    async def _parse_attachments(cls, signal: SignalAPI, data_message: dict) -> str:
+
+        if "attachments" not in data_message:
+            return []
+
+        return [
+            await signal.get_attachment(attachment["id"])
+            for attachment in data_message["attachments"]
+        ]
+
+    @classmethod
+    def _parse_attachments_local_filenames(cls, data_message: dict) -> list[str]:
+
+        if "attachments" not in data_message:
+            return []
+
+        # The ["id"] is the local filename and the ["filename"] is the remote filename
+        return [attachment["id"] for attachment in data_message["attachments"]]
 
     @classmethod
     def _parse_sync_message(cls, sync_message: dict) -> str:

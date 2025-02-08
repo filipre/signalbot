@@ -73,15 +73,15 @@ jobs:
         with:
           ref: ${{ fromJson(steps.get_pull_request_ref.outputs.data).head.ref }}
 
-      - name: Set up Python 3.11
+      - name: Set up Python
         uses: actions/setup-python@v2
         with:
-          python-version: 3.11
+          python-version: 3.13.1
 
       - name: Install Poetry
         uses: abatilo/actions-poetry@v2.0.0
         with:
-          poetry-version: 1.5.1
+          poetry-version: 1.8.4
 
       - name: Install dependencies
         run: poetry install --no-dev

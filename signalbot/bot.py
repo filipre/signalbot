@@ -4,7 +4,7 @@ import time
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 import logging
 import traceback
-from typing import Optional, Union, List, Callable
+from typing import Optional, Union, List, Callable, Any
 import re
 import uuid
 import phonenumbers
@@ -182,7 +182,9 @@ class SignalBot:
         quote_mentions: list = None,
         quote_message: str = None,
         quote_timestamp: str = None,
-        mentions: list = None,
+        mentions: (
+            list[dict[str, Any]] | None
+        ) = None,  # [{ "author": "uuid" , "start": 0, "length": 1 }]
         text_mode: str = None,
         listen: bool = False,
     ) -> int:
@@ -223,6 +225,34 @@ class SignalBot:
     async def stop_typing(self, receiver: str):
         receiver = self._resolve_receiver(receiver)
         await self._signal.stop_typing(receiver)
+
+    async def update_contact(
+        self,
+        receiver: str,
+        expiration_in_seconds: Optional[int] = None,
+        name: Optional[str] = None,
+    ) -> None:
+        receiver = self._resolve_receiver(receiver)
+        await self._signal.update_contact(
+            receiver, expiration_in_seconds=expiration_in_seconds, name=name
+        )
+
+    async def update_group(
+        self,
+        group_id: str,
+        base64_avatar: Optional[str] = None,
+        description: Optional[str] = None,
+        expiration_in_seconds: Optional[int] = None,
+        name: Optional[str] = None,
+    ) -> None:
+        group_id = self._resolve_receiver(group_id)
+        await self._signal.update_group(
+            group_id,
+            base64_avatar=base64_avatar,
+            description=description,
+            expiration_in_seconds=expiration_in_seconds,
+            name=name,
+        )
 
     async def _detect_groups(self):
         # reset group lookups to avoid stale data
@@ -335,9 +365,16 @@ class SignalBot:
                 logging.info(f"[Raw Message] {raw_message}")
 
                 try:
-                    message = Message.parse(raw_message)
+                    message = await Message.parse(self._signal, raw_message)
                 except UnknownMessageFormatError:
                     continue
+
+                # Update groups if message is from an unknown group
+                if (
+                    message.is_group()
+                    and self._groups_by_internal_id.get(message.group) is None
+                ):
+                    await self._detect_groups()
 
                 await self._ask_commands_to_handle(message)
 

@@ -1,5 +1,8 @@
+import base64
+
 import aiohttp
 import websockets
+from typing import Any, Optional
 
 
 class SignalAPI:
@@ -33,7 +36,7 @@ class SignalAPI:
         quote_mentions: list = None,
         quote_message: str = None,
         quote_timestamp: str = None,
-        mentions: list = None,
+        mentions: list[dict[str, Any]] | None = None,
         text_mode: str = None,
     ) -> aiohttp.ClientResponse:
         uri = self._send_rest_uri()
@@ -138,6 +141,87 @@ class SignalAPI:
         ):
             raise GroupsError
 
+    async def get_attachment(self, attachment_id: str) -> str:
+        uri = f"{self._attachment_rest_uri()}/{attachment_id}"
+        try:
+            async with aiohttp.ClientSession() as session:
+                resp = await session.get(uri)
+                resp.raise_for_status()
+                content = await resp.content.read()
+        except (
+            aiohttp.ClientError,
+            aiohttp.http_exceptions.HttpProcessingError,
+        ):
+            raise GetAttachmentError
+
+        base64_bytes = base64.b64encode(content)
+        base64_string = str(base64_bytes, encoding="utf-8")
+
+        return base64_string
+
+    async def update_contact(
+        self,
+        receiver: str,
+        expiration_in_seconds: Optional[int] = None,
+        name: Optional[str] = None,
+    ) -> None:
+        uri = self._contacts_uri()
+        payload = {"recipient": receiver}
+
+        if expiration_in_seconds is not None:
+            payload["expiration_in_seconds"] = expiration_in_seconds
+
+        if name is not None:
+            payload["name"] = name
+
+        try:
+            async with aiohttp.ClientSession() as session:
+                resp = await session.put(uri, json=payload)
+                resp.raise_for_status()
+                return resp
+        except (
+            aiohttp.ClientError,
+            aiohttp.http_exceptions.HttpProcessingError,
+        ):
+            raise ContactUpdateError
+
+    async def update_group(
+        self,
+        group_id: str,
+        base64_avatar: Optional[str] = None,
+        description: Optional[str] = None,
+        expiration_in_seconds: Optional[int] = None,
+        name: Optional[str] = None,
+    ) -> None:
+        uri = self._group_id_uri(group_id)
+        payload = {}
+
+        if base64_avatar is not None:
+            payload["base64_avatar"] = base64_avatar
+
+        if description is not None:
+            payload["description"] = description
+
+        if expiration_in_seconds is not None:
+            payload["expiration_time"] = expiration_in_seconds
+
+        if name is not None:
+            payload["name"] = name
+
+        try:
+            async with aiohttp.ClientSession() as session:
+                resp = await session.put(uri, json=payload)
+                resp.raise_for_status()
+                return resp
+        except (
+            aiohttp.ClientError,
+            aiohttp.http_exceptions.HttpProcessingError,
+        ):
+            raise ContactUpdateError
+
+    def _attachment_rest_uri(self):
+        return f"http://{self.signal_service}/v1/attachments"
+
     def _receive_ws_uri(self):
         return f"ws://{self.signal_service}/v1/receive/{self.phone_number}"
 
@@ -152,6 +236,12 @@ class SignalAPI:
 
     def _groups_uri(self):
         return f"http://{self.signal_service}/v1/groups/{self.phone_number}"
+
+    def _group_id_uri(self, group_id: str):
+        return self._groups_uri() + "/" + group_id
+
+    def _contacts_uri(self):
+        return f"http://{self.signal_service}/v1/contacts/{self.phone_number}"
 
 
 class ReceiveMessagesError(Exception):
@@ -179,4 +269,12 @@ class ReactionError(Exception):
 
 
 class GroupsError(Exception):
+    pass
+
+
+class GetAttachmentError(Exception):
+    pass
+
+
+class ContactUpdateError(Exception):
     pass

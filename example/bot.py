@@ -6,6 +6,7 @@ from commands import (
     TypingCommand,
     TriggeredCommand,
     ReplyCommand,
+    RegexTriggeredCommand,
 )
 import logging
 
@@ -36,6 +37,8 @@ def main():
 
     # chat command is enabled for all groups and one specific contact
     bot.register(TriggeredCommand(), contacts=["+490123456789"], groups=True)
+
+    bot.register(RegexTriggeredCommand())
 
     bot.start()
 

@@ -128,7 +128,7 @@ class SignalAPI:
         ):
             raise StopTypingError
 
-    async def get_groups(self):
+    async def get_groups(self) -> list[dict[str, Any]]:
         uri = self._groups_uri()
         try:
             async with aiohttp.ClientSession() as session:

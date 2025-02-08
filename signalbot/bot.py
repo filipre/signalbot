@@ -258,9 +258,9 @@ class SignalBot:
         # reset group lookups to avoid stale data
         self.groups = await self._signal.get_groups()
 
-        self._groups_by_id = {}
-        self._groups_by_internal_id = {}
-        self._groups_by_name = defaultdict(list)
+        self._groups_by_id: dict[str, dict[str, Any]] = {}
+        self._groups_by_internal_id: dict[str, dict[str, Any]] = {}
+        self._groups_by_name: defaultdict[str, list[dict[str, Any]]] = defaultdict(list)
         for group in self.groups:
             self._groups_by_id[group["id"]] = group
             self._groups_by_internal_id[group["internal_id"]] = group

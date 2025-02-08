@@ -98,8 +98,12 @@ class Message:
             mentions = cls._parse_mentions(
                 raw_message["envelope"]["syncMessage"]["sentMessage"]
             )
-            base64_attachments = None
-            attachments_local_filenames = None
+            base64_attachments = await cls._parse_attachments(
+                signal, raw_message["envelope"]["syncMessage"]["sentMessage"]
+            )
+            attachments_local_filenames = cls._parse_attachments_local_filenames(
+                raw_message["envelope"]["syncMessage"]["sentMessage"]
+            )
 
         # Option 2: dataMessage
         elif "dataMessage" in raw_message["envelope"]:

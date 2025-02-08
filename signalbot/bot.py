@@ -7,6 +7,7 @@ import traceback
 from typing import Optional, Union, List, Callable, Any
 import re
 import uuid
+import phonenumbers
 
 from .api import SignalAPI, ReceiveMessagesError
 from .command import Command
@@ -285,13 +286,11 @@ class SignalBot:
             raise SignalBotError(f"Cannot resolve receiver.")
 
     def _is_phone_number(self, phone_number: str) -> bool:
-        if phone_number is None:
+        try:
+            parsed_number = phonenumbers.parse(phone_number, region=None)
+            return phonenumbers.is_valid_number(parsed_number)
+        except phonenumbers.phonenumberutil.NumberParseException:
             return False
-        if phone_number[0] != "+":
-            return False
-        if len(phone_number[1:]) > 15:
-            return False
-        return True
 
     def _is_valid_uuid(self, receiver_uuid: str):
         try:

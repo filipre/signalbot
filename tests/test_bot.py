@@ -106,7 +106,7 @@ class TestListenUser(BotTestCase):
 
     def test_listen_valid_invalid_phone_number(self):
         invalid_number = "49987654321"
-        valid_number = "+49123454321"
+        valid_number = "+49303454321"
         self.signal_bot.listen(invalid_number)
         self.signal_bot.listen(valid_number)
         expected_user_chats = {valid_number}

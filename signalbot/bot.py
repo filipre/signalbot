@@ -309,7 +309,7 @@ class SignalBot:
         except ValueError:
             return False
 
-    def _is_username(self, receiver_username: str):
+    def _is_username(self, receiver_username: str) -> bool:
         """
         Check if username has correct format.
         Usernames can be between 3 and 32 characters.

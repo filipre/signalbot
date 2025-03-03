@@ -275,6 +275,9 @@ class SignalBot:
         if self._is_valid_uuid(receiver):
             return receiver
 
+        if self._is_username(receiver):
+            return receiver
+
         if self._is_group_id(receiver):
             return receiver
 
@@ -304,6 +307,34 @@ class SignalBot:
             uuid.UUID(str(receiver_uuid))
             return True
         except ValueError:
+            return False
+
+    def _is_username(self, receiver_username: str):
+        """
+        Check if username has correct format.
+        Usernames can be between 3 and 32 characters.
+        Usernames may only contain a-z, 0-9 and _.
+        You must include at least two digits at the end of your username.
+        There cannot be more than 9 digits at the of your username.
+        """
+        split_username = receiver_username.split('.')
+        if len(split_username) == 2:
+            characters = split_username[0]
+            digits = split_username[1]
+            if len(characters) < 3 or len(characters) > 32:
+                return False
+            if not re.match(r'^[A-Za-z\d_]+$', characters):
+                return False
+            if len(digits) < 2 or len(digits) > 9:
+                return False
+            try:
+                digits = int(digits)
+                if digits == 0:
+                    return False
+                return True
+            except ValueError:
+                return False
+        else:
             return False
 
     def _is_group_id(self, group_id: str) -> bool:

@@ -316,6 +316,7 @@ class SignalBot:
         Usernames may only contain a-z, 0-9 and _.
         You must include at least two digits at the end of your username.
         There cannot be more than 9 digits at the of your username.
+        Digits cannnot be 00.
         """
         split_username = receiver_username.split('.')
         if len(split_username) == 2:

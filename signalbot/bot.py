@@ -318,13 +318,13 @@ class SignalBot:
         There cannot be more than 9 digits at the of your username.
         Digits cannnot be 00.
         """
-        split_username = receiver_username.split('.')
+        split_username = receiver_username.split(".")
         if len(split_username) == 2:
             characters = split_username[0]
             digits = split_username[1]
             if len(characters) < 3 or len(characters) > 32:
                 return False
-            if not re.match(r'^[A-Za-z\d_]+$', characters):
+            if not re.match(r"^[A-Za-z\d_]+$", characters):
                 return False
             if len(digits) < 2 or len(digits) > 9:
                 return False

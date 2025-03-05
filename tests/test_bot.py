@@ -113,6 +113,25 @@ class TestListenUser(BotTestCase):
         self.assertSetEqual(self.signal_bot.user_chats, expected_user_chats)
 
 
+class TestUsernameValidation(BotTestCase):
+    def test_valid_username(self):
+        self.assertTrue(self.signal_bot._is_username("UserName.99"))
+        self.assertTrue(self.signal_bot._is_username("username.999999999"))
+        self.assertTrue(self.signal_bot._is_username("UserName99.99"))
+        self.assertTrue(self.signal_bot._is_username("_Use_rName99_.99"))
+
+    def test_invalid_username(self):
+        self.assertFalse(self.signal_bot._is_username(".UserName99"))
+        self.assertFalse(self.signal_bot._is_username(".UserName.99"))
+        self.assertFalse(self.signal_bot._is_username("UserName99"))
+        self.assertFalse(self.signal_bot._is_username("UserName99."))
+        self.assertFalse(self.signal_bot._is_username("username.9999999999"))
+        self.assertFalse(self.signal_bot._is_username("user@name.999"))
+        self.assertFalse(self.signal_bot._is_username("UserName99.0"))
+        self.assertFalse(self.signal_bot._is_username("UserName99.00"))
+        self.assertFalse(self.signal_bot._is_username("UserName99.000000000"))
+
+
 class TestRegisterCommand(BotTestCase):
     def test_register_one_command(self):
         self.signal_bot.register(DummyCommand())

@@ -127,6 +127,7 @@ class TestUsernameValidation(BotTestCase):
 
     def test_invalid_username(self):
         self.assertFalse(self.signal_bot._is_username("Us.99"))
+        self.assertFalse(self.signal_bot._is_username("Usr.9"))
         self.assertFalse(self.signal_bot._is_username(".UserName99"))
         self.assertFalse(self.signal_bot._is_username(".UserName.99"))
         self.assertFalse(self.signal_bot._is_username("UserName99"))

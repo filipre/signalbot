@@ -119,6 +119,10 @@ class TestUsernameValidation(BotTestCase):
         self.assertTrue(self.signal_bot._is_username("username.999999999"))
         self.assertTrue(self.signal_bot._is_username("UserName99.99"))
         self.assertTrue(self.signal_bot._is_username("_Use_rName99_.99"))
+        self.assertTrue(self.signal_bot._is_username("username.999999999"))
+        self.assertTrue(
+            self.signal_bot._is_username("usernameeeeeeeeeeeeeeeeeeeeeeeee.999999999")
+        )
 
     def test_invalid_username(self):
         self.assertFalse(self.signal_bot._is_username(".UserName99"))
@@ -130,6 +134,9 @@ class TestUsernameValidation(BotTestCase):
         self.assertFalse(self.signal_bot._is_username("UserName99.0"))
         self.assertFalse(self.signal_bot._is_username("UserName99.00"))
         self.assertFalse(self.signal_bot._is_username("UserName99.000000000"))
+        self.assertFalse(
+            self.signal_bot._is_username(".usernameeeeeeeeeeeeeeeeeeeeeeeeee.99")
+        )
 
 
 class TestRegisterCommand(BotTestCase):

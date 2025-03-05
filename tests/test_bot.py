@@ -115,6 +115,7 @@ class TestListenUser(BotTestCase):
 
 class TestUsernameValidation(BotTestCase):
     def test_valid_username(self):
+        self.assertTrue(self.signal_bot._is_username("Usr.99"))
         self.assertTrue(self.signal_bot._is_username("UserName.99"))
         self.assertTrue(self.signal_bot._is_username("username.999999999"))
         self.assertTrue(self.signal_bot._is_username("UserName99.99"))
@@ -125,6 +126,7 @@ class TestUsernameValidation(BotTestCase):
         )
 
     def test_invalid_username(self):
+        self.assertFalse(self.signal_bot._is_username("Us.99"))
         self.assertFalse(self.signal_bot._is_username(".UserName99"))
         self.assertFalse(self.signal_bot._is_username(".UserName.99"))
         self.assertFalse(self.signal_bot._is_username("UserName99"))

@@ -14,7 +14,7 @@ keywords = [
   "Home Automation",
 ]
 license = "MIT"
-maintainers = ["René Filip"]
+maintainers = ["René Filip", "Era Dorta"]
 name = "signalbot"
 readme = "README.md"
 repository = "https://github.com/filipre/signalbot"

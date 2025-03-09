@@ -215,7 +215,7 @@ class SignalBot:
         ) = None,  # [{ "author": "uuid" , "start": 0, "length": 1 }]
         text_mode: str = None,
         listen: bool = False,
-    ) -> int:
+    ) -> str:
         receiver = self._resolve_receiver(receiver)
         resp = await self._signal.send(
             receiver,

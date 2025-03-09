@@ -311,7 +311,8 @@ class SignalBot:
 
     def _is_username(self, receiver_username: str) -> bool:
         """
-        Check if username has correct format, as described in https://support.signal.org/hc/en-us/articles/6712070553754-Phone-Number-Privacy-and-Usernames#username_req
+        Check if username has correct format, as described in
+        https://support.signal.org/hc/en-us/articles/6712070553754-Phone-Number-Privacy-and-Usernames#username_req
         Additionally, cannot have more than 9 digits and the digits cannot be 00.
         """
         split_username = receiver_username.split(".")

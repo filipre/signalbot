@@ -4,7 +4,7 @@ import time
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 import logging
 import traceback
-from typing import Optional, Union, List, Callable, Any
+from typing import Optional, Union, List, Callable, Any, TypeAlias
 import re
 import uuid
 import phonenumbers
@@ -14,6 +14,15 @@ from .command import Command
 from .message import Message, UnknownMessageFormatError
 from .storage import RedisStorage, InMemoryStorage
 from .context import Context
+
+CommandList: TypeAlias = list[
+    tuple[
+        Command,
+        Optional[Union[List[str], bool]],
+        Optional[Union[List[str], bool]],
+        Optional[Callable[[Message], bool]],
+    ]
+]
 
 
 class SignalBot:
@@ -30,13 +39,14 @@ class SignalBot:
         """
         self.config = config
 
-        self.commands = []  # populated by .register()
+        self._commands_to_be_registered: CommandList = []  # populated by .register()
+        self.commands: CommandList = []  # populated by .start()
 
         self.user_chats = set()  # deprecated
         self.group_chats = set()  # deprecated
         self._listen_mode_activated = False
 
-        self.groups = []  # populated by .register()
+        self.groups = []  # populated by .start()
         self._groups_by_id = {}
         self._groups_by_internal_id = {}
         self._groups_by_name = defaultdict(list)
@@ -145,22 +155,35 @@ class SignalBot:
     ):
         command.bot = self
         command.setup()
+        self._commands_to_be_registered.append((command, contacts, groups, f))
 
-        group_ids = None
+    async def _resolve_commands(self):
+        for command, contacts, groups, f in self._commands_to_be_registered:
+            group_ids = None
 
-        if isinstance(groups, bool):
-            group_ids = groups
+            if isinstance(groups, bool):
+                group_ids = groups
 
-        if isinstance(groups, list):
-            group_ids = []
-            for group in groups:
-                if self._is_group_id(group):  # group is a group id, higher prio
-                    group_ids.append(group)
-                else:  # group is a group name
-                    for matched_group in self._groups_by_name:
-                        group_ids.append(matched_group["id"])
+            if isinstance(groups, list):
+                group_ids = []
+                for group in groups:
+                    if self._is_group_id(group):  # group is a group id, higher prio
+                        group_ids.append(group)
+                    else:  # group is a group name
+                        matched_group = self._get_group_by_name(group)
+                        if matched_group is not None:
+                            group_ids.append(matched_group["id"])
+                        else:
+                            logging.warning(
+                                f"[Bot] [{command.__class__.__name__}] '{group}' is not a valid group name or id"
+                            )
 
-        self.commands.append((command, contacts, group_ids, f))
+            self.commands.append((command, contacts, group_ids, f))
+
+    async def _async_post_init(self):
+        await self._detect_groups()
+        await self._resolve_commands()
+        await self._produce_consume_messages()
 
     def _store_reference_to_task(self, task: asyncio.Task):
         # Keep a hard reference to the tasks, fixes Ruff's RUF006 rule
@@ -168,11 +191,7 @@ class SignalBot:
         task.add_done_callback(self._running_tasks.discard)
 
     def start(self):
-        # TODO: schedule this every hour or so
-        task = self._event_loop.create_task(self._detect_groups())
-        self._store_reference_to_task(task)
-
-        task = self._event_loop.create_task(self._produce_consume_messages())
+        task = self._event_loop.create_task(self._async_post_init())
         self._store_reference_to_task(task)
 
         # Add more scheduler tasks here
@@ -294,13 +313,9 @@ class SignalBot:
         if group is not None:
             return group["id"]
 
-        groups = self._groups_by_name.get(receiver)
-        if groups is not None:
-            if len(groups) > 1:
-                logging.warning(
-                    f"[Bot] There is more than one group named '{receiver}', using the first one."
-                )
-            return groups[0]["id"]
+        group = self._get_group_by_name(receiver)
+        if group is not None:
+            return group["id"]
 
         raise SignalBotError(f"Cannot resolve receiver.")
 
@@ -362,6 +377,16 @@ class SignalBot:
         if internal_id is None:
             return False
         return internal_id[-1] == "="
+
+    def _get_group_by_name(self, group_name: str) -> Optional[dict[str, Any]]:
+        groups = self._groups_by_name.get(group_name)
+        if groups is not None:
+            if len(groups) > 1:
+                logging.warning(
+                    f"[Bot] There is more than one group named '{group_name}', using the first one."
+                )
+            return groups[0]
+        return None
 
     # see https://stackoverflow.com/questions/55184226/catching-exceptions-in-individual-tasks-and-restarting-them
     @classmethod

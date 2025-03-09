@@ -115,31 +115,35 @@ class TestListenUser(BotTestCase):
 
 class TestUsernameValidation(BotTestCase):
     def test_valid_username(self):
-        self.assertTrue(self.signal_bot._is_username("Usr.99"))
-        self.assertTrue(self.signal_bot._is_username("UserName.99"))
-        self.assertTrue(self.signal_bot._is_username("username.999999999"))
-        self.assertTrue(self.signal_bot._is_username("UserName99.99"))
-        self.assertTrue(self.signal_bot._is_username("_Use_rName99_.99"))
-        self.assertTrue(self.signal_bot._is_username("username.999999999"))
-        self.assertTrue(
-            self.signal_bot._is_username("usernameeeeeeeeeeeeeeeeeeeeeeeee.999999999")
-        )
+        valid_usernames = [
+            "Usr.99",
+            "UserName.99",
+            "username.999999999",
+            "UserName99.99",
+            "_Use_rName99_.99",
+            "username.999999999",
+            "usernameeeeeeeeeeeeeeeeeeeeeeeee.999999999"
+        ]
+        for valid_username in valid_usernames:
+            self.assertTrue(self.signal_bot._is_username(valid_username))
 
     def test_invalid_username(self):
-        self.assertFalse(self.signal_bot._is_username("Us.99"))
-        self.assertFalse(self.signal_bot._is_username("Usr.9"))
-        self.assertFalse(self.signal_bot._is_username(".UserName99"))
-        self.assertFalse(self.signal_bot._is_username(".UserName.99"))
-        self.assertFalse(self.signal_bot._is_username("UserName99"))
-        self.assertFalse(self.signal_bot._is_username("UserName99."))
-        self.assertFalse(self.signal_bot._is_username("username.9999999999"))
-        self.assertFalse(self.signal_bot._is_username("user@name.999"))
-        self.assertFalse(self.signal_bot._is_username("UserName99.0"))
-        self.assertFalse(self.signal_bot._is_username("UserName99.00"))
-        self.assertFalse(self.signal_bot._is_username("UserName99.000000000"))
-        self.assertFalse(
-            self.signal_bot._is_username(".usernameeeeeeeeeeeeeeeeeeeeeeeeee.99")
-        )
+        invalid_usernames = [
+            "Us.99",
+            "Usr.9",
+            ".UserName99",
+            ".UserName.99",
+            "UserName99",
+            "UserName99.",
+            "username.9999999999",
+            "user@name.999",
+            "UserName99.0",
+            "UserName99.00",
+            "UserName99.000000000",
+            ".usernameeeeeeeeeeeeeeeeeeeeeeeeee.99"
+        ]
+        for invalid_username in invalid_usernames:
+            self.assertFalse(self.signal_bot._is_username(invalid_username))
 
 
 class TestRegisterCommand(BotTestCase):

@@ -468,7 +468,7 @@ class SignalBot:
             context = Context(self, message)
             await command.handle(context)
         except Exception as e:
-            logging.error(f"[{command.__class__.__name__}] Error: {e}")
+            logging.error(f"[{command.__class__.__name__}] {e.__class__.__name__}: {e}")
             raise e
 
         # done

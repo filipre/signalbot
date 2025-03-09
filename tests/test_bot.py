@@ -53,6 +53,7 @@ class TestProducer(BotTestCase):
         # Any two commands
         self.signal_bot.register(DummyCommand())
         self.signal_bot.register(DummyCommand())
+        await self.signal_bot._resolve_commands()
 
         await self.signal_bot._produce(1337)
 
@@ -148,13 +149,13 @@ class TestUsernameValidation(BotTestCase):
 class TestRegisterCommand(BotTestCase):
     def test_register_one_command(self):
         self.signal_bot.register(DummyCommand())
-        self.assertEqual(len(self.signal_bot.commands), 1)
+        self.assertEqual(len(self.signal_bot._commands_to_be_registered), 1)
 
     def test_register_three_commands(self):
         self.signal_bot.register(DummyCommand())
         self.signal_bot.register(DummyCommand())
         self.signal_bot.register(DummyCommand())
-        self.assertEqual(len(self.signal_bot.commands), 3)
+        self.assertEqual(len(self.signal_bot._commands_to_be_registered), 3)
 
     def test_register_calls_setup_of_command(self):
         class SomeTestCommand(Command):

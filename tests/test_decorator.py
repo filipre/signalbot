@@ -44,6 +44,7 @@ class TriggeredTest(ChatTestCase):
     @patch("signalbot.SignalAPI.receive", new_callable=ReceiveMessagesMock)
     async def test_triggered(self, receive_mock, send_mock):
         receive_mock.define(["Trump"])
+        await self.signal_bot._resolve_commands()
         await self.run_bot()
         self.assertEqual(send_mock.call_count, 1)
 
@@ -51,6 +52,7 @@ class TriggeredTest(ChatTestCase):
     @patch("signalbot.SignalAPI.receive", new_callable=ReceiveMessagesMock)
     async def test_also_triggered(self, receive_mock, send_mock):
         receive_mock.define(["Biden"])
+        await self.signal_bot._resolve_commands()
         await self.run_bot()
         self.assertEqual(send_mock.call_count, 1)
 
@@ -73,6 +75,7 @@ class TriggeredCaseSensitiveTest(ChatTestCase):
     @patch("signalbot.SignalAPI.receive", new_callable=ReceiveMessagesMock)
     async def test_triggered(self, receive_mock, send_mock):
         receive_mock.define(["Trump"])
+        await self.signal_bot._resolve_commands()
         await self.run_bot()
         self.assertEqual(send_mock.call_count, 1)
 
@@ -102,6 +105,7 @@ class RegexTriggeredTest(ChatTestCase):
     @patch("signalbot.SignalAPI.receive", new_callable=ReceiveMessagesMock)
     async def test_regex_triggered(self, receive_mock, send_mock):
         receive_mock.define(["123-555-1234"])
+        await self.signal_bot._resolve_commands()
         await self.run_bot()
         self.assertEqual(send_mock.call_count, 1)
 

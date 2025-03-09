@@ -1,11 +1,16 @@
-# from .bot import Signalbot # TODO: figure out how to enable this for typing
-from .message import Message
+from __future__ import annotations
+from typing import TYPE_CHECKING
 from typing import Any
 from copy import deepcopy
 
+from .message import Message
+
+if TYPE_CHECKING:
+    from .bot import SignalBot
+
 
 class Context:
-    def __init__(self, bot, message: Message):
+    def __init__(self, bot: SignalBot, message: Message):
         self.bot = bot
         self.message = message
 

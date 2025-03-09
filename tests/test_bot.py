@@ -122,7 +122,7 @@ class TestUsernameValidation(BotTestCase):
             "UserName99.99",
             "_Use_rName99_.99",
             "username.999999999",
-            "usernameeeeeeeeeeeeeeeeeeeeeeeee.999999999"
+            "usernameeeeeeeeeeeeeeeeeeeeeeeee.999999999",
         ]
         for valid_username in valid_usernames:
             self.assertTrue(self.signal_bot._is_username(valid_username))
@@ -140,7 +140,7 @@ class TestUsernameValidation(BotTestCase):
             "UserName99.0",
             "UserName99.00",
             "UserName99.000000000",
-            ".usernameeeeeeeeeeeeeeeeeeeeeeeeee.99"
+            ".usernameeeeeeeeeeeeeeeeeeeeeeeeee.99",
         ]
         for invalid_username in invalid_usernames:
             self.assertFalse(self.signal_bot._is_username(invalid_username))

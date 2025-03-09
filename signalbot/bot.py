@@ -154,12 +154,11 @@ class SignalBot:
         f: Optional[Callable[[Message], bool]] = None,
     ):
         command.bot = self
+        command.setup()
         self._commands_to_be_registered.append((command, contacts, groups, f))
 
     async def _resolve_commands(self):
         for command, contacts, groups, f in self._commands_to_be_registered:
-            command.setup()
-
             group_ids = None
 
             if isinstance(groups, bool):

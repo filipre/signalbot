@@ -121,7 +121,6 @@ class TestUsernameValidation(BotTestCase):
             "username.999999999",
             "UserName99.99",
             "_Use_rName99_.99",
-            "username.999999999",
             "usernameeeeeeeeeeeeeeeeeeeeeeeee.999999999",
         ]
         for valid_username in valid_usernames:

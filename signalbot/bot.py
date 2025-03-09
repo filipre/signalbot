@@ -50,6 +50,7 @@ class SignalBot:
 
         self._event_loop = asyncio.get_event_loop()
         self._q = asyncio.Queue()
+        self._running_tasks: set[asyncio.Task] = set()
 
         try:
             self.scheduler = AsyncIOScheduler(event_loop=self._event_loop)
@@ -161,10 +162,18 @@ class SignalBot:
 
         self.commands.append((command, contacts, group_ids, f))
 
+    def _store_reference_to_task(self, task: asyncio.Task):
+        # Keep a hard reference to the tasks, fixes Ruff's RUF006 rule
+        self._running_tasks.add(task)
+        task.add_done_callback(self._running_tasks.discard)
+
     def start(self):
         # TODO: schedule this every hour or so
-        self._event_loop.create_task(self._detect_groups())
-        self._event_loop.create_task(self._produce_consume_messages())
+        task = self._event_loop.create_task(self._detect_groups())
+        self._store_reference_to_task(task)
+
+        task = self._event_loop.create_task(self._produce_consume_messages())
+        self._store_reference_to_task(task)
 
         # Add more scheduler tasks here
         # self.scheduler.add_job(...)
@@ -388,11 +397,13 @@ class SignalBot:
     async def _produce_consume_messages(self, producers=1, consumers=3) -> None:
         for n in range(1, producers + 1):
             produce_task = self._rerun_on_exception(self._produce, n)
-            asyncio.create_task(produce_task)
+            task = asyncio.create_task(produce_task)
+            self._store_reference_to_task(task)
 
         for n in range(1, consumers + 1):
             consume_task = self._rerun_on_exception(self._consume, n)
-            asyncio.create_task(consume_task)
+            task = asyncio.create_task(consume_task)
+            self._store_reference_to_task(task)
 
     async def _produce(self, name: int) -> None:
         logging.info(f"[Bot] Producer #{name} started")

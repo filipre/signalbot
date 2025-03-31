@@ -12,7 +12,7 @@ import phonenumbers
 from .api import SignalAPI, ReceiveMessagesError
 from .command import Command
 from .message import Message, UnknownMessageFormatError
-from .storage import RedisStorage, InMemoryStorage
+from .storage import RedisStorage, SQLiteStorage
 from .context import Context
 
 CommandList: TypeAlias = list[
@@ -73,11 +73,16 @@ class SignalBot:
             self._redis_port = config_storage["redis_port"]
             self.storage = RedisStorage(self._redis_host, self._redis_port)
         except Exception:
-            self.storage = InMemoryStorage()
-            logging.warning(
-                "[Bot] Could not initialize Redis. In-memory storage will be used. "
-                "Restarting will delete the storage!"
-            )
+            try:
+                self._sqlite_db = config_storage["sqlite_db"]
+                self.storage = SQLiteStorage(self._sqlite_db)
+            except Exception:
+                self.storage = SQLiteStorage()
+                logging.warning(
+                    "[Bot] Could not initialize Redis and no SQLite DB name was given. "
+                    "In-memory storage will be used. "
+                    "Restarting will delete the storage!"
+                )
 
     # deprecated
     def listen(self, required_id: str, optional_id: str = None):
@@ -533,7 +538,7 @@ class SignalBot:
             context = Context(self, message)
             await command.handle(context)
         except Exception as e:
-            logging.error(f"[{command.__class__.__name__}] {e.__class__.__name__}: {e}")
+            traceback.print_exc()
             raise e
 
         # done

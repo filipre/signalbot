@@ -33,7 +33,7 @@ Please check out https://github.com/bbernhard/signal-cli-rest-api#getting-starte
 ```bash
 docker run -p 8080:8080 \
     -v $(pwd)/signal-cli-config:/home/.local/share/signal-cli \
-    -e 'MODE=normal' bbernhard/signal-cli-rest-api:0.57
+    -e 'MODE=normal' bbernhard/signal-cli-rest-api:0.92
 ```
 
 2. Open http://127.0.0.1:8080/v1/qrcodelink?device_name=local to link your account with the signal-cli-rest-api server
@@ -44,7 +44,7 @@ docker run -p 8080:8080 \
 ```bash
 docker run -p 8080:8080 \
     -v $(pwd)/signal-cli-config:/home/.local/share/signal-cli \
-    -e 'MODE=json-rpc' bbernhard/signal-cli-rest-api:0.57
+    -e 'MODE=json-rpc' bbernhard/signal-cli-rest-api:0.92
 ```
 
 5. The logs should show something like this. You can also confirm that the server is running in the correct mode by visiting http://127.0.0.1:8080/v1/about.
@@ -55,12 +55,7 @@ time="2022-03-07T13:02:22Z" level=info msg="Found number +491234567890 and added
 time="2022-03-07T13:02:24Z" level=info msg="Started Signal Messenger REST API"
 ```
 
-6. Use the following snippet to get a group's `id`:
-```bash
-curl -X GET 'http://127.0.0.1:8080/v1/groups/+49123456789' | python -m json.tool
-```
-
-7. Install `signalbot` and start your python script. You need to pass following environment variables to make the example run:
+6. Install `signalbot` and start your python script. You need to pass following environment variables to make the example run:
 - `SIGNAL_SERVICE`: Address of the signal service without protocol, e.g. `127.0.0.1:8080`
 - `PHONE_NUMBER`: Phone number of the bot, e.g. `+49123456789`
 
@@ -71,7 +66,7 @@ pip install signalbot
 python bot.py
 ```
 
-8. The logs should indicate that one "producer" and three "consumers" have started. The producer checks for new messages sent to the linked account using a web socket connection. It creates a task for every registered command and the consumers work off the tasks. In case you are working with many blocking function calls, you may need to adjust the number of consumers such that the bot stays reactive.
+7. The logs should indicate that one "producer" and three "consumers" have started. The producer checks for new messages sent to the linked account using a web socket connection. It creates a task for every registered command and the consumers work off the tasks. In case you are working with many blocking function calls, you may need to adjust the number of consumers such that the bot stays reactive.
 ```
 INFO:root:[Bot] Producer #1 started
 INFO:root:[Bot] Consumer #1 started
@@ -79,7 +74,7 @@ INFO:root:[Bot] Consumer #2 started
 INFO:root:[Bot] Consumer #3 started
 ```
 
-9. Send the message `Ping` (case sensitive) to the group that the bot is listening to. The bot (i.e. the linked account) should respond with a `Pong`. Confirm that the bot received a raw message, that the consumer worked on the message and that a new message has been sent.
+8. Send the message `Ping` (case sensitive) to the number that the bot is listening to. The bot (i.e. the linked account) should respond with a `Pong`. Confirm that the bot received a raw message, that the consumer worked on the message and that a new message has been sent.
 ```
 INFO:root:[Raw Message] {"envelope":{"source":"+49123456789","sourceNumber":"+49123456789","sourceUuid":"fghjkl-asdf-asdf-asdf-dfghjkl","sourceName":"René","sourceDevice":3,"timestamp":1646000000000,"syncMessage":{"sentMessage":{"destination":null,"destinationNumber":null,"destinationUuid":null,"timestamp":1646000000000,"message":"Pong","expiresInSeconds":0,"viewOnce":false,"groupInfo":{"groupId":"asdasdfweasdfsdfcvbnmfghjkl=","type":"DELIVER"}}}},"account":"+49123456789","subscription":0}
 INFO:root:[Bot] Consumer #2 got new job in 0.00046 seconds
@@ -107,7 +102,10 @@ The package provides methods to easily listen for incoming messages and respondi
 - `bot.start_typing(receiver)`: Start typing
 - `bot.stop_typing(receiver)`: Stop typing
 - `bot.scheduler`: APScheduler > AsyncIOScheduler, see [here](https://apscheduler.readthedocs.io/en/3.x/modules/schedulers/asyncio.html?highlight=AsyncIOScheduler#apscheduler.schedulers.asyncio.AsyncIOScheduler)
-- `bot.storage`: In-memory or Redis stroage, see `storage.py`
+
+### Storage
+
+`bot.storage` is In-memory, SQLite,  or Redis storage, see `storage.py`. This is important because the bot runs multi-threaded, so instance state on your command classes isn't shared between threads. 
 
 ### Command
 

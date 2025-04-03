@@ -33,7 +33,7 @@ Please check out https://github.com/bbernhard/signal-cli-rest-api#getting-starte
 ```bash
 docker run -p 8080:8080 \
     -v $(pwd)/signal-cli-config:/home/.local/share/signal-cli \
-    -e 'MODE=normal' bbernhard/signal-cli-rest-api:0.92
+    -e 'MODE=normal' bbernhard/signal-cli-rest-api:latest
 ```
 
 2. Open http://127.0.0.1:8080/v1/qrcodelink?device_name=local to link your account with the signal-cli-rest-api server
@@ -44,7 +44,7 @@ docker run -p 8080:8080 \
 ```bash
 docker run -p 8080:8080 \
     -v $(pwd)/signal-cli-config:/home/.local/share/signal-cli \
-    -e 'MODE=json-rpc' bbernhard/signal-cli-rest-api:0.92
+    -e 'MODE=json-rpc' bbernhard/signal-cli-rest-api:latest
 ```
 
 5. The logs should show something like this. You can also confirm that the server is running in the correct mode by visiting http://127.0.0.1:8080/v1/about.
@@ -105,7 +105,8 @@ The package provides methods to easily listen for incoming messages and respondi
 
 ### Storage
 
-`bot.storage` is In-memory, SQLite,  or Redis storage, see `storage.py`. This is important because the bot runs multi-threaded, so instance state on your command classes isn't shared between threads. 
+`bot.storage` is in-memory, SQLite, or Redis storage, see `storage.py`.
+This is important because the bot runs multi-threaded, so instance state on your command classes isn't shared between threads.
 
 ### Command
 

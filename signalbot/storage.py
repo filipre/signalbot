@@ -1,5 +1,10 @@
-import redis
+try:
+    import redis
+except ModuleNotFoundError:
+    pass
+
 import json
+import sqlite3
 from typing import Any
 
 
@@ -18,27 +23,37 @@ class StorageError(Exception):
     pass
 
 
-class InMemoryStorage(Storage):
-    def __init__(self):
-        self._storage = {}
+class SQLiteStorage(Storage):
+    def __init__(self, database=":memory:"):
+        self._sqlite = sqlite3.connect(database)
+        self._sqlite.execute(
+            "CREATE TABLE IF NOT EXISTS signalbot (key text unique, value text)"
+        )
 
-    def exists(self, key: str) -> bool:
-        return key in self._storage
+    def exists(self, key):
+        return self._sqlite.execute(
+            "SELECT EXISTS(SELECT 1 FROM signalbot WHERE key = ?)", [key]
+        ).fetchone()[0]
 
-    def read(self, key: str) -> Any:
+    def read(self, key):
         try:
-            result_str = self._storage[key]
-            result_dict = json.loads(result_str)
-            return result_dict
+            result = self._sqlite.execute(
+                "SELECT value FROM signalbot WHERE key = ?", [key]
+            ).fetchone()[0]
+            return json.loads(result)
         except Exception as e:
-            raise StorageError(f"InMemory load failed: {e}")
+            raise StorageError(f"SQLite load failed: {e}")
 
-    def save(self, key: str, object: Any):
+    def save(self, key, object):
         try:
-            object_str = json.dumps(object)
-            self._storage[key] = object_str
+            value = json.dumps(object)
+            self._sqlite.execute(
+                "INSERT INTO signalbot VALUES (?, ?) ON CONFLICT(key) DO UPDATE SET value=?",
+                [key, value, value],
+            )
+            self._sqlite.commit()
         except Exception as e:
-            raise StorageError(f"InMemory save failed: {e}")
+            raise StorageError(f"SQLite save failed: {e}")
 
 
 class RedisStorage(Storage):

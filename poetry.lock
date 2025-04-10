@@ -1126,7 +1126,10 @@ idna = ">=2.0"
 multidict = ">=4.0"
 propcache = ">=0.2.0"
 
+[extras]
+redis = ["redis"]
+
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.9"
-content-hash = "3e69dc7f84fb8f42b70ae7d002a8faf87679f3bfb2bedb570255da8c6844b101"
+content-hash = "43e12aa51c713280dfb601a3a1d2df3696fb9e50bbaca02befb471f8ef0788ff"

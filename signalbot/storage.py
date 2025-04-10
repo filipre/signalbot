@@ -22,17 +22,24 @@ class Storage:
 class StorageError(Exception):
     pass
 
+
 class SQLiteStorage(Storage):
-    def __init__(self, database = ":memory:"):
+    def __init__(self, database=":memory:"):
         self._sqlite = sqlite3.connect(database)
-        self._sqlite.execute("CREATE TABLE IF NOT EXISTS signalbot (key text unique, value text)")
+        self._sqlite.execute(
+            "CREATE TABLE IF NOT EXISTS signalbot (key text unique, value text)"
+        )
 
     def exists(self, key):
-        return self._sqlite.execute('SELECT EXISTS(SELECT 1 FROM signalbot WHERE key = ?)', [key]).fetchone()[0]
+        return self._sqlite.execute(
+            "SELECT EXISTS(SELECT 1 FROM signalbot WHERE key = ?)", [key]
+        ).fetchone()[0]
 
     def read(self, key):
         try:
-            result = self._sqlite.execute('SELECT value FROM signalbot WHERE key = ?', [key]).fetchone()[0]
+            result = self._sqlite.execute(
+                "SELECT value FROM signalbot WHERE key = ?", [key]
+            ).fetchone()[0]
             return json.loads(result)
         except Exception as e:
             raise StorageError(f"SQLite load failed: {e}")
@@ -40,10 +47,14 @@ class SQLiteStorage(Storage):
     def save(self, key, object):
         try:
             value = json.dumps(object)
-            self._sqlite.execute('INSERT INTO signalbot VALUES (?, ?) ON CONFLICT(key) DO UPDATE SET value=?', [key, value, value])
+            self._sqlite.execute(
+                "INSERT INTO signalbot VALUES (?, ?) ON CONFLICT(key) DO UPDATE SET value=?",
+                [key, value, value],
+            )
             self._sqlite.commit()
         except Exception as e:
             raise StorageError(f"SQLite save failed: {e}")
+
 
 class RedisStorage(Storage):
     def __init__(self, host, port):

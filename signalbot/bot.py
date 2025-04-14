@@ -80,8 +80,8 @@ class SignalBot:
             self.storage = SQLiteStorage()
             logging.warning(
                 "[Bot] Could not initialize Redis and no SQLite DB name was given."
-                "In-memory storage will be used."
-                "Restarting will delete the storage!"
+                " In-memory storage will be used."
+                " Restarting will delete the storage!"
             )
 
     # deprecated

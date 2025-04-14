@@ -31,7 +31,7 @@ jobs:
         run: poetry install --no-dev
       - name: Get Package Version
         id: get-version
-        run: echo "::set-output name=package_version::$(poetry version -s)"
+        run: echo "{package_version}=$(poetry version -s)" >> $GITHUB_OUTPUT
       - name: Build package
         run: poetry build
       - name: Add test.pypi.org to Poetry
@@ -63,7 +63,7 @@ jobs:
         run: poetry install --no-dev
       - name: Get Package Version
         id: get-version
-        run: echo "::set-output name=package_version::$(poetry version -s)"
+        run: echo "{package_version}=$(poetry version -s)" >> $GITHUB_OUTPUT
       - name: Build package
         run: poetry build
       - name: Add pypi.org to Poetry

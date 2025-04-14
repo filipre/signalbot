@@ -287,6 +287,10 @@ class SignalBot:
             name=name,
         )
 
+    async def delete_attachment(self, attachment_filename: str) -> None:
+        # Delete the attachment from the local storage
+        await self._signal.delete_attachment(attachment_filename)
+
     async def _detect_groups(self):
         # reset group lookups to avoid stale data
         self.groups = await self._signal.get_groups()

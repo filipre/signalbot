@@ -2,11 +2,11 @@ import os
 from signalbot import SignalBot
 from commands import (
     PingCommand,
-    FridayCommand,
     TypingCommand,
     TriggeredCommand,
     ReplyCommand,
     RegexTriggeredCommand,
+    AttachmentCommand,
 )
 import logging
 
@@ -30,7 +30,7 @@ def main():
     bot.register(ReplyCommand())
 
     # enable a chat command only for groups
-    bot.register(FridayCommand(), contacts=False, groups=True)
+    bot.register(AttachmentCommand(), contacts=False, groups=True)
 
     # enable a chat command for one specific group with the name "My Group"
     bot.register(TypingCommand(), groups=["My Group"])

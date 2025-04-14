@@ -4,7 +4,9 @@ Python package to build your own Signal bots. To run the the bot you need to sta
 
 ## Getting Started
 
-Below you can find a minimal example on how to use the package. There is also a bigger example in the `example` folder.
+Below you can find a minimal example on how to use the package.
+Save it as `bot.py`.
+There is also a bigger example in the `example` folder.
 
 ```python
 import os

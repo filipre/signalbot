@@ -1,13 +1,15 @@
 from .ping import PingCommand
-from .friday import FridayCommand
 from .typing import TypingCommand
 from .triggered import TriggeredCommand
 from .reply import ReplyCommand
+from .regex_triggered import RegexTriggeredCommand
+from .attachments import AttachmentCommand
 
 __all__ = [
     "PingCommand",
-    "FridayCommand",
     "TypingCommand",
     "TriggeredCommand",
     "ReplyCommand",
+    "RegexTriggeredCommand",
+    "AttachmentCommand",
 ]

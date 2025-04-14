@@ -159,6 +159,19 @@ class SignalAPI:
 
         return base64_string
 
+    async def delete_attachment(self, attachment_id: str) -> str:
+        uri = f"{self._attachment_rest_uri()}/{attachment_id}"
+        try:
+            async with aiohttp.ClientSession() as session:
+                resp = await session.delete(uri)
+                resp.raise_for_status()
+                return resp
+        except (
+            aiohttp.ClientError,
+            aiohttp.http_exceptions.HttpProcessingError,
+        ):
+            raise GetAttachmentError
+
     async def update_contact(
         self,
         receiver: str,

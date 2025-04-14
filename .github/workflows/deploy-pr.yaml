@@ -105,7 +105,7 @@ jobs:
         run: poetry publish -r testpypi
 
       - name: Write comment in Pull Request
-        uses: peter-evans/create-or-update-comment@v1
+        uses: peter-evans/create-or-update-comment@v4
         with:
           issue-number: ${{ github.event.issue.number }}
           body: |

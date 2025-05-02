@@ -186,9 +186,19 @@ class SignalBot:
             self.commands.append((command, contacts, group_ids, f))
 
     async def _async_post_init(self):
+        await self._check_signal_service()
         await self._detect_groups()
         await self._resolve_commands()
         await self._produce_consume_messages()
+
+    async def _check_signal_service(self):
+        try:
+            await self._signal.check_signal_service()
+        except Exception as e:
+            logging.exception(
+                "Cannot connect to signal-cli-rest-api service, is it running?"
+            )
+            self._event_loop.stop()
 
     def _store_reference_to_task(self, task: asyncio.Task):
         # Keep a hard reference to the tasks, fixes Ruff's RUF006 rule

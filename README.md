@@ -105,10 +105,11 @@ The package provides methods to easily listen for incoming messages and respondi
 - `bot.stop_typing(receiver)`: Stop typing
 - `bot.scheduler`: APScheduler > AsyncIOScheduler, see [here](https://apscheduler.readthedocs.io/en/3.x/modules/schedulers/asyncio.html?highlight=AsyncIOScheduler#apscheduler.schedulers.asyncio.AsyncIOScheduler)
 
-### Storage
+### Persistent storage
 
-`bot.storage` is in-memory, SQLite, or Redis storage, see `storage.py`.
-This is important because the bot runs multi-threaded, so instance state on your command classes isn't shared between threads.
+By default the `bot.storage` is in-memory.
+Any changes are lost when the bot is stopped or reseted.
+For persistent storage to disk, check the SQLite or Redis storage in `storage.py`.
 
 ### Command
 

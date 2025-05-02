@@ -260,28 +260,19 @@ class SignalAPI:
 
 
 class SignalAPIURIs:
-    _use_https: bool = True
 
     def __init__(self, signal_service: str, phone_number: str, use_https: bool = True):
         self.signal_service = signal_service
         self.phone_number = phone_number
-        self._use_https = use_https
-
-    @property
-    def use_https(self) -> bool:
-        return self._use_https
-
-    @use_https.setter
-    def use_https(self, value: bool) -> None:
-        self._use_https = value
+        self.use_https = use_https
 
     @property
     def https_or_http(self) -> str:
-        return "https" if self._use_https else "http"
+        return "https" if self.use_https else "http"
 
     @property
     def wss_or_ws(self) -> str:
-        return "wss" if self._use_https else "ws"
+        return "wss" if self.use_https else "ws"
 
     def attachment_rest_uri(self):
         return f"{self.https_or_http}://{self.signal_service}/v1/attachments"

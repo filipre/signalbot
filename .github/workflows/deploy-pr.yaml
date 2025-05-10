@@ -93,7 +93,6 @@ jobs:
           echo "The custom version is ${pr_version}"
           echo "pr_version=${pr_version}" >> "$GITHUB_OUTPUT"
 
-
       - name: Set new version
         run: poetry version ${{ steps.create-custom-version.outputs.pr_version }}
 

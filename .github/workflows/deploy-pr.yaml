@@ -2,6 +2,8 @@ name: Deploy Pull Request
 
 on:
   workflow_dispatch:
+  issue_comment:
+    types: [created]
 
 jobs:
   deploy-check:

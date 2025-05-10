@@ -1,0 +1,23 @@
+name: Deploy Pull Request
+
+on:
+  issue_comment:
+    types: [created]
+
+jobs:
+  deploy-check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: "Check if user has write access"
+        uses: actions-cool/check-user-permission@main
+        id: checkUser
+        with:
+          require: "write"
+      - name: Acknowledge deployment request to commenter
+        if: steps.checkUser.outputs.require-result == 'true'
+        id: checkCommand
+        uses: peter-evans/slash-command-dispatch@v4
+        with:
+          commands: |
+            deploy
+          token: ${{ secrets.GITHUB_TOKEN }}

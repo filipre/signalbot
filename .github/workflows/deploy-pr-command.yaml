@@ -1,48 +1,15 @@
-name: Deploy Pull Request
-
+name: deploy-command
 on:
-  issue_comment:
-    types: [created]
+  repository_dispatch:
+    types: [deploy-command]
 
 jobs:
-  deploy-check:
-    runs-on: ubuntu-latest
-    steps:
-      - name: "Check if user has write access"
-        uses: actions-cool/check-user-permission@main
-        id: checkUser
-        with:
-          require: "write"
-      - name: Acknowledge deployment request to commenter
-        if: steps.checkUser.outputs.require-result == 'true'
-        id: checkCommand
-        uses: khan/pull-request-comment-trigger@master
-        with:
-          trigger: "/deploy"
-          reaction: rocket
-        env:
-          GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
-    outputs:
-      triggered: ${{ steps.checkCommand.outputs.triggered }}
-
   publish-package:
     name: Publish Package
     runs-on: ubuntu-latest
-    needs: deploy-check
-    if: needs.deploy-check.outputs.triggered == 'true'
     environment:
       name: test.pypi.org
     steps:
-      - name: Get pull request ref
-        id: get_pull_request_ref
-        uses: octokit/request-action@v2.x
-        with:
-          route: GET /repos/:repository/pulls/:issue_id
-          issue_id: ${{ github.event.issue.number }}
-        env:
-          GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
-          INPUT_REPOSITORY: ${{ github.repository }}
-
       - name: Create deployment
         id: create_deployment
         uses: octokit/request-action@v2.x
@@ -50,7 +17,7 @@ jobs:
           route: POST /repos/:repository/deployments
         env:
           INPUT_REPOSITORY: ${{ github.repository }}
-          INPUT_REF: ${{ fromJson(steps.get_pull_request_ref.outputs.data).head.ref }}
+          INPUT_REF: ${{ github.event.client_payload.pull_request.head.ref }}
           INPUT_ENVIRONMENT: test.pypi.org
           INPUT_AUTO_MERGE: false
           GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
@@ -71,7 +38,7 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
         with:
-          ref: ${{ fromJson(steps.get_pull_request_ref.outputs.data).head.ref }}
+          ref: ${{ github.event.client_payload.pull_request.head.ref }}
 
       - name: Set up Python
         uses: actions/setup-python@v5

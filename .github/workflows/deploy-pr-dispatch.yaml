@@ -1,4 +1,4 @@
-name: Deploy Pull Request
+name: Deploy Pull Request Dispatch
 
 on:
   issue_comment:

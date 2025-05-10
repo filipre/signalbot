@@ -1,4 +1,4 @@
-name: deploy-command
+name: Deploy Pull Request
 on:
   repository_dispatch:
     types: [deploy-command]

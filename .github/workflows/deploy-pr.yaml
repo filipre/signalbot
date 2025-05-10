@@ -1,8 +1,7 @@
 name: Deploy Pull Request
 
-workflow_dispatch:
-
 on:
+  workflow_dispatch:
   issue_comment:
     types: [created]
 

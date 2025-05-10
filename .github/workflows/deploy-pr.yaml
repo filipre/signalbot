@@ -88,7 +88,11 @@ jobs:
 
       - name: Create custom version
         id: create-custom-version
-        run: echo "{pr_version}=$(poetry version -s)a$(date +%s)" >> $GITHUB_OUTPUT
+        run: |
+          pr_version=$(poetry version -s)a$(date +%s)
+          echo "The custom version is ${pr_version}"
+          echo "pr_version=${pr_version}" >> "$GITHUB_OUTPUT"
+
 
       - name: Set new version
         run: poetry version ${{ steps.create-custom-version.outputs.pr_version }}

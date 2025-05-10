@@ -248,15 +248,16 @@ class SignalAPI:
         ):
             raise HealthCheckError
 
-    async def check_signal_service(self) -> None:
+    async def check_signal_service(self) -> bool:
+        self._signal_api_uris.use_https = True
         try:
-            await self.health_check()
+            return (await self.health_check()).status == 204
         except HealthCheckError:
             self._signal_api_uris.use_https = False
             try:
-                await self.health_check()
+                return (await self.health_check()).status == 204
             except HealthCheckError as e:
-                raise SignalServiceConnectionError(e) from e
+                return False
 
 
 class SignalAPIURIs:

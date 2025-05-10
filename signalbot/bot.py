@@ -38,7 +38,6 @@ class SignalBot:
         storage:
             redis_host: "redis"
             redis_port: 6379
-
         retry_interval: 1
         """
         self.config = config

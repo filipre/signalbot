@@ -38,7 +38,7 @@ jobs:
         uses: octokit/request-action@v2.x
         with:
           route: GET /repos/:repository/pulls/:issue_id
-          repository: ${{ github.repository }}
+          repo: ${{ github.repository }}
           issue_id: ${{ github.event.issue.number }}
         env:
           GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
@@ -60,7 +60,7 @@ jobs:
         uses: octokit/request-action@v2.x
         with:
           route: POST /repos/:repository/deployments/:deployment/statuses
-          repository: ${{ github.repository }}
+          repo: ${{ github.repository }}
           deployment: ${{ fromJson(steps.create_deployment.outputs.data).id }}
           environment: test.pypi.org
           log_url: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
@@ -119,7 +119,7 @@ jobs:
         uses: octokit/request-action@v2.x
         with:
           route: POST /repos/:repository/deployments/:deployment/statuses
-          repository: ${{ github.repository }}
+          repo: ${{ github.repository }}
           deployment: ${{ fromJson(steps.create_deployment.outputs.data).id }}
           environment: test.pypi.org
           environment_url: https://test.pypi.org/project/signalbot/${{ steps.create-custom-version.outputs.pr_version }}/
@@ -134,7 +134,7 @@ jobs:
         if: failure()
         with:
           route: POST /repos/:repository/deployments/:deployment/statuses
-          repository: ${{ github.repository }}
+          repo: ${{ github.repository }}
           deployment: ${{ fromJson(steps.create_deployment.outputs.data).id }}
           environment: test.pypi.org
           environment_url: https://test.pypi.org/project/signalbot/${{ steps.create-custom-version.outputs.pr_version }}/

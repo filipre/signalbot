@@ -1,7 +1,6 @@
 name: Deploy Pull Request
 
 on:
-  workflow_dispatch:
   issue_comment:
     types: [created]
 
@@ -39,10 +38,10 @@ jobs:
         uses: octokit/request-action@v2.x
         with:
           route: GET /repos/:repository/pulls/:issue_id
-          repo: ${{ github.repository }}
           issue_id: ${{ github.event.issue.number }}
         env:
           GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+          INPUT_REPOSITORY: ${{ github.repository }}
 
       - name: Create deployment
         id: create_deployment
@@ -61,13 +60,13 @@ jobs:
         uses: octokit/request-action@v2.x
         with:
           route: POST /repos/:repository/deployments/:deployment/statuses
-          repo: ${{ github.repository }}
           deployment: ${{ fromJson(steps.create_deployment.outputs.data).id }}
           environment: test.pypi.org
           log_url: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
           state: in_progress
         env:
           GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+          INPUT_REPOSITORY: ${{ github.repository }}
 
       - name: Checkout Code
         uses: actions/checkout@v4
@@ -93,7 +92,6 @@ jobs:
           pr_version=$(poetry version -s)a$(date +%s)
           echo "The custom version is ${pr_version}"
           echo "pr_version=${pr_version}" >> "$GITHUB_OUTPUT"
-
 
       - name: Set new version
         run: poetry version ${{ steps.create-custom-version.outputs.pr_version }}
@@ -124,7 +122,6 @@ jobs:
         uses: octokit/request-action@v2.x
         with:
           route: POST /repos/:repository/deployments/:deployment/statuses
-          repo: ${{ github.repository }}
           deployment: ${{ fromJson(steps.create_deployment.outputs.data).id }}
           environment: test.pypi.org
           environment_url: https://test.pypi.org/project/signalbot/${{ steps.create-custom-version.outputs.pr_version }}/
@@ -132,6 +129,7 @@ jobs:
           state: success
         env:
           GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+          INPUT_REPOSITORY: ${{ github.repository }}
 
       - name: Set deployment status to failure
         id: failed_deployment
@@ -139,7 +137,6 @@ jobs:
         if: failure()
         with:
           route: POST /repos/:repository/deployments/:deployment/statuses
-          repo: ${{ github.repository }}
           deployment: ${{ fromJson(steps.create_deployment.outputs.data).id }}
           environment: test.pypi.org
           environment_url: https://test.pypi.org/project/signalbot/${{ steps.create-custom-version.outputs.pr_version }}/
@@ -147,3 +144,4 @@ jobs:
           state: failure
         env:
           GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+          INPUT_REPOSITORY: ${{ github.repository }}

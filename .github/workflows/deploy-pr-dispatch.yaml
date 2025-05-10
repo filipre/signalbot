@@ -8,12 +8,12 @@ jobs:
   deploy-check:
     runs-on: ubuntu-latest
     steps:
-      - name: "Check if user has write access"
+      - name: Check if user has write access
         uses: actions-cool/check-user-permission@main
         id: checkUser
         with:
           require: "write"
-      - name: Acknowledge deployment request to commenter
+      - name: Trigger the deploy-pr-command workflow and add a reaction to the comment
         if: steps.checkUser.outputs.require-result == 'true'
         id: checkCommand
         uses: peter-evans/slash-command-dispatch@v4

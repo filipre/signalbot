@@ -30,12 +30,15 @@ class SignalBot:
         """SignalBot
 
         Example Config:
-        ===============
+        ======= Mandatory fields ========
         signal_service: "127.0.0.1:8080"
         phone_number: "+49123456789"
+
+        ======= Optional fields ========
         storage:
             redis_host: "redis"
             redis_port: 6379
+        retry_interval: 1
         """
         self.config = config
 
@@ -186,9 +189,15 @@ class SignalBot:
             self.commands.append((command, contacts, group_ids, f))
 
     async def _async_post_init(self):
+        await self._check_signal_service()
         await self._detect_groups()
         await self._resolve_commands()
         await self._produce_consume_messages()
+
+    async def _check_signal_service(self):
+        while (await self._signal.check_signal_service()) is False:
+            logging.error("Cannot connect to the signal-cli-rest-api service, retrying")
+            await asyncio.sleep(self.config.get("retry_interval", 1))
 
     def _store_reference_to_task(self, task: asyncio.Task):
         # Keep a hard reference to the tasks, fixes Ruff's RUF006 rule

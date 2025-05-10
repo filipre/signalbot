@@ -71,13 +71,13 @@ jobs:
           poetry config repositories.testpypi https://test.pypi.org/legacy/
           poetry config pypi-token.testpypi ${{ secrets.API_TOKEN }}
 
-      - name: Publish package
-        run: poetry publish -r testpypi
+      # - name: Publish package
+      #   run: poetry publish -r testpypi
 
       - name: Write comment in Pull Request
         uses: peter-evans/create-or-update-comment@v4
         with:
-          issue-number: ${{ github.event.issue.number }}
+          issue-number: ${{ github.event.client_payload.github.payload.comment.id }}
           body: |
             Pull Request has been deployed on test.pypi.org: [${{ steps.create-custom-version.outputs.pr_version }}](https://test.pypi.org/project/signalbot/${{ steps.create-custom-version.outputs.pr_version }}/) :rocket: You can test the package by running
             ```bash

@@ -8,6 +8,7 @@ from typing import Optional, Union, List, Callable, Any, TypeAlias
 import re
 import uuid
 import phonenumbers
+import itertools
 
 from .api import SignalAPI, ReceiveMessagesError
 from .command import Command
@@ -64,6 +65,9 @@ class SignalBot:
         self._event_loop = asyncio.get_event_loop()
         self._q = asyncio.Queue()
         self._running_tasks: set[asyncio.Task] = set()
+
+        self._produce_tasks: set[asyncio.Task] = set()
+        self._consume_tasks: set[asyncio.Task] = set()
 
         try:
             self.scheduler = AsyncIOScheduler(event_loop=self._event_loop)
@@ -166,6 +170,7 @@ class SignalBot:
         self._commands_to_be_registered.append((command, contacts, groups, f))
 
     async def _resolve_commands(self):
+        self.commands = []
         for command, contacts, groups, f in self._commands_to_be_registered:
             group_ids = None
 
@@ -199,14 +204,16 @@ class SignalBot:
             logging.error("Cannot connect to the signal-cli-rest-api service, retrying")
             await asyncio.sleep(self.config.get("retry_interval", 1))
 
-    def _store_reference_to_task(self, task: asyncio.Task):
+    def _store_reference_to_task(self, task: asyncio.Task, task_set: set[asyncio.Task]):
         # Keep a hard reference to the tasks, fixes Ruff's RUF006 rule
-        self._running_tasks.add(task)
-        task.add_done_callback(self._running_tasks.discard)
+        task_set.add(task)
+        task.add_done_callback(task_set.discard)
 
     def start(self):
-        task = self._event_loop.create_task(self._async_post_init())
-        self._store_reference_to_task(task)
+        task = self._event_loop.create_task(
+            self._rerun_on_exception(self._async_post_init)
+        )
+        self._store_reference_to_task(task, self._running_tasks)
 
         # Add more scheduler tasks here
         # self.scheduler.add_job(...)
@@ -419,7 +426,7 @@ class SignalBot:
             start_t = int(time.monotonic())  # seconds
 
             try:
-                await coro(*args, **kwargs)
+                return await coro(*args, **kwargs)
             except asyncio.CancelledError:
                 raise
             except Exception:
@@ -438,15 +445,22 @@ class SignalBot:
             await asyncio.sleep(sleep_t)
 
     async def _produce_consume_messages(self, producers=1, consumers=3) -> None:
+        for task in itertools.chain(self._consume_tasks, self._produce_tasks):
+            task.cancel()
+
+        self._produce_tasks.clear()
+
         for n in range(1, producers + 1):
             produce_task = self._rerun_on_exception(self._produce, n)
-            task = asyncio.create_task(produce_task)
-            self._store_reference_to_task(task)
+            produce_task = asyncio.create_task(produce_task)
+            self._store_reference_to_task(produce_task, self._produce_tasks)
+
+        self._consume_tasks.clear()
 
         for n in range(1, consumers + 1):
             consume_task = self._rerun_on_exception(self._consume, n)
-            task = asyncio.create_task(consume_task)
-            self._store_reference_to_task(task)
+            consume_task = asyncio.create_task(consume_task)
+            self._store_reference_to_task(consume_task, self._consume_tasks)
 
     async def _produce(self, name: int) -> None:
         logging.info(f"[Bot] Producer #{name} started")

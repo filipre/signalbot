@@ -50,18 +50,18 @@ class TestAPI(unittest.IsolatedAsyncioTestCase):
             self.assertEqual(messages[i], results[i])
 
     def test_receive_uri(self):
-        expected_uri = f"ws://{self.signal_service}/v1/receive/{self.phone_number}"
-        actual_uri = self.signal_api._receive_ws_uri()
+        expected_uri = f"wss://{self.signal_service}/v1/receive/{self.phone_number}"
+        actual_uri = self.signal_api._signal_api_uris.receive_ws_uri()
         self.assertEqual(actual_uri, expected_uri)
 
     def test_send_uri(self):
-        expected_uri = f"http://{self.signal_service}/v2/send"
-        actual_uri = self.signal_api._send_rest_uri()
+        expected_uri = f"https://{self.signal_service}/v2/send"
+        actual_uri = self.signal_api._signal_api_uris.send_rest_uri()
         self.assertEqual(actual_uri, expected_uri)
 
     def test_attachment_rest_uri(self):
-        expected_uri = f"http://{self.signal_service}/v1/attachments"
-        actual_uri = self.signal_api._attachment_rest_uri()
+        expected_uri = f"https://{self.signal_service}/v1/attachments"
+        actual_uri = self.signal_api._signal_api_uris.attachment_rest_uri()
         self.assertEqual(actual_uri, expected_uri)
 
 

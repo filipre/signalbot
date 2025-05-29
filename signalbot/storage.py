@@ -6,17 +6,22 @@ except ModuleNotFoundError:
 import json
 import sqlite3
 from typing import Any
+from abc import ABC, abstractmethod
 
 
-class Storage:
+class Storage(ABC):
+
+    @abstractmethod
     def exists(self, key: str) -> bool:
-        raise NotImplementedError
+        pass
 
+    @abstractmethod
     def read(self, key: str) -> Any:
-        raise NotImplementedError
+        pass
 
+    @abstractmethod
     def save(self, key: str, object: Any):
-        raise NotImplementedError
+        pass
 
 
 class StorageError(Exception):

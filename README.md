@@ -11,7 +11,6 @@ There is also a bigger example in the `example` folder.
 ```python
 import os
 from signalbot import SignalBot, Command, Context
-from commands import PingCommand
 
 
 class PingCommand(Command):

@@ -1,6 +1,5 @@
 from __future__ import annotations
-from typing import TYPE_CHECKING
-from typing import Any
+from typing import TYPE_CHECKING, Literal, Any
 from copy import deepcopy
 
 from .message import Message
@@ -56,7 +55,7 @@ class Context:
     async def react(self, emoji: str):
         await self.bot.react(self.message, emoji)
 
-    async def receipt(self, receipt_type: str):
+    async def receipt(self, receipt_type: Literal["read", "viewed"]):
         await self.bot.receipt(self.message, receipt_type)
 
     async def start_typing(self):

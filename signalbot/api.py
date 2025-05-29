@@ -3,6 +3,7 @@ import base64
 import aiohttp
 import websockets
 from typing import Any, Optional
+from typing import Literal
 
 
 class SignalAPI:
@@ -100,9 +101,9 @@ class SignalAPI:
             raise ReactionError
 
     async def receipt(
-        self, recipient: str, receipt_type: str, target_author: str, timestamp: int
+        self, recipient: str, receipt_type: Literal["read", "viewed"], timestamp: int
     ) -> aiohttp.ClientResponse:
-        uri = self._signal_api_uris.receipt_rest_uri()
+        uri = self._signal_api_uris.receipts_rest_uri()
         payload = {
             "recipient": recipient,
             "receipt_type": receipt_type,
@@ -324,7 +325,7 @@ class SignalAPIURIs:
     def health_check_uri(self):
         return f"{self.https_or_http}://{self.signal_service}/v1/health"
 
-    def receipt_rest_uri(self):
+    def receipts_rest_uri(self):
         return f"{self.https_or_http}://{self.signal_service}/v1/receipts/{self.phone_number}"
 
 

@@ -3,6 +3,7 @@ import base64
 import aiohttp
 import websockets
 from typing import Any, Optional
+from typing import Literal
 
 
 class SignalAPI:
@@ -86,6 +87,26 @@ class SignalAPI:
             "recipient": recipient,
             "reaction": reaction,
             "target_author": target_author,
+            "timestamp": timestamp,
+        }
+        try:
+            async with aiohttp.ClientSession() as session:
+                resp = await session.post(uri, json=payload)
+                resp.raise_for_status()
+                return resp
+        except (
+            aiohttp.ClientError,
+            aiohttp.http_exceptions.HttpProcessingError,
+        ):
+            raise ReactionError
+
+    async def receipt(
+        self, recipient: str, receipt_type: Literal["read", "viewed"], timestamp: int
+    ) -> aiohttp.ClientResponse:
+        uri = self._signal_api_uris.receipts_rest_uri()
+        payload = {
+            "recipient": recipient,
+            "receipt_type": receipt_type,
             "timestamp": timestamp,
         }
         try:
@@ -303,6 +324,9 @@ class SignalAPIURIs:
 
     def health_check_uri(self):
         return f"{self.https_or_http}://{self.signal_service}/v1/health"
+
+    def receipts_rest_uri(self):
+        return f"{self.https_or_http}://{self.signal_service}/v1/receipts/{self.phone_number}"
 
 
 class ReceiveMessagesError(Exception):

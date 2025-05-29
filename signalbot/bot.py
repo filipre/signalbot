@@ -4,7 +4,7 @@ import time
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 import logging
 import traceback
-from typing import Optional, Union, List, Callable, Any, TypeAlias
+from typing import Optional, Union, List, Callable, Any, TypeAlias, Literal
 import re
 import uuid
 import phonenumbers
@@ -266,6 +266,15 @@ class SignalBot:
         timestamp = message.timestamp
         await self._signal.react(recipient, emoji, target_author, timestamp)
         logging.info(f"[Bot] New reaction: {emoji}")
+
+    async def receipt(self, message: Message, receipt_type: Literal["read", "viewed"]):
+        if message.group is not None:
+            logging.warning(f"[Bot] Receipts are not supported for groups")
+            return
+
+        recipient = self._resolve_receiver(message.recipient())
+        await self._signal.receipt(recipient, receipt_type, message.timestamp)
+        logging.info(f"[Bot] Receipt: {receipt_type}")
 
     async def start_typing(self, receiver: str):
         receiver = self._resolve_receiver(receiver)

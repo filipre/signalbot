@@ -9,9 +9,12 @@ class TestQuote(unittest.TestCase):
 
     def test_quote_with_attachment(self):
         import json
-        quote_data = json.loads(self.raw_quote_message)["envelope"]["syncMessage"]["sentMessage"]["quote"]
+
+        quote_data = json.loads(self.raw_quote_message)["envelope"]["syncMessage"][
+            "sentMessage"
+        ]["quote"]
         quote = Quote.from_dict(quote_data)
-        
+
         self.assertIsNotNone(quote)
         self.assertEqual(quote.id, 1632576001632)
         self.assertEqual(quote.author, "+490123456789")
@@ -24,9 +27,12 @@ class TestQuote(unittest.TestCase):
 
     def test_quote_with_text(self):
         import json
-        quote_data = json.loads(self.raw_quote_text_message)["envelope"]["syncMessage"]["sentMessage"]["quote"]
+
+        quote_data = json.loads(self.raw_quote_text_message)["envelope"]["syncMessage"][
+            "sentMessage"
+        ]["quote"]
         quote = Quote.from_dict(quote_data)
-        
+
         self.assertIsNotNone(quote)
         self.assertEqual(quote.id, 1632576001632)
         self.assertEqual(quote.author, "+490123456789")
@@ -42,7 +48,7 @@ class TestQuote(unittest.TestCase):
             "authorNumber": "+490123456789",
             "authorUuid": "<uuid>",
             "text": "Test quote",
-            "attachments": []
+            "attachments": [],
         }
         quote = Quote.from_dict(quote_dict)
         self.assertIsNotNone(quote)
@@ -59,4 +65,4 @@ class TestQuote(unittest.TestCase):
 
 
 if __name__ == "__main__":
-    unittest.main() 
+    unittest.main()

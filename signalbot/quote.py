@@ -2,7 +2,7 @@ from typing import Optional, List, Dict, Any
 
 
 class Quote:
-    
+
     def __init__(
         self,
         id: int,
@@ -34,4 +34,4 @@ class Quote:
                 attachments=quote_dict.get("attachments", []),
             )
         except (KeyError, TypeError):
-            return None 
+            return None

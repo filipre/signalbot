@@ -120,7 +120,7 @@ To implement your own commands, you need to inherent `Command` and overwrite fol
 
 ### Unit Testing
 
-*Note: deprecated, I want to switch to pytest eventually*
+*Note: deprecated, the plan is to switch to pytest eventually*
 
 In many cases, we can mock receiving and sending messages to speed up development time. To do so, you can use `signalbot.utils.ChatTestCase` which sets up a "skeleton" bot. Then, you can send messages using the `@chat` decorator in `signalbot.utils` like this:
 ```python
@@ -150,9 +150,7 @@ In `signalbot.utils`, check out `ReceiveMessagesMock`, `SendMessagesMock` and `R
 - Do you see "consumers" picking up jobs and handling incoming messages?
 - Do you see the response in the bot's logs?
 
-## Local development and package
-
-*Section work in progress. Feel free to open an issue for questions.*
+## Local development
 
 ```bash
 poetry install

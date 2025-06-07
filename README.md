@@ -159,9 +159,14 @@ poetry install
 poetry run pre-commit install
 ```
 
+## Real world bot examples
+
+There are many real world examples of bot implementations using this library.
+Check the whole list at https://github.com/filipre/signalbot/network/dependents
+
 ## Other Projects
 
-There are a few other related projects similar to this one. You may want to check them out and see if it fits your needs.
+There are a few other projects similar to this one. You may want to check them out and see if it fits your needs.
 
 |Project|Description|Language|
 |-------|-----------|--------|

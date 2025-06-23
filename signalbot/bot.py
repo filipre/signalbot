@@ -93,7 +93,9 @@ class SignalBot:
                 " Restarting will delete the storage!"
             )
             if "redis_host" in config_storage:
-                logging.warning(f"[Bot] Redis initialization error: {traceback.format_exc()}")
+                logging.warning(
+                    f"[Bot] Redis initialization error: {traceback.format_exc()}"
+                )
 
     # deprecated
     def listen(self, required_id: str, optional_id: str = None):

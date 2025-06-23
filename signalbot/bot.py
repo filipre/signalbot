@@ -74,6 +74,7 @@ class SignalBot:
         except Exception as e:
             raise SignalBotError(f"Could not initialize scheduler: {e}")
 
+        config_storage = {}
         try:
             config_storage = self.config["storage"]
             if config_storage.get("type") == "sqlite":

@@ -100,10 +100,10 @@ class Message:
             )
             base64_attachments = await cls._parse_attachments(
                 signal, raw_message["envelope"]["syncMessage"]["sentMessage"]
-            )
+            ) if signal.download_attachments else []
             attachments_local_filenames = cls._parse_attachments_local_filenames(
                 raw_message["envelope"]["syncMessage"]["sentMessage"]
-            )
+            ) if signal.download_attachments else []
 
         # Option 2: dataMessage
         elif "dataMessage" in raw_message["envelope"]:
@@ -114,10 +114,10 @@ class Message:
             mentions = cls._parse_mentions(raw_message["envelope"]["dataMessage"])
             base64_attachments = await cls._parse_attachments(
                 signal, raw_message["envelope"]["dataMessage"]
-            )
+            ) if signal.download_attachments else []
             attachments_local_filenames = cls._parse_attachments_local_filenames(
                 raw_message["envelope"]["dataMessage"]
-            )
+            ) if signal.download_attachments else []
 
         else:
             raise UnknownMessageFormatError

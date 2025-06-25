@@ -8,10 +8,7 @@ from typing import Literal
 
 class SignalAPI:
     def __init__(
-        self,
-        signal_service: str,
-        phone_number: str,
-        download_attachments: bool = True
+        self, signal_service: str, phone_number: str, download_attachments: bool = True
     ):
         self.phone_number = phone_number
         self._signal_api_uris = SignalAPIURIs(

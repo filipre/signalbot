@@ -74,15 +74,18 @@ class SignalBot:
         except Exception as e:
             raise SignalBotError(f"Could not initialize scheduler: {e}")
 
+        config_storage = {}
         try:
             config_storage = self.config["storage"]
             if config_storage.get("type") == "sqlite":
                 self._sqlite_db = config_storage["sqlite_db"]
                 self.storage = SQLiteStorage(self._sqlite_db)
+                logging.info("sqlite storage initilized")
             else:
                 self._redis_host = config_storage["redis_host"]
                 self._redis_port = config_storage["redis_port"]
                 self.storage = RedisStorage(self._redis_host, self._redis_port)
+                logging.info("redis storage initilized")
         except Exception:
             self.storage = SQLiteStorage()
             logging.warning(
@@ -90,6 +93,10 @@ class SignalBot:
                 " In-memory storage will be used."
                 " Restarting will delete the storage!"
             )
+            if "redis_host" in config_storage:
+                logging.warning(
+                    f"[Bot] Redis initialization error: {traceback.format_exc()}"
+                )
 
     # deprecated
     def listen(self, required_id: str, optional_id: str = None):

@@ -8,16 +8,14 @@ from typing import Literal
 
 class SignalAPI:
     def __init__(
-        self,
-        signal_service: str,
-        phone_number: str,
+        self, signal_service: str, phone_number: str, download_attachments: bool = True
     ):
         self.phone_number = phone_number
         self._signal_api_uris = SignalAPIURIs(
             signal_service=signal_service,
             phone_number=phone_number,
         )
-
+        self.download_attachments = download_attachments
         # self.session = aiohttp.ClientSession()
 
     async def receive(self):

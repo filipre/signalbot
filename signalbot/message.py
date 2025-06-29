@@ -98,11 +98,19 @@ class Message:
             mentions = cls._parse_mentions(
                 raw_message["envelope"]["syncMessage"]["sentMessage"]
             )
-            base64_attachments = await cls._parse_attachments(
-                signal, raw_message["envelope"]["syncMessage"]["sentMessage"]
+            base64_attachments = (
+                await cls._parse_attachments(
+                    signal, raw_message["envelope"]["syncMessage"]["sentMessage"]
+                )
+                if signal.download_attachments
+                else []
             )
-            attachments_local_filenames = cls._parse_attachments_local_filenames(
-                raw_message["envelope"]["syncMessage"]["sentMessage"]
+            attachments_local_filenames = (
+                cls._parse_attachments_local_filenames(
+                    raw_message["envelope"]["syncMessage"]["sentMessage"]
+                )
+                if signal.download_attachments
+                else []
             )
 
         # Option 2: dataMessage
@@ -112,11 +120,19 @@ class Message:
             group = cls._parse_group_information(raw_message["envelope"]["dataMessage"])
             reaction = cls._parse_reaction(raw_message["envelope"]["dataMessage"])
             mentions = cls._parse_mentions(raw_message["envelope"]["dataMessage"])
-            base64_attachments = await cls._parse_attachments(
-                signal, raw_message["envelope"]["dataMessage"]
+            base64_attachments = (
+                await cls._parse_attachments(
+                    signal, raw_message["envelope"]["dataMessage"]
+                )
+                if signal.download_attachments
+                else []
             )
-            attachments_local_filenames = cls._parse_attachments_local_filenames(
-                raw_message["envelope"]["dataMessage"]
+            attachments_local_filenames = (
+                cls._parse_attachments_local_filenames(
+                    raw_message["envelope"]["dataMessage"]
+                )
+                if signal.download_attachments
+                else []
             )
 
         else:

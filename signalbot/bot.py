@@ -40,6 +40,7 @@ class SignalBot:
             redis_host: "redis"
             redis_port: 6379
         retry_interval: 1
+        download_attachments: True
         """
         self.config = config
 
@@ -58,7 +59,10 @@ class SignalBot:
         try:
             self._phone_number = self.config["phone_number"]
             self._signal_service = self.config["signal_service"]
-            self._signal = SignalAPI(self._signal_service, self._phone_number)
+            download_attachments = self.config.get("download_attachments", True)
+            self._signal = SignalAPI(
+                self._signal_service, self._phone_number, download_attachments
+            )
         except KeyError:
             raise SignalBotError("Could not initialize SignalAPI with given config")
 

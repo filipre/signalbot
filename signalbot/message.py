@@ -4,6 +4,7 @@ from typing import Optional
 
 
 from signalbot.api import SignalAPI
+from signalbot.quote import Quote
 
 
 class MessageType(Enum):
@@ -26,6 +27,7 @@ class Message:
         reaction: str = None,
         mentions: list = None,
         raw_message: str = None,
+        quote: Optional[Quote] = None,
     ):
         # required
         self.source = source
@@ -36,23 +38,13 @@ class Message:
         self.text = text
 
         # optional
-        self.base64_attachments = base64_attachments
-        if self.base64_attachments is None:
-            self.base64_attachments = []
-
-        self.attachments_local_filenames = attachments_local_filenames
-        if self.attachments_local_filenames is None:
-            self.attachments_local_filenames = []
-
+        self.base64_attachments = base64_attachments or []
+        self.attachments_local_filenames = attachments_local_filenames or []
         self.group = group
-
         self.reaction = reaction
-
-        self.mentions = mentions
-        if self.mentions is None:
-            self.mentions = []
-
+        self.mentions = mentions or []
         self.raw_message = raw_message
+        self.quote = quote
 
     def recipient(self) -> str:
         # Case 1: Group chat
@@ -112,6 +104,9 @@ class Message:
                 if signal.download_attachments
                 else []
             )
+            quote = cls._parse_quote(
+                raw_message["envelope"]["syncMessage"]["sentMessage"]
+            )
 
         # Option 2: dataMessage
         elif "dataMessage" in raw_message["envelope"]:
@@ -134,6 +129,7 @@ class Message:
                 if signal.download_attachments
                 else []
             )
+            quote = cls._parse_quote(raw_message["envelope"]["dataMessage"])
 
         else:
             raise UnknownMessageFormatError
@@ -151,6 +147,7 @@ class Message:
             reaction,
             mentions,
             raw_message_str,
+            quote,
         )
 
     @classmethod
@@ -210,6 +207,13 @@ class Message:
         try:
             reaction = message["reaction"]["emoji"]
             return reaction
+        except Exception:
+            return None
+
+    @classmethod
+    def _parse_quote(cls, message: dict) -> Optional[Quote]:
+        try:
+            return Quote.from_dict(message["quote"])
         except Exception:
             return None
 

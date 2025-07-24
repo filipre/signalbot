@@ -35,7 +35,7 @@ class Context:
             text_mode: str = None,
     ):
         return await self.bot.send(
-            self.message,
+            self.message.recipient(),
             text,
             base64_attachments=base64_attachments,
             mentions=mentions,

@@ -27,6 +27,22 @@ class Context:
             mentions=mentions,
             text_mode=text_mode,
         )
+    async def edit(
+            self, 
+            text: str,
+            base64_attachments: list = None,
+            mentions: list = None,
+            text_mode: str = None,
+    ):
+        return await self.bot.send(
+            self.message,
+            text,
+            base64_attachments=base64_attachments,
+            mentions=mentions,
+            text_mode=text_mode,
+            edit_timestamp=self.message.timestamp,
+        )
+
 
     async def reply(
         self,

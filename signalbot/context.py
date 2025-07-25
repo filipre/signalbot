@@ -27,12 +27,14 @@ class Context:
             mentions=mentions,
             text_mode=text_mode,
         )
+
     async def edit(
-            self, 
-            text: str,
-            base64_attachments: list = None,
-            mentions: list = None,
-            text_mode: str = None,
+        self,
+        text: str,
+        base64_attachments: list | None = None,
+        mentions: list | None = None,
+        text_mode: str | None = None,
+        timestamp: int | None = None,
     ):
         return await self.bot.send(
             self.message.recipient(),
@@ -40,9 +42,8 @@ class Context:
             base64_attachments=base64_attachments,
             mentions=mentions,
             text_mode=text_mode,
-            edit_timestamp=self.message.timestamp,
+            edit_timestamp=timestamp or self.message.timestamp,
         )
-
 
     async def reply(
         self,

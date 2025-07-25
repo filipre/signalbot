@@ -245,7 +245,7 @@ class SignalBot:
         mentions: (
             list[dict[str, Any]] | None
         ) = None,  # [{ "author": "uuid" , "start": 0, "length": 1 }]
-        edit_timestamp: str = None, 
+        edit_timestamp: str | None = None,
         text_mode: str = None,
         listen: bool = False,
     ) -> str:

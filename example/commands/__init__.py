@@ -4,6 +4,7 @@ from .triggered import TriggeredCommand
 from .reply import ReplyCommand
 from .regex_triggered import RegexTriggeredCommand
 from .attachments import AttachmentCommand
+from .edit import EditCommand
 
 __all__ = [
     "PingCommand",
@@ -12,4 +13,5 @@ __all__ = [
     "ReplyCommand",
     "RegexTriggeredCommand",
     "AttachmentCommand",
+    "EditCommand",
 ]

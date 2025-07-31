@@ -245,6 +245,7 @@ class SignalBot:
         mentions: (
             list[dict[str, Any]] | None
         ) = None,  # [{ "author": "uuid" , "start": 0, "length": 1 }]
+        edit_timestamp: str | None = None,
         text_mode: str = None,
         listen: bool = False,
     ) -> str:
@@ -259,6 +260,7 @@ class SignalBot:
             quote_timestamp=quote_timestamp,
             mentions=mentions,
             text_mode=text_mode,
+            edit_timestamp=edit_timestamp,
         )
         resp_payload = await resp.json()
         timestamp = resp_payload["timestamp"]

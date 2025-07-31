@@ -7,6 +7,7 @@ from commands import (
     ReplyCommand,
     RegexTriggeredCommand,
     AttachmentCommand,
+    EditCommand,
 )
 import logging
 
@@ -40,6 +41,7 @@ def main():
 
     bot.register(RegexTriggeredCommand())
 
+    bot.register(EditCommand(), contacts=True, groups=True)
     bot.start()
 
 

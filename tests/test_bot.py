@@ -17,6 +17,7 @@ class BotTestCase(unittest.IsolatedAsyncioTestCase):
         config = {
             "signal_service": BotTestCase.signal_service,
             "phone_number": BotTestCase.phone_number,
+            "storage": {"type": "in-memory"},
         }
         self.signal_bot = SignalBot(config)
 

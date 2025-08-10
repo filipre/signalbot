@@ -91,11 +91,14 @@ class SignalBot:
                 logging.info("redis storage initilized")
         except Exception:
             self.storage = SQLiteStorage()
-            logging.warning(
-                "[Bot] Could not initialize Redis and no SQLite DB name was given."
-                " In-memory storage will be used."
-                " Restarting will delete the storage!"
-            )
+            if config_storage.get("type") != "in-memory":
+                logging.warning(
+                    "[Bot] Could not initialize Redis and no SQLite DB name was given."
+                    " In-memory storage will be used."
+                    " Restarting will delete the storage!"
+                    " Add storage: {'type': 'in-memory'}"
+                    " to the config to silence this error."
+                )
             if "redis_host" in config_storage:
                 logging.warning(
                     f"[Bot] Redis initialization error: {traceback.format_exc()}"

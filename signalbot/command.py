@@ -5,7 +5,6 @@ import re
 from abc import ABC, abstractmethod
 
 
-from signalbot.message import Message
 from signalbot.context import Context
 
 if TYPE_CHECKING:
@@ -69,22 +68,6 @@ class Command(ABC):
     @abstractmethod
     async def handle(self, context: Context) -> None:
         pass
-
-    # helper method
-    # deprecated: please use @triggered
-    @classmethod
-    def triggered(cls, message: Message, trigger_words: list[str]) -> bool:
-        # Message needs to be text
-        text = message.text
-        if not isinstance(text, str):
-            return False
-
-        # Text must match trigger words without capitalization
-        text = text.lower()
-        if text in trigger_words:
-            return True
-
-        return False
 
 
 class CommandError(Exception):

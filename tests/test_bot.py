@@ -49,7 +49,7 @@ class TestProducer(BotTestCase):
         self.signal_bot._signal = SignalAPI(
             TestProducer.signal_service, TestProducer.phone_number
         )
-        self.signal_bot.listen(TestProducer.group_id, TestProducer.internal_id)
+
         # Any two commands
         self.signal_bot.register(DummyCommand())
         self.signal_bot.register(DummyCommand())
@@ -58,60 +58,6 @@ class TestProducer(BotTestCase):
         await self.signal_bot._produce(1337)
 
         self.assertEqual(self.signal_bot._q.qsize(), 4)
-
-
-class TestListenUser(BotTestCase):
-    def test_listen_phone_number(self):
-        user_number = "+49987654321"
-        self.signal_bot.listen(user_number)
-        expected_user_chats = {user_number}
-        self.assertSetEqual(self.signal_bot.user_chats, expected_user_chats)
-
-    def test_listenUser_phone_number(self):
-        user_number = "+49987654321"
-        self.signal_bot.listenUser(user_number)
-        expected_user_chats = {user_number}
-        self.assertSetEqual(self.signal_bot.user_chats, expected_user_chats)
-
-    def test_listen_multiple_user_chats(self):
-        user_number1 = "+49987654321"
-        user_number2 = "+49987654322"
-        user_number3 = "+49987654323"
-        self.signal_bot.listen(user_number1)
-        self.signal_bot.listen(user_number2)
-        self.signal_bot.listen(user_number3)
-        expected_user_chats = {user_number1, user_number3, user_number2}
-        self.assertSetEqual(self.signal_bot.user_chats, expected_user_chats)
-
-    def test_listenUser_multiple_user_chats(self):
-        user_number1 = "+49987654321"
-        user_number2 = "+49987654322"
-        user_number3 = "+49987654323"
-        self.signal_bot.listenUser(user_number1)
-        self.signal_bot.listenUser(user_number2)
-        self.signal_bot.listenUser(user_number3)
-        expected_user_chats = {user_number1, user_number3, user_number2}
-        self.assertSetEqual(self.signal_bot.user_chats, expected_user_chats)
-
-    def test_listen_invalid_phone_number(self):
-        invalid_number = "49987654321"
-        self.signal_bot.listen(invalid_number)
-        expected_user_chats = set()
-        self.assertSetEqual(self.signal_bot.user_chats, expected_user_chats)
-
-    def test_listenUser_invalid_phone_number(self):
-        invalid_number = "49987654321"
-        self.signal_bot.listenUser(invalid_number)
-        expected_user_chats = set()
-        self.assertSetEqual(self.signal_bot.user_chats, expected_user_chats)
-
-    def test_listen_valid_invalid_phone_number(self):
-        invalid_number = "49987654321"
-        valid_number = "+49303454321"
-        self.signal_bot.listen(invalid_number)
-        self.signal_bot.listen(valid_number)
-        expected_user_chats = {valid_number}
-        self.assertSetEqual(self.signal_bot.user_chats, expected_user_chats)
 
 
 class TestUsernameValidation(BotTestCase):
@@ -173,3 +119,32 @@ class TestRegisterCommand(BotTestCase):
 
         self.signal_bot.register(cmd)
         self.assertEqual(cmd.state, True)
+
+    async def test_register_single_contact(self):
+        user_number = "+49987654321"
+        self.signal_bot.register(DummyCommand(), contacts=[user_number])
+        await self.signal_bot._resolve_commands()
+        self.assertListEqual(self.signal_bot.commands[0][1], [user_number])
+
+    async def test_register_multiple_contacts(self):
+        user_number1 = "+49987654321"
+        user_number2 = "+49987654322"
+        user_number3 = "+49987654323"
+        self.signal_bot.register(
+            DummyCommand(), contacts=[user_number1, user_number2, user_number3]
+        )
+        await self.signal_bot._resolve_commands()
+        expected_user_chats = [user_number1, user_number2, user_number3]
+        self.assertListEqual(self.signal_bot.commands[0][1], expected_user_chats)
+
+    async def test_register_multiple_contacts_multiple_commands(self):
+        user_number1 = "+49987654321"
+        user_number2 = "+49987654322"
+        user_number3 = "+49987654323"
+        self.signal_bot.register(DummyCommand(), contacts=[user_number1, user_number2])
+        self.signal_bot.register(DummyCommand(), contacts=[user_number3])
+        await self.signal_bot._resolve_commands()
+        expected_user_chats_cmd0 = [user_number1, user_number2]
+        expected_user_chats_cmd1 = [user_number3]
+        self.assertListEqual(self.signal_bot.commands[0][1], expected_user_chats_cmd0)
+        self.assertListEqual(self.signal_bot.commands[1][1], expected_user_chats_cmd1)

@@ -50,10 +50,6 @@ class SignalBot:
         self._commands_to_be_registered: CommandList = []  # populated by .register()
         self.commands: CommandList = []  # populated by .start()
 
-        self.user_chats = set()  # deprecated
-        self.group_chats = set()  # deprecated
-        self._listen_mode_activated = False
-
         self.groups = []  # populated by .start()
         self._groups_by_id = {}
         self._groups_by_internal_id = {}
@@ -104,73 +100,6 @@ class SignalBot:
                 logging.warning(
                     f"[Bot] Redis initialization error: {traceback.format_exc()}"
                 )
-
-    # deprecated
-    def listen(self, required_id: str, optional_id: str | None = None) -> None:
-        logging.warning(
-            "[Deprecation Warning] .listen is deprecated and will be removed in future versions. Please use .register"
-        )
-
-        # Case 1: required id is a phone number, optional_id is not being used
-        if self._is_phone_number(required_id):
-            phone_number = required_id
-            self._listenUser(phone_number)
-            return
-
-        # Case 2: required id is a group id
-        if self._is_group_id(required_id) and self._is_internal_id(optional_id):
-            group_id = required_id
-            internal_id = optional_id
-            self._listenGroup(group_id, internal_id)
-            return
-
-        # Case 3: optional_id is a group id (Case 2 swapped)
-        if self._is_internal_id(required_id) and self._is_group_id(optional_id):
-            group_id = optional_id
-            internal_id = required_id
-            self._listenGroup(group_id, internal_id)
-            return
-
-        logging.warning(
-            "[Bot] Can't listen for user/group because input does not look valid"
-        )
-
-    # deprecated
-    def listenUser(self, phone_number: str) -> None:
-        logging.warning(
-            "[Deprecation Warning] .listenUser is deprecated and will be removed in future versions. Please use .register"
-        )
-        return self._listenUser(phone_number)
-
-    # deprecated
-    def _listenUser(self, phone_number: str) -> None:
-        self._listen_mode_activated = True
-        if not self._is_phone_number(phone_number):
-            logging.warning(
-                "[Bot] Can't listen for user because phone number does not look valid"
-            )
-            return
-
-        self.user_chats.add(phone_number)
-
-    # deprecated
-    def listenGroup(self, group_id: str, internal_id: str | None = None) -> None:
-        logging.warning(
-            "[Deprecation Warning] .listenGroup is deprecated and will be removed in future versions. Please use .register"
-        )
-        return self._listenGroup(group_id, internal_id)
-
-    # deprecated
-    def _listenGroup(self, group_id: str, internal_id: str | None = None) -> None:
-        self._listen_mode_activated = True
-        if not (self._is_group_id(group_id) and self._is_internal_id(internal_id)):
-            logging.warning(
-                "[Bot] Can't listen for group because group id and "
-                "internal id do not look valid"
-            )
-            return
-
-        self.group_chats.add(internal_id)
 
     def register(
         self,
@@ -262,7 +191,6 @@ class SignalBot:
         ) = None,  # [{ "author": "uuid" , "start": 0, "length": 1 }]
         edit_timestamp: str | None = None,
         text_mode: str = None,
-        listen: bool = False,
     ) -> str:
         receiver = self._resolve_receiver(receiver)
         link_preview_raw = link_preview.model_dump() if link_preview else None
@@ -283,9 +211,6 @@ class SignalBot:
         resp_payload = await resp.json()
         timestamp = resp_payload["timestamp"]
         logging.info(f"[Bot] New message {timestamp} sent:\n{text}")
-
-        if listen:
-            logging.warning(f"[Bot] send(..., listen=True) is not supported anymore")
 
         return timestamp
 
@@ -537,17 +462,6 @@ class SignalBot:
         group_ids: list[str] | bool,
     ) -> bool:
         """Is the command activated for a certain chat or group?"""
-
-        # Deprected Case: Listen Mode
-        if self._listen_mode_activated:
-            if message.is_private() and message.source in self.user_chats:
-                return True
-
-            if message.is_group() and message.group in self.group_chats:
-                return True
-
-            return False
-
         # Case 1: Private message
         if message.is_private():
             # a) registered for all numbers

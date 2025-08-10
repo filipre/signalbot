@@ -1,6 +1,6 @@
 import unittest
 from signalbot.utils import ChatTestCase, chat
-from commands.ping import PingCommand
+from ..ping import PingCommand
 
 
 class PingChatTest(ChatTestCase):

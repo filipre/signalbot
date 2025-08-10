@@ -1,23 +1,20 @@
 import unittest
 import asyncio
 import logging
-from signalbot import Command, Context
+from signalbot import Command, Context, triggered
 
 
 class SchnickSchnackSchnuckCommand(Command):
-    triggers = ["schnick", "schnack"]
+    def __init__(self):
+        pass
 
-    def __init__(self, listen):
-        self.listen = listen
-
+    @triggered("schnick", "schnack")
     async def handle(self, c: Context) -> bool:
-        if not Command.triggered(c.message, self.triggers):
-            return
 
         text = c.message.text
         if text == "schnick":
             await asyncio.sleep(1)
-            await c.send("schnack", listen=self.listen)
+            await c.send("schnack")
             return
 
         if text == "schnack":

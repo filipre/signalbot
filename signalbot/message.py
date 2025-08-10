@@ -252,6 +252,7 @@ class Message:
                         title=preview["title"],
                         description=preview["description"],
                         url=preview["url"],
+                        id=preview["image"]["id"],
                     )
                 )
             return parsed_previews

@@ -17,10 +17,10 @@ class Context:
     async def send(
         self,
         text: str,
-        base64_attachments: list = None,
-        link_preview: LinkPreview = None,
-        mentions: list = None,
-        text_mode: str = None,
+        base64_attachments: list[str] | None = None,
+        link_preview: LinkPreview | None = None,
+        mentions: list[dict[str, Any]] | None = None,
+        text_mode: str | None = None,
     ):
         return await self.bot.send(
             self.message.recipient(),
@@ -34,9 +34,9 @@ class Context:
     async def edit(
         self,
         text: str,
-        base64_attachments: list | None = None,
-        link_preview: LinkPreview = None,
-        mentions: list | None = None,
+        base64_attachments: list[str] | None = None,
+        link_preview: LinkPreview | None = None,
+        mentions: list[dict[str, Any]] | None = None,
         text_mode: str | None = None,
     ):
         return await self.bot.send(
@@ -52,8 +52,8 @@ class Context:
     async def reply(
         self,
         text: str,
-        base64_attachments: list = None,
-        link_preview: LinkPreview = None,
+        base64_attachments: list[str] | None = None,
+        link_preview: LinkPreview | None = None,
         mentions: (
             list[dict[str, Any]] | None
         ) = None,  # [{ "author": "uuid" , "start": 0, "length": 1 }]

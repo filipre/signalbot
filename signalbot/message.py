@@ -1,3 +1,4 @@
+from __future__ import annotations
 import json
 from enum import Enum
 
@@ -74,7 +75,7 @@ class Message:
         return bool(self.group)
 
     @classmethod
-    async def parse(cls, signal: SignalAPI, raw_message_str: str):
+    async def parse(cls, signal: SignalAPI, raw_message_str: str) -> Message:
         try:
             raw_message = json.loads(raw_message_str)
         except Exception:

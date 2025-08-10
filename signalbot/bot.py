@@ -166,18 +166,18 @@ class SignalBot:
         task_set.add(task)
         task.add_done_callback(task_set.discard)
 
-    def start(self) -> None:
+    def start(self, run_forever: bool = True) -> None:
         task = self._event_loop.create_task(
             self._rerun_on_exception(self._async_post_init)
         )
         self._store_reference_to_task(task, self._running_tasks)
 
-        # Add more scheduler tasks here
-        # self.scheduler.add_job(...)
-        self.scheduler.start()
+        if run_forever:
+            # Add more scheduler tasks here
+            # self.scheduler.add_job(...)
+            self.scheduler.start()
 
-        # Run event loop
-        self._event_loop.run_forever()
+            self._event_loop.run_forever()
 
     async def send(
         self,

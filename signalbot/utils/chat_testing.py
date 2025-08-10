@@ -49,7 +49,6 @@ class ChatTestCase(unittest.IsolatedAsyncioTestCase):
 
     def setUp(self):
         self.signal_bot = SignalBot(ChatTestCase.config)
-        self.signal_bot.listen(ChatTestCase.group_id, ChatTestCase.group_secret)
 
     async def run_bot(self):
         PRODUCER_ID = 1337

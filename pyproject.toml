@@ -27,7 +27,7 @@ python = ">=3.9"
 redis = {version=">=5.2.0", optional=true}
 websockets = ">=14.1"
 phonenumbers = ">=8.13.54"
-pydantic = "^2.11.7"
+pydantic = ">=2.11.7"
 
 [tool.poetry.group.dev.dependencies]
 black = ">=24.10.0"

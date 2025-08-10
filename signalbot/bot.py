@@ -183,16 +183,16 @@ class SignalBot:
         self,
         receiver: str,
         text: str,
-        base64_attachments: list = None,
-        link_preview: LinkPreview = None,
-        quote_author: str = None,
-        quote_mentions: list = None,
-        quote_message: str = None,
-        quote_timestamp: str = None,
+        base64_attachments: list | None = None,
+        link_preview: LinkPreview | None = None,
+        quote_author: str | None = None,
+        quote_mentions: list | None = None,
+        quote_message: str | None = None,
+        quote_timestamp: int | None = None,
         mentions: (
             list[dict[str, Any]] | None
         ) = None,  # [{ "author": "uuid" , "start": 0, "length": 1 }]
-        edit_timestamp: str | None = None,
+        edit_timestamp: int | None = None,
         text_mode: str = None,
     ) -> str:
         receiver = self._resolve_receiver(receiver)

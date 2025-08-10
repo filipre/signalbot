@@ -45,6 +45,7 @@ class ChatTestCase(unittest.IsolatedAsyncioTestCase):
     config = {
         "signal_service": signal_service,
         "phone_number": phone_number,
+        "storage": {"type": "in-memory"},
     }
 
     def setUp(self):

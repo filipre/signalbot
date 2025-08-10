@@ -3,6 +3,7 @@ import base64
 import aiohttp
 import websockets
 from typing import Any, Literal
+from collections.abc import AsyncIterator
 
 
 class SignalAPI:
@@ -15,9 +16,8 @@ class SignalAPI:
             phone_number=phone_number,
         )
         self.download_attachments = download_attachments
-        # self.session = aiohttp.ClientSession()
 
-    async def receive(self):
+    async def receive(self) -> AsyncIterator[str]:
         try:
             uri = self._signal_api_uris.receive_ws_uri()
             self.connection = websockets.connect(uri, ping_interval=None)
@@ -123,7 +123,7 @@ class SignalAPI:
         ):
             raise ReactionError
 
-    async def start_typing(self, receiver: str):
+    async def start_typing(self, receiver: str) -> aiohttp.ClientResponse:
         uri = self._signal_api_uris.typing_indicator_uri()
         payload = {
             "recipient": receiver,
@@ -139,7 +139,7 @@ class SignalAPI:
         ):
             raise StartTypingError
 
-    async def stop_typing(self, receiver: str):
+    async def stop_typing(self, receiver: str) -> aiohttp.ClientResponse:
         uri = self._signal_api_uris.typing_indicator_uri()
         payload = {
             "recipient": receiver,
@@ -312,39 +312,39 @@ class SignalAPIURIs:
     def wss_or_ws(self) -> str:
         return "wss" if self.use_https else "ws"
 
-    def attachment_rest_uri(self):
+    def attachment_rest_uri(self) -> str:
         return f"{self.https_or_http}://{self.signal_service}/v1/attachments"
 
-    def receive_ws_uri(self):
+    def receive_ws_uri(self) -> str:
         return (
             f"{self.wss_or_ws}://{self.signal_service}/v1/receive/{self.phone_number}"
         )
 
-    def send_rest_uri(self):
+    def send_rest_uri(self) -> str:
         return f"{self.https_or_http}://{self.signal_service}/v2/send"
 
-    def react_rest_uri(self):
+    def react_rest_uri(self) -> str:
         return f"{self.https_or_http}://{self.signal_service}/v1/reactions/{self.phone_number}"
 
-    def typing_indicator_uri(self):
+    def typing_indicator_uri(self) -> str:
         return f"{self.https_or_http}://{self.signal_service}/v1/typing-indicator/{self.phone_number}"
 
-    def groups_uri(self):
+    def groups_uri(self) -> str:
         return f"{self.https_or_http}://{self.signal_service}/v1/groups/{self.phone_number}"
 
-    def group_id_uri(self, group_id: str):
+    def group_id_uri(self, group_id: str) -> str:
         return self.groups_uri() + "/" + group_id
 
-    def contacts_uri(self):
+    def contacts_uri(self) -> str:
         return f"{self.https_or_http}://{self.signal_service}/v1/contacts/{self.phone_number}"
 
-    def health_check_uri(self):
+    def health_check_uri(self) -> str:
         return f"{self.https_or_http}://{self.signal_service}/v1/health"
 
-    def receipts_rest_uri(self):
+    def receipts_rest_uri(self) -> str:
         return f"{self.https_or_http}://{self.signal_service}/v1/receipts/{self.phone_number}"
 
-    def about_rest_uri(self):
+    def about_rest_uri(self) -> str:
         return f"{self.https_or_http}://{self.signal_service}/v1/about"
 
 

@@ -9,6 +9,7 @@ import re
 import uuid
 import phonenumbers
 import itertools
+from packaging.version import Version
 
 from .api import SignalAPI, ReceiveMessagesError
 from .command import Command
@@ -207,6 +208,7 @@ class SignalBot:
 
     async def _async_post_init(self):
         await self._check_signal_service()
+        await self._check_signal_cli_rest_api_version()
         await self._detect_groups()
         await self._resolve_commands()
         await self._produce_consume_messages()
@@ -215,6 +217,14 @@ class SignalBot:
         while (await self._signal.check_signal_service()) is False:
             logging.error("Cannot connect to the signal-cli-rest-api service, retrying")
             await asyncio.sleep(self.config.get("retry_interval", 1))
+
+    async def _check_signal_cli_rest_api_version(self):
+        min_version = Version("0.94.0")
+        version = await self._signal.get_signal_cli_rest_api_version()
+        if Version(version) < min_version:
+            raise RuntimeError(
+                f"Incompatible signal-cli-rest-api version, found {version}, minimum required is {min_version}"
+            )
 
     def _store_reference_to_task(self, task: asyncio.Task, task_set: set[asyncio.Task]):
         # Keep a hard reference to the tasks, fixes Ruff's RUF006 rule

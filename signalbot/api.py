@@ -284,6 +284,19 @@ class SignalAPI:
             except HealthCheckError as e:
                 return False
 
+    async def get_signal_cli_rest_api_version(self) -> str:
+        uri = self._signal_api_uris.about_rest_uri()
+        try:
+            async with aiohttp.ClientSession() as session:
+                resp = await session.get(uri)
+                resp.raise_for_status()
+                return (await resp.json())["version"]
+        except (
+            aiohttp.ClientError,
+            aiohttp.http_exceptions.HttpProcessingError,
+        ):
+            raise AboutError
+
 
 class SignalAPIURIs:
 
@@ -332,6 +345,9 @@ class SignalAPIURIs:
     def receipts_rest_uri(self):
         return f"{self.https_or_http}://{self.signal_service}/v1/receipts/{self.phone_number}"
 
+    def about_rest_uri(self):
+        return f"{self.https_or_http}://{self.signal_service}/v1/about"
+
 
 class ReceiveMessagesError(Exception):
     pass
@@ -374,4 +390,8 @@ class HealthCheckError(Exception):
 
 
 class SignalServiceConnectionError(Exception):
+    pass
+
+
+class AboutError(Exception):
     pass

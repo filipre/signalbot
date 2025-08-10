@@ -58,16 +58,16 @@ class Command(ABC):
         self.bot: SignalBot | None = None  # Available after calling bot.register()
 
     # optional
-    def setup(self):
+    def setup(self) -> None:
         pass
 
     # optional
-    def describe(self) -> str:
+    def describe(self) -> str | None:
         return None
 
     # overwrite
     @abstractmethod
-    async def handle(self, context: Context):
+    async def handle(self, context: Context) -> None:
         pass
 
     # helper method

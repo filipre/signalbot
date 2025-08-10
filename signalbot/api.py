@@ -2,8 +2,7 @@ import base64
 
 import aiohttp
 import websockets
-from typing import Any, Optional
-from typing import Literal
+from typing import Any, Literal
 
 
 class SignalAPI:
@@ -33,14 +32,14 @@ class SignalAPI:
         self,
         receiver: str,
         message: str,
-        base64_attachments: list = None,
-        link_preview: dict[str, Any] = None,
-        quote_author: str = None,
-        quote_mentions: list = None,
-        quote_message: str = None,
-        quote_timestamp: str = None,
+        base64_attachments: list | None = None,
+        link_preview: dict[str, Any] | None = None,
+        quote_author: str | None = None,
+        quote_mentions: list | None = None,
+        quote_message: str | None = None,
+        quote_timestamp: str | None = None,
         mentions: list[dict[str, Any]] | None = None,
-        text_mode: str = None,
+        text_mode: str | None = None,
         edit_timestamp: str | None = None,
     ) -> aiohttp.ClientResponse:
         uri = self._signal_api_uris.send_rest_uri()
@@ -203,8 +202,8 @@ class SignalAPI:
     async def update_contact(
         self,
         receiver: str,
-        expiration_in_seconds: Optional[int] = None,
-        name: Optional[str] = None,
+        expiration_in_seconds: int | None = None,
+        name: str | None = None,
     ) -> None:
         uri = self._signal_api_uris.contacts_uri()
         payload = {"recipient": receiver}
@@ -229,10 +228,10 @@ class SignalAPI:
     async def update_group(
         self,
         group_id: str,
-        base64_avatar: Optional[str] = None,
-        description: Optional[str] = None,
-        expiration_in_seconds: Optional[int] = None,
-        name: Optional[str] = None,
+        base64_avatar: str | None = None,
+        description: str | None = None,
+        expiration_in_seconds: int | None = None,
+        name: str | None = None,
     ) -> None:
         uri = self._signal_api_uris.group_id_uri(group_id)
         payload = {}

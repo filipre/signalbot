@@ -4,7 +4,8 @@ import time
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 import logging
 import traceback
-from typing import Optional, Union, List, Callable, Any, TypeAlias, Literal
+from typing import Any, TypeAlias, Literal
+from collections.abc import Callable
 import re
 import uuid
 import phonenumbers
@@ -21,9 +22,9 @@ from signalbot.link_previews import LinkPreview
 CommandList: TypeAlias = list[
     tuple[
         Command,
-        Optional[Union[List[str], bool]],
-        Optional[Union[List[str], bool]],
-        Optional[Callable[[Message], bool]],
+        list[str] | bool,
+        list[str] | bool,
+        Callable[[Message], bool] | None,
     ]
 ]
 
@@ -105,7 +106,7 @@ class SignalBot:
                 )
 
     # deprecated
-    def listen(self, required_id: str, optional_id: str = None):
+    def listen(self, required_id: str, optional_id: str | None = None):
         logging.warning(
             "[Deprecation Warning] .listen is deprecated and will be removed in future versions. Please use .register"
         )
@@ -153,14 +154,14 @@ class SignalBot:
         self.user_chats.add(phone_number)
 
     # deprecated
-    def listenGroup(self, group_id: str, internal_id: str = None):
+    def listenGroup(self, group_id: str, internal_id: str | None = None):
         logging.warning(
             "[Deprecation Warning] .listenGroup is deprecated and will be removed in future versions. Please use .register"
         )
         return self._listenGroup(group_id, internal_id)
 
     # deprecated
-    def _listenGroup(self, group_id: str, internal_id: str = None):
+    def _listenGroup(self, group_id: str, internal_id: str | None = None):
         self._listen_mode_activated = True
         if not (self._is_group_id(group_id) and self._is_internal_id(internal_id)):
             logging.warning(
@@ -174,9 +175,9 @@ class SignalBot:
     def register(
         self,
         command: Command,
-        contacts: Optional[Union[List[str], bool]] = True,
-        groups: Optional[Union[List[str], bool]] = True,
-        f: Optional[Callable[[Message], bool]] = None,
+        contacts: list[str] | bool = True,
+        groups: list[str] | bool = True,
+        f: Callable[[Message], bool] | None = None,
     ):
         command.bot = self
         command.setup()
@@ -315,8 +316,8 @@ class SignalBot:
     async def update_contact(
         self,
         receiver: str,
-        expiration_in_seconds: Optional[int] = None,
-        name: Optional[str] = None,
+        expiration_in_seconds: int | None = None,
+        name: str | None = None,
     ) -> None:
         receiver = self._resolve_receiver(receiver)
         await self._signal.update_contact(
@@ -326,10 +327,10 @@ class SignalBot:
     async def update_group(
         self,
         group_id: str,
-        base64_avatar: Optional[str] = None,
-        description: Optional[str] = None,
-        expiration_in_seconds: Optional[int] = None,
-        name: Optional[str] = None,
+        base64_avatar: str | None = None,
+        description: str | None = None,
+        expiration_in_seconds: int | None = None,
+        name: str | None = None,
     ) -> None:
         group_id = self._resolve_receiver(group_id)
         await self._signal.update_group(
@@ -440,7 +441,7 @@ class SignalBot:
             return False
         return internal_id[-1] == "="
 
-    def _get_group_by_name(self, group_name: str) -> Optional[dict[str, Any]]:
+    def _get_group_by_name(self, group_name: str) -> dict[str, Any] | None:
         groups = self._groups_by_name.get(group_name)
         if groups is not None:
             if len(groups) > 1:
@@ -526,8 +527,8 @@ class SignalBot:
     def _should_react_for_contact(
         self,
         message: Message,
-        contacts: Union[list[str], bool],
-        group_ids: Union[list[str], bool],
+        contacts: list[str] | bool,
+        group_ids: list[str] | bool,
     ):
         """Is the command activated for a certain chat or group?"""
 
@@ -567,7 +568,7 @@ class SignalBot:
     def _should_react_for_lambda(
         self,
         message: Message,
-        f: Optional[Callable[[Message], bool]] = None,
+        f: Callable[[Message], bool] | None = None,
     ) -> bool:
         if f is None:
             return True

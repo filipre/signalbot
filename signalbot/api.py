@@ -34,6 +34,7 @@ class SignalAPI:
         receiver: str,
         message: str,
         base64_attachments: list = None,
+        link_preview: dict[str, Any] = None,
         quote_author: str = None,
         quote_mentions: list = None,
         quote_message: str = None,
@@ -67,6 +68,8 @@ class SignalAPI:
             payload["text_mode"] = text_mode
         if edit_timestamp:
             payload["edit_timestamp"] = edit_timestamp
+        if link_preview:
+            payload["link_preview"] = link_preview
 
         try:
             async with aiohttp.ClientSession() as session:

@@ -1,6 +1,7 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING, Literal, Any
 from copy import deepcopy
+from signalbot.link_previews import LinkPreview
 
 from .message import Message
 
@@ -17,6 +18,7 @@ class Context:
         self,
         text: str,
         base64_attachments: list = None,
+        link_preview: LinkPreview = None,
         mentions: list = None,
         text_mode: str = None,
     ):
@@ -26,12 +28,14 @@ class Context:
             base64_attachments=base64_attachments,
             mentions=mentions,
             text_mode=text_mode,
+            link_preview=link_preview,
         )
 
     async def edit(
         self,
         text: str,
         base64_attachments: list | None = None,
+        link_preview: LinkPreview = None,
         mentions: list | None = None,
         text_mode: str | None = None,
     ):
@@ -42,12 +46,14 @@ class Context:
             mentions=mentions,
             text_mode=text_mode,
             edit_timestamp=self.message.timestamp,
+            link_preview=link_preview,
         )
 
     async def reply(
         self,
         text: str,
         base64_attachments: list = None,
+        link_preview: LinkPreview = None,
         mentions: (
             list[dict[str, Any]] | None
         ) = None,  # [{ "author": "uuid" , "start": 0, "length": 1 }]
@@ -66,6 +72,7 @@ class Context:
             quote_timestamp=self.message.timestamp,
             mentions=mentions,
             text_mode=text_mode,
+            link_preview=link_preview,
         )
 
     async def react(self, emoji: str):

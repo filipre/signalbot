@@ -15,6 +15,7 @@ from .command import Command
 from .message import Message, UnknownMessageFormatError
 from .storage import RedisStorage, SQLiteStorage
 from .context import Context
+from signalbot.link_previews import LinkPreview
 
 CommandList: TypeAlias = list[
     tuple[
@@ -238,6 +239,7 @@ class SignalBot:
         receiver: str,
         text: str,
         base64_attachments: list = None,
+        link_preview: LinkPreview = None,
         quote_author: str = None,
         quote_mentions: list = None,
         quote_message: str = None,
@@ -250,10 +252,13 @@ class SignalBot:
         listen: bool = False,
     ) -> str:
         receiver = self._resolve_receiver(receiver)
+        link_preview_raw = link_preview.model_dump() if link_preview else None
+
         resp = await self._signal.send(
             receiver,
             text,
             base64_attachments=base64_attachments,
+            link_preview=link_preview_raw,
             quote_author=quote_author,
             quote_mentions=quote_mentions,
             quote_message=quote_message,

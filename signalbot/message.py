@@ -4,6 +4,7 @@ from typing import Optional
 
 
 from signalbot.api import SignalAPI
+from signalbot.link_previews import LinkPreview
 
 
 class MessageType(Enum):
@@ -22,6 +23,7 @@ class Message:
         text: str,
         base64_attachments: list = None,
         attachments_local_filenames: Optional[list] = None,
+        link_previews: list[LinkPreview] = None,
         group: str = None,
         reaction: str = None,
         mentions: list = None,
@@ -53,6 +55,10 @@ class Message:
             self.mentions = []
 
         self.raw_message = raw_message
+
+        self.link_previews = link_previews
+        if self.link_previews is None:
+            self.link_previews = []
 
     def recipient(self) -> str:
         # Case 1: Group chat
@@ -112,6 +118,13 @@ class Message:
                 if signal.download_attachments
                 else []
             )
+            link_previews = (
+                await cls._parse_previews(
+                    signal, raw_message["envelope"]["syncMessage"]["sentMessage"]
+                )
+                if signal.download_attachments
+                else []
+            )
 
         # Option 2: dataMessage
         elif "dataMessage" in raw_message["envelope"]:
@@ -135,6 +148,14 @@ class Message:
                 else []
             )
 
+            link_previews = (
+                await cls._parse_previews(
+                    signal, raw_message["envelope"]["dataMessage"]
+                )
+                if signal.download_attachments
+                else []
+            )
+
         else:
             raise UnknownMessageFormatError
 
@@ -147,6 +168,7 @@ class Message:
             text,
             base64_attachments,
             attachments_local_filenames,
+            link_previews,
             group,
             reaction,
             mentions,
@@ -190,7 +212,7 @@ class Message:
             raise UnknownMessageFormatError
 
     @classmethod
-    def _parse_group_information(self, message: dict) -> str:
+    def _parse_group_information(cls, message: dict) -> str:
         try:
             group = message["groupInfo"]["groupId"]
             return group
@@ -217,6 +239,24 @@ class Message:
         if self.text is None:
             return ""
         return self.text
+
+    @classmethod
+    async def _parse_previews(cls, signal: SignalAPI, data_message: dict) -> list:
+        try:
+            parsed_previews = []
+            for preview in data_message["previews"]:
+                base64_thumbnail = await signal.get_attachment(preview["image"]["id"])
+                parsed_previews.append(
+                    LinkPreview(
+                        base64_thumbnail=base64_thumbnail,
+                        title=preview["title"],
+                        description=preview["description"],
+                        url=preview["url"],
+                    )
+                )
+            return parsed_previews
+        except Exception:
+            return []
 
 
 class UnknownMessageFormatError(Exception):

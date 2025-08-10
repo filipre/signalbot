@@ -5,11 +5,11 @@ import re
 from abc import ABC, abstractmethod
 
 
-from .message import Message
-from .context import Context
+from signalbot.message import Message
+from signalbot.context import Context
 
 if TYPE_CHECKING:
-    from .bot import SignalBot
+    from signalbot.bot import SignalBot
 
 
 def regex_triggered(*by: str | re.Pattern[str]):

@@ -1,4 +1,4 @@
-from .chat_testing import (
+from signalbot.utils.chat_testing import (
     ChatTestCase,
     DummyCommand,
     SendMessagesMock,

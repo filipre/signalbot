@@ -3,10 +3,10 @@ from typing import TYPE_CHECKING, Literal, Any
 from copy import deepcopy
 from signalbot.link_previews import LinkPreview
 
-from .message import Message
+from signalbot.message import Message
 
 if TYPE_CHECKING:
-    from .bot import SignalBot
+    from signalbot.bot import SignalBot
 
 
 class Context:

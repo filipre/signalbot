@@ -11,11 +11,11 @@ import phonenumbers
 import itertools
 from packaging.version import Version
 
-from .api import SignalAPI, ReceiveMessagesError
-from .command import Command
-from .message import Message, UnknownMessageFormatError
-from .storage import RedisStorage, SQLiteStorage
-from .context import Context
+from signalbot.api import SignalAPI, ReceiveMessagesError
+from signalbot.command import Command
+from signalbot.message import Message, UnknownMessageFormatError
+from signalbot.storage import RedisStorage, SQLiteStorage
+from signalbot.context import Context
 from signalbot.link_previews import LinkPreview
 
 CommandList: TypeAlias = list[

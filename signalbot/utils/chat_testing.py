@@ -6,7 +6,7 @@ import functools
 import aiohttp
 from unittest.mock import AsyncMock, MagicMock
 
-from ..bot import SignalBot, Command, Context
+from signalbot.bot import SignalBot, Command, Context
 
 from unittest.mock import patch
 

@@ -1,5 +1,5 @@
 from __future__ import annotations
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING
 import functools
 import re
 from abc import ABC, abstractmethod
@@ -55,7 +55,7 @@ def triggered(*by: str, case_sensitive=False):
 
 class Command(ABC):
     def __init__(self):
-        self.bot: Optional[SignalBot] = None  # Available after calling bot.register()
+        self.bot: SignalBot | None = None  # Available after calling bot.register()
 
     # optional
     def setup(self):

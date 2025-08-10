@@ -4,7 +4,8 @@ import time
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 import logging
 import traceback
-from typing import Optional, Union, List, Callable, Any, TypeAlias, Literal
+from typing import Any, TypeAlias, Literal
+from collections.abc import Callable
 import re
 import uuid
 import phonenumbers
@@ -21,9 +22,9 @@ from signalbot.link_previews import LinkPreview
 CommandList: TypeAlias = list[
     tuple[
         Command,
-        Optional[Union[List[str], bool]],
-        Optional[Union[List[str], bool]],
-        Optional[Callable[[Message], bool]],
+        list[str] | bool,
+        list[str] | bool,
+        Callable[[Message], bool] | None,
     ]
 ]
 
@@ -105,7 +106,7 @@ class SignalBot:
                 )
 
     # deprecated
-    def listen(self, required_id: str, optional_id: str = None):
+    def listen(self, required_id: str, optional_id: str | None = None) -> None:
         logging.warning(
             "[Deprecation Warning] .listen is deprecated and will be removed in future versions. Please use .register"
         )
@@ -135,14 +136,14 @@ class SignalBot:
         )
 
     # deprecated
-    def listenUser(self, phone_number: str):
+    def listenUser(self, phone_number: str) -> None:
         logging.warning(
             "[Deprecation Warning] .listenUser is deprecated and will be removed in future versions. Please use .register"
         )
         return self._listenUser(phone_number)
 
     # deprecated
-    def _listenUser(self, phone_number: str):
+    def _listenUser(self, phone_number: str) -> None:
         self._listen_mode_activated = True
         if not self._is_phone_number(phone_number):
             logging.warning(
@@ -153,14 +154,14 @@ class SignalBot:
         self.user_chats.add(phone_number)
 
     # deprecated
-    def listenGroup(self, group_id: str, internal_id: str = None):
+    def listenGroup(self, group_id: str, internal_id: str | None = None) -> None:
         logging.warning(
             "[Deprecation Warning] .listenGroup is deprecated and will be removed in future versions. Please use .register"
         )
         return self._listenGroup(group_id, internal_id)
 
     # deprecated
-    def _listenGroup(self, group_id: str, internal_id: str = None):
+    def _listenGroup(self, group_id: str, internal_id: str | None = None) -> None:
         self._listen_mode_activated = True
         if not (self._is_group_id(group_id) and self._is_internal_id(internal_id)):
             logging.warning(
@@ -174,15 +175,15 @@ class SignalBot:
     def register(
         self,
         command: Command,
-        contacts: Optional[Union[List[str], bool]] = True,
-        groups: Optional[Union[List[str], bool]] = True,
-        f: Optional[Callable[[Message], bool]] = None,
-    ):
+        contacts: list[str] | bool = True,
+        groups: list[str] | bool = True,
+        f: Callable[[Message], bool] | None = None,
+    ) -> None:
         command.bot = self
         command.setup()
         self._commands_to_be_registered.append((command, contacts, groups, f))
 
-    async def _resolve_commands(self):
+    async def _resolve_commands(self) -> None:
         self.commands = []
         for command, contacts, groups, f in self._commands_to_be_registered:
             group_ids = None
@@ -206,19 +207,19 @@ class SignalBot:
 
             self.commands.append((command, contacts, group_ids, f))
 
-    async def _async_post_init(self):
+    async def _async_post_init(self) -> None:
         await self._check_signal_service()
         await self._check_signal_cli_rest_api_version()
         await self._detect_groups()
         await self._resolve_commands()
         await self._produce_consume_messages()
 
-    async def _check_signal_service(self):
+    async def _check_signal_service(self) -> None:
         while (await self._signal.check_signal_service()) is False:
             logging.error("Cannot connect to the signal-cli-rest-api service, retrying")
             await asyncio.sleep(self.config.get("retry_interval", 1))
 
-    async def _check_signal_cli_rest_api_version(self):
+    async def _check_signal_cli_rest_api_version(self) -> None:
         min_version = Version("0.94.0")
         version = await self._signal.get_signal_cli_rest_api_version()
         if Version(version) < min_version:
@@ -226,12 +227,14 @@ class SignalBot:
                 f"Incompatible signal-cli-rest-api version, found {version}, minimum required is {min_version}"
             )
 
-    def _store_reference_to_task(self, task: asyncio.Task, task_set: set[asyncio.Task]):
+    def _store_reference_to_task(
+        self, task: asyncio.Task, task_set: set[asyncio.Task]
+    ) -> None:
         # Keep a hard reference to the tasks, fixes Ruff's RUF006 rule
         task_set.add(task)
         task.add_done_callback(task_set.discard)
 
-    def start(self):
+    def start(self) -> None:
         task = self._event_loop.create_task(
             self._rerun_on_exception(self._async_post_init)
         )
@@ -286,7 +289,7 @@ class SignalBot:
 
         return timestamp
 
-    async def react(self, message: Message, emoji: str):
+    async def react(self, message: Message, emoji: str) -> None:
         # TODO: check that emoji is really an emoji
         recipient = message.recipient()
         recipient = self._resolve_receiver(recipient)
@@ -295,7 +298,9 @@ class SignalBot:
         await self._signal.react(recipient, emoji, target_author, timestamp)
         logging.info(f"[Bot] New reaction: {emoji}")
 
-    async def receipt(self, message: Message, receipt_type: Literal["read", "viewed"]):
+    async def receipt(
+        self, message: Message, receipt_type: Literal["read", "viewed"]
+    ) -> None:
         if message.group is not None:
             logging.warning(f"[Bot] Receipts are not supported for groups")
             return
@@ -304,19 +309,19 @@ class SignalBot:
         await self._signal.receipt(recipient, receipt_type, message.timestamp)
         logging.info(f"[Bot] Receipt: {receipt_type}")
 
-    async def start_typing(self, receiver: str):
+    async def start_typing(self, receiver: str) -> None:
         receiver = self._resolve_receiver(receiver)
         await self._signal.start_typing(receiver)
 
-    async def stop_typing(self, receiver: str):
+    async def stop_typing(self, receiver: str) -> None:
         receiver = self._resolve_receiver(receiver)
         await self._signal.stop_typing(receiver)
 
     async def update_contact(
         self,
         receiver: str,
-        expiration_in_seconds: Optional[int] = None,
-        name: Optional[str] = None,
+        expiration_in_seconds: int | None = None,
+        name: str | None = None,
     ) -> None:
         receiver = self._resolve_receiver(receiver)
         await self._signal.update_contact(
@@ -326,10 +331,10 @@ class SignalBot:
     async def update_group(
         self,
         group_id: str,
-        base64_avatar: Optional[str] = None,
-        description: Optional[str] = None,
-        expiration_in_seconds: Optional[int] = None,
-        name: Optional[str] = None,
+        base64_avatar: str | None = None,
+        description: str | None = None,
+        expiration_in_seconds: int | None = None,
+        name: str | None = None,
     ) -> None:
         group_id = self._resolve_receiver(group_id)
         await self._signal.update_group(
@@ -344,7 +349,7 @@ class SignalBot:
         # Delete the attachment from the local storage
         await self._signal.delete_attachment(attachment_filename)
 
-    async def _detect_groups(self):
+    async def _detect_groups(self) -> None:
         # reset group lookups to avoid stale data
         self.groups = await self._signal.get_groups()
 
@@ -388,7 +393,7 @@ class SignalBot:
         except phonenumbers.phonenumberutil.NumberParseException:
             return False
 
-    def _is_valid_uuid(self, receiver_uuid: str):
+    def _is_valid_uuid(self, receiver_uuid: str) -> bool:
         try:
             uuid.UUID(str(receiver_uuid))
             return True
@@ -440,7 +445,7 @@ class SignalBot:
             return False
         return internal_id[-1] == "="
 
-    def _get_group_by_name(self, group_name: str) -> Optional[dict[str, Any]]:
+    def _get_group_by_name(self, group_name: str) -> dict[str, Any] | None:
         groups = self._groups_by_name.get(group_name)
         if groups is not None:
             if len(groups) > 1:
@@ -481,7 +486,9 @@ class SignalBot:
             logging.warning(f"Restarting coroutine in {sleep_t} seconds")
             await asyncio.sleep(sleep_t)
 
-    async def _produce_consume_messages(self, producers=1, consumers=3) -> None:
+    async def _produce_consume_messages(
+        self, producers: int = 1, consumers: int = 3
+    ) -> None:
         for task in itertools.chain(self._consume_tasks, self._produce_tasks):
             task.cancel()
 
@@ -526,9 +533,9 @@ class SignalBot:
     def _should_react_for_contact(
         self,
         message: Message,
-        contacts: Union[list[str], bool],
-        group_ids: Union[list[str], bool],
-    ):
+        contacts: list[str] | bool,
+        group_ids: list[str] | bool,
+    ) -> bool:
         """Is the command activated for a certain chat or group?"""
 
         # Deprected Case: Listen Mode
@@ -567,14 +574,14 @@ class SignalBot:
     def _should_react_for_lambda(
         self,
         message: Message,
-        f: Optional[Callable[[Message], bool]] = None,
+        f: Callable[[Message], bool] | None = None,
     ) -> bool:
         if f is None:
             return True
 
         return f(message)
 
-    async def _ask_commands_to_handle(self, message: Message):
+    async def _ask_commands_to_handle(self, message: Message) -> None:
         for command, contacts, group_ids, f in self.commands:
             if not self._should_react_for_contact(message, contacts, group_ids):
                 continue

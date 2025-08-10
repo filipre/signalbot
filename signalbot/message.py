@@ -1,6 +1,6 @@
+from __future__ import annotations
 import json
 from enum import Enum
-from typing import Optional
 
 
 from signalbot.api import SignalAPI
@@ -16,18 +16,18 @@ class Message:
     def __init__(
         self,
         source: str,
-        source_number: Optional[str],
+        source_number: str | None,
         source_uuid: str,
         timestamp: int,
         type: MessageType,
         text: str,
-        base64_attachments: list = None,
-        attachments_local_filenames: Optional[list] = None,
-        link_previews: list[LinkPreview] = None,
-        group: str = None,
-        reaction: str = None,
-        mentions: list = None,
-        raw_message: str = None,
+        base64_attachments: list[str] | None = None,
+        attachments_local_filenames: list[str] | None = None,
+        link_previews: list[LinkPreview] | None = None,
+        group: str | None = None,
+        reaction: str | None = None,
+        mentions: list[str] | None = None,
+        raw_message: str | None = None,
     ):
         # required
         self.source = source
@@ -75,7 +75,7 @@ class Message:
         return bool(self.group)
 
     @classmethod
-    async def parse(cls, signal: SignalAPI, raw_message_str: str):
+    async def parse(cls, signal: SignalAPI, raw_message_str: str) -> Message:
         try:
             raw_message = json.loads(raw_message_str)
         except Exception:

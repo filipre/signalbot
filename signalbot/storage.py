@@ -29,18 +29,18 @@ class StorageError(Exception):
 
 
 class SQLiteStorage(Storage):
-    def __init__(self, database=":memory:"):
+    def __init__(self, database: str = ":memory:"):
         self._sqlite = sqlite3.connect(database)
         self._sqlite.execute(
             "CREATE TABLE IF NOT EXISTS signalbot (key text unique, value text)"
         )
 
-    def exists(self, key):
+    def exists(self, key: str) -> bool:
         return self._sqlite.execute(
             "SELECT EXISTS(SELECT 1 FROM signalbot WHERE key = ?)", [key]
         ).fetchone()[0]
 
-    def read(self, key):
+    def read(self, key: str) -> Any:
         try:
             result = self._sqlite.execute(
                 "SELECT value FROM signalbot WHERE key = ?", [key]
@@ -49,7 +49,7 @@ class SQLiteStorage(Storage):
         except Exception as e:
             raise StorageError(f"SQLite load failed: {e}")
 
-    def save(self, key, object):
+    def save(self, key: str, object: Any):
         try:
             value = json.dumps(object)
             self._sqlite.execute(
@@ -62,7 +62,7 @@ class SQLiteStorage(Storage):
 
 
 class RedisStorage(Storage):
-    def __init__(self, host, port):
+    def __init__(self, host: str, port: int):
         self._redis = redis.Redis(host=host, port=port, db=0)
 
     def exists(self, key: str) -> bool:

@@ -2,8 +2,8 @@ import base64
 
 import aiohttp
 import websockets
-from typing import Any, Optional
-from typing import Literal
+from typing import Any, Literal
+from collections.abc import AsyncIterator
 
 
 class SignalAPI:
@@ -16,9 +16,8 @@ class SignalAPI:
             phone_number=phone_number,
         )
         self.download_attachments = download_attachments
-        # self.session = aiohttp.ClientSession()
 
-    async def receive(self):
+    async def receive(self) -> AsyncIterator[str]:
         try:
             uri = self._signal_api_uris.receive_ws_uri()
             self.connection = websockets.connect(uri, ping_interval=None)
@@ -33,14 +32,14 @@ class SignalAPI:
         self,
         receiver: str,
         message: str,
-        base64_attachments: list = None,
-        link_preview: dict[str, Any] = None,
-        quote_author: str = None,
-        quote_mentions: list = None,
-        quote_message: str = None,
-        quote_timestamp: str = None,
+        base64_attachments: list | None = None,
+        link_preview: dict[str, Any] | None = None,
+        quote_author: str | None = None,
+        quote_mentions: list | None = None,
+        quote_message: str | None = None,
+        quote_timestamp: str | None = None,
         mentions: list[dict[str, Any]] | None = None,
-        text_mode: str = None,
+        text_mode: str | None = None,
         edit_timestamp: str | None = None,
     ) -> aiohttp.ClientResponse:
         uri = self._signal_api_uris.send_rest_uri()
@@ -124,7 +123,7 @@ class SignalAPI:
         ):
             raise ReactionError
 
-    async def start_typing(self, receiver: str):
+    async def start_typing(self, receiver: str) -> aiohttp.ClientResponse:
         uri = self._signal_api_uris.typing_indicator_uri()
         payload = {
             "recipient": receiver,
@@ -140,7 +139,7 @@ class SignalAPI:
         ):
             raise StartTypingError
 
-    async def stop_typing(self, receiver: str):
+    async def stop_typing(self, receiver: str) -> aiohttp.ClientResponse:
         uri = self._signal_api_uris.typing_indicator_uri()
         payload = {
             "recipient": receiver,
@@ -203,8 +202,8 @@ class SignalAPI:
     async def update_contact(
         self,
         receiver: str,
-        expiration_in_seconds: Optional[int] = None,
-        name: Optional[str] = None,
+        expiration_in_seconds: int | None = None,
+        name: str | None = None,
     ) -> None:
         uri = self._signal_api_uris.contacts_uri()
         payload = {"recipient": receiver}
@@ -229,10 +228,10 @@ class SignalAPI:
     async def update_group(
         self,
         group_id: str,
-        base64_avatar: Optional[str] = None,
-        description: Optional[str] = None,
-        expiration_in_seconds: Optional[int] = None,
-        name: Optional[str] = None,
+        base64_avatar: str | None = None,
+        description: str | None = None,
+        expiration_in_seconds: int | None = None,
+        name: str | None = None,
     ) -> None:
         uri = self._signal_api_uris.group_id_uri(group_id)
         payload = {}
@@ -313,39 +312,39 @@ class SignalAPIURIs:
     def wss_or_ws(self) -> str:
         return "wss" if self.use_https else "ws"
 
-    def attachment_rest_uri(self):
+    def attachment_rest_uri(self) -> str:
         return f"{self.https_or_http}://{self.signal_service}/v1/attachments"
 
-    def receive_ws_uri(self):
+    def receive_ws_uri(self) -> str:
         return (
             f"{self.wss_or_ws}://{self.signal_service}/v1/receive/{self.phone_number}"
         )
 
-    def send_rest_uri(self):
+    def send_rest_uri(self) -> str:
         return f"{self.https_or_http}://{self.signal_service}/v2/send"
 
-    def react_rest_uri(self):
+    def react_rest_uri(self) -> str:
         return f"{self.https_or_http}://{self.signal_service}/v1/reactions/{self.phone_number}"
 
-    def typing_indicator_uri(self):
+    def typing_indicator_uri(self) -> str:
         return f"{self.https_or_http}://{self.signal_service}/v1/typing-indicator/{self.phone_number}"
 
-    def groups_uri(self):
+    def groups_uri(self) -> str:
         return f"{self.https_or_http}://{self.signal_service}/v1/groups/{self.phone_number}"
 
-    def group_id_uri(self, group_id: str):
+    def group_id_uri(self, group_id: str) -> str:
         return self.groups_uri() + "/" + group_id
 
-    def contacts_uri(self):
+    def contacts_uri(self) -> str:
         return f"{self.https_or_http}://{self.signal_service}/v1/contacts/{self.phone_number}"
 
-    def health_check_uri(self):
+    def health_check_uri(self) -> str:
         return f"{self.https_or_http}://{self.signal_service}/v1/health"
 
-    def receipts_rest_uri(self):
+    def receipts_rest_uri(self) -> str:
         return f"{self.https_or_http}://{self.signal_service}/v1/receipts/{self.phone_number}"
 
-    def about_rest_uri(self):
+    def about_rest_uri(self) -> str:
         return f"{self.https_or_http}://{self.signal_service}/v1/about"
 
 

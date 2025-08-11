@@ -41,7 +41,7 @@ def main():
 
     bot.register(RegexTriggeredCommand())
 
-    bot.register(EditCommand(), contacts=True, groups=True)
+    bot.register(EditCommand())
     bot.start()
 
 

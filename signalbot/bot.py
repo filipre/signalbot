@@ -194,7 +194,7 @@ class SignalBot:
         ) = None,  # [{ "author": "uuid" , "start": 0, "length": 1 }]
         edit_timestamp: int | None = None,
         text_mode: str = None,
-    ) -> str:
+    ) -> int:
         receiver = self._resolve_receiver(receiver)
         link_preview_raw = link_preview.model_dump() if link_preview else None
 
@@ -212,7 +212,7 @@ class SignalBot:
             edit_timestamp=edit_timestamp,
         )
         resp_payload = await resp.json()
-        timestamp = resp_payload["timestamp"]
+        timestamp = int(resp_payload["timestamp"])
         logging.info(f"[Bot] New message {timestamp} sent:\n{text}")
 
         return timestamp

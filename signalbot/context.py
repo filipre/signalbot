@@ -21,7 +21,7 @@ class Context:
         link_preview: LinkPreview | None = None,
         mentions: list[dict[str, Any]] | None = None,
         text_mode: str | None = None,
-    ) -> str:
+    ) -> int:
         return await self.bot.send(
             self.message.recipient(),
             text,
@@ -38,7 +38,7 @@ class Context:
         link_preview: LinkPreview | None = None,
         mentions: list[dict[str, Any]] | None = None,
         text_mode: str | None = None,
-    ) -> str:
+    ) -> int:
         return await self.bot.send(
             self.message.recipient(),
             text,
@@ -58,7 +58,7 @@ class Context:
             list[dict[str, Any]] | None
         ) = None,  # [{ "author": "uuid" , "start": 0, "length": 1 }]
         text_mode: str = None,
-    ) -> str:
+    ) -> int:
         send_mentions = self._convert_receive_mentions_into_send_mentions(
             self.message.mentions
         )

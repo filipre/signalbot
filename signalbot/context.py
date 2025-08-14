@@ -39,6 +39,9 @@ class Context:
         mentions: list[dict[str, Any]] | None = None,
         text_mode: str | None = None,
     ) -> int:
+        if self.message.recipient() != self.bot._phone_number:
+            raise ValueError("Cannot edit other users' messages.")
+
         return await self.bot.send(
             self.message.recipient(),
             text,

@@ -5,9 +5,9 @@ class PingCommand(Command):
     def describe(self) -> str:
         return "🏓 Ping Command: Listen for a ping"
 
-    async def handle(self, c: Context):
-        command = c.message.text
+    def is_appropriate(self, message) -> bool:
+        return message.text == "ping"
 
-        if command == "ping":
-            await c.send("pong")
-            return
+    async def handle(self, c: Context):
+        await c.send("pong")
+        return

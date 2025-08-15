@@ -64,6 +64,10 @@ class Command(ABC):
     def describe(self) -> str | None:
         return None
 
+    # optional
+    def is_appropriate(self, msg) -> bool:
+        return True
+
     # overwrite
     @abstractmethod
     async def handle(self, context: Context) -> None:

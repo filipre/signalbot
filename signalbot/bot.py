@@ -506,6 +506,9 @@ class SignalBot:
             if not self._should_react_for_lambda(message, f):
                 continue
 
+            if not command.is_appropriate(message):
+                continue
+
             await self._q.put((command, message, time.perf_counter()))
 
     async def _consume(self, name: int) -> None:

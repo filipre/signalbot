@@ -168,7 +168,7 @@ There are a few other projects similar to this one. You may want to check them o
 
 |Project|Description|Language|
 |-------|-----------|--------|
-|https://github.com/lwesterhof/semaphore|Bot Framework|Python|
+|https://codeberg.org/lazlo/semaphore|signald Library / Bot Framework|Python|
 |https://git.sr.ht/~nicoco/aiosignald|signald Library / Bot Framework|Python|
 |https://gitlab.com/stavros/pysignald/|signald Library / Bot Framework|Python|
 |https://gitlab.com/signald/signald-go|signald Library|Go|

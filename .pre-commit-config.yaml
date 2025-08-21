@@ -5,8 +5,13 @@ repos:
       - id: check-yaml
       - id: end-of-file-fixer
       - id: trailing-whitespace
-  - repo: https://github.com/psf/black
-    rev: 24.10.0
+
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.12.10
     hooks:
-      - id: black
-        exclude: ^dist/
+      # Run the linter.
+      - id: ruff-check
+        types_or: [python]
+        args: ["--fix", "--show-fixes"]
+      # Run the formatter.
+      - id: ruff-format

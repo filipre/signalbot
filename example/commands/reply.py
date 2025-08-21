@@ -1,9 +1,7 @@
-from signalbot import Command, Context
+from signalbot import Command, Context, triggered
 
 
 class ReplyCommand(Command):
+    @triggered(["reply"])
     async def handle(self, c: Context):
-        if "reply" in c.message.text.lower():
-            await c.reply(
-                "i ain't reading all that. i'm happy for u tho or sorry that happened"
-            )
+        await c.reply("This is a reply.")

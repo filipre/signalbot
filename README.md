@@ -10,13 +10,13 @@ There is also a bigger example in the `example` folder.
 
 ```python
 import os
-from signalbot import SignalBot, Command, Context
+from signalbot import SignalBot, Command, Context, triggered
 
 
 class PingCommand(Command):
+    @triggered(["Ping"])
     async def handle(self, c: Context):
-        if c.message.text == "Ping":
-            await c.send("Pong")
+        await c.send("Pong")
 
 
 if __name__ == "__main__":

@@ -82,7 +82,10 @@ class SignalBot:
             config_storage = self.config["storage"]
             if config_storage.get("type") == "sqlite":
                 self._sqlite_db = config_storage["sqlite_db"]
-                self.storage = SQLiteStorage(self._sqlite_db)
+                check_same_thread = config_storage.get("check_same_thread", True)
+                self.storage = SQLiteStorage(
+                    self._sqlite_db, check_same_thread=check_same_thread
+                )
                 logging.info("sqlite storage initilized")
             else:
                 self._redis_host = config_storage["redis_host"]

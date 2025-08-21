@@ -1,9 +1,9 @@
 from __future__ import annotations
+
 import json
 from enum import Enum
 
-
-from signalbot.api import SignalAPI
+from signalbot.api import SignalAPI  # noqa: TC001
 from signalbot.link_previews import LinkPreview
 
 
@@ -14,13 +14,13 @@ class MessageType(Enum):
 
 
 class Message:
-    def __init__(
+    def __init__(  # noqa: ANN204, PLR0913
         self,
         source: str,
         source_number: str | None,
         source_uuid: str,
         timestamp: int,
-        type: MessageType,
+        type: MessageType,  # noqa: A002
         text: str,
         base64_attachments: list[str] | None = None,
         attachments_local_filenames: list[str] | None = None,
@@ -82,8 +82,8 @@ class Message:
     async def parse(cls, signal: SignalAPI, raw_message_str: str) -> Message:
         try:
             raw_message = json.loads(raw_message_str)
-        except Exception:
-            raise UnknownMessageFormatError
+        except Exception:  # noqa: BLE001
+            raise UnknownMessageFormatError  # noqa: B904
 
         envelope = raw_message["envelope"]
         # General attributes
@@ -91,8 +91,8 @@ class Message:
             source = envelope["source"]
             source_uuid = envelope["sourceUuid"]
             timestamp = envelope["timestamp"]
-        except Exception:
-            raise UnknownMessageFormatError
+        except Exception:  # noqa: BLE001
+            raise UnknownMessageFormatError  # noqa: B904
 
         source_number = envelope.get("sourceNumber")
 
@@ -105,14 +105,14 @@ class Message:
             or "editMessage" in envelope
         ):
             if "syncMessage" in envelope:
-                type = MessageType.SYNC_MESSAGE
-                dataMessage = envelope["syncMessage"]["sentMessage"]
+                type = MessageType.SYNC_MESSAGE  # noqa: A001
+                dataMessage = envelope["syncMessage"]["sentMessage"]  # noqa: N806
             elif "dataMessage" in envelope:
-                type = MessageType.DATA_MESSAGE
-                dataMessage = envelope["dataMessage"]
+                type = MessageType.DATA_MESSAGE  # noqa: A001
+                dataMessage = envelope["dataMessage"]  # noqa: N806
             elif "editMessage" in envelope:
-                type = MessageType.EDIT_MESSAGE
-                dataMessage = envelope["editMessage"]["dataMessage"]
+                type = MessageType.EDIT_MESSAGE  # noqa: A001
+                dataMessage = envelope["editMessage"]["dataMessage"]  # noqa: N806
                 target_sent_timestamp = envelope["editMessage"]["targetSentTimestamp"]
             else:
                 raise UnknownMessageFormatError
@@ -124,7 +124,7 @@ class Message:
             if signal.download_attachments:
                 base64_attachments = await cls._parse_attachments(signal, dataMessage)
                 attachments_local_filenames = cls._parse_attachments_local_filenames(
-                    dataMessage
+                    dataMessage,
                 )
                 link_previews = await cls._parse_previews(signal, dataMessage)
         else:
@@ -149,7 +149,6 @@ class Message:
 
     @classmethod
     async def _parse_attachments(cls, signal: SignalAPI, data_message: dict) -> str:
-
         if "attachments" not in data_message:
             return []
 
@@ -160,7 +159,6 @@ class Message:
 
     @classmethod
     def _parse_attachments_local_filenames(cls, data_message: dict) -> list[str]:
-
         if "attachments" not in data_message:
             return []
 
@@ -171,35 +169,35 @@ class Message:
     def _parse_data_message(cls, data_message: dict) -> str:
         try:
             text = data_message["message"]
-            return text
-        except Exception:
-            raise UnknownMessageFormatError
+            return text  # noqa: RET504, TRY300
+        except Exception:  # noqa: BLE001
+            raise UnknownMessageFormatError  # noqa: B904
 
     @classmethod
     def _parse_group_information(cls, message: dict) -> str:
         try:
             group = message["groupInfo"]["groupId"]
-            return group
-        except Exception:
+            return group  # noqa: RET504, TRY300
+        except Exception:  # noqa: BLE001
             return None
 
     @classmethod
     def _parse_mentions(cls, data_message: dict) -> list:
         try:
             mentions = data_message["mentions"]
-            return mentions
-        except Exception:
+            return mentions  # noqa: RET504, TRY300
+        except Exception:  # noqa: BLE001
             return []
 
     @classmethod
-    def _parse_reaction(self, message: dict) -> str:
+    def _parse_reaction(self, message: dict) -> str:  # noqa: N804
         try:
             reaction = message["reaction"]["emoji"]
-            return reaction
-        except Exception:
+            return reaction  # noqa: RET504, TRY300
+        except Exception:  # noqa: BLE001
             return None
 
-    def __str__(self):
+    def __str__(self):  # noqa: ANN204
         if self.text is None:
             return ""
         return self.text
@@ -217,10 +215,10 @@ class Message:
                         description=preview["description"],
                         url=preview["url"],
                         id=preview["image"]["id"],
-                    )
+                    ),
                 )
-            return parsed_previews
-        except Exception:
+            return parsed_previews  # noqa: TRY300
+        except Exception:  # noqa: BLE001
             return []
 
 

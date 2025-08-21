@@ -1,23 +1,24 @@
 import asyncio
-from collections import defaultdict
-import time
-from apscheduler.schedulers.asyncio import AsyncIOScheduler
-import logging
-import traceback
-from typing import Any, TypeAlias, Literal
-from collections.abc import Callable
-import re
-import uuid
-import phonenumbers
 import itertools
+import logging
+import re
+import time
+import traceback
+import uuid
+from collections import defaultdict
+from collections.abc import Callable
+from typing import Any, Literal, TypeAlias
+
+import phonenumbers
+from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from packaging.version import Version
 
-from signalbot.api import SignalAPI, ReceiveMessagesError
+from signalbot.api import ReceiveMessagesError, SignalAPI
 from signalbot.command import Command
-from signalbot.message import Message, UnknownMessageFormatError
-from signalbot.storage import RedisStorage, SQLiteStorage
 from signalbot.context import Context
 from signalbot.link_previews import LinkPreview
+from signalbot.message import Message, UnknownMessageFormatError
+from signalbot.storage import RedisStorage, SQLiteStorage
 
 CommandList: TypeAlias = list[
     tuple[
@@ -30,7 +31,7 @@ CommandList: TypeAlias = list[
 
 
 class SignalBot:
-    def __init__(self, config: dict):
+    def __init__(self, config: dict):  # noqa: ANN204
         """SignalBot
 
         Example Config:
@@ -60,10 +61,12 @@ class SignalBot:
             self._signal_service = self.config["signal_service"]
             download_attachments = self.config.get("download_attachments", True)
             self._signal = SignalAPI(
-                self._signal_service, self._phone_number, download_attachments
+                self._signal_service,
+                self._phone_number,
+                download_attachments,
             )
         except KeyError:
-            raise SignalBotError("Could not initialize SignalAPI with given config")
+            raise SignalBotError("Could not initialize SignalAPI with given config")  # noqa: B904, EM101, TRY003
 
         self._event_loop = asyncio.get_event_loop()
         self._q = asyncio.Queue()
@@ -74,8 +77,8 @@ class SignalBot:
 
         try:
             self.scheduler = AsyncIOScheduler(event_loop=self._event_loop)
-        except Exception as e:
-            raise SignalBotError(f"Could not initialize scheduler: {e}")
+        except Exception as e:  # noqa: BLE001
+            raise SignalBotError(f"Could not initialize scheduler: {e}")  # noqa: B904, EM102, TRY003
 
         config_storage = {}
         try:
@@ -84,35 +87,36 @@ class SignalBot:
                 self._sqlite_db = config_storage["sqlite_db"]
                 check_same_thread = config_storage.get("check_same_thread", True)
                 self.storage = SQLiteStorage(
-                    self._sqlite_db, check_same_thread=check_same_thread
+                    self._sqlite_db,
+                    check_same_thread=check_same_thread,
                 )
-                logging.info("sqlite storage initilized")
+                logging.info("sqlite storage initilized")  # noqa: LOG015
             else:
                 self._redis_host = config_storage["redis_host"]
                 self._redis_port = config_storage["redis_port"]
                 self.storage = RedisStorage(self._redis_host, self._redis_port)
-                logging.info("redis storage initilized")
-        except Exception:
+                logging.info("redis storage initilized")  # noqa: LOG015
+        except Exception:  # noqa: BLE001
             self.storage = SQLiteStorage()
             if config_storage.get("type") != "in-memory":
-                logging.warning(
+                logging.warning(  # noqa: LOG015
                     "[Bot] Could not initialize Redis and no SQLite DB name was given."
                     " In-memory storage will be used."
                     " Restarting will delete the storage!"
                     " Add storage: {'type': 'in-memory'}"
-                    " to the config to silence this error."
+                    " to the config to silence this error.",
                 )
             if "redis_host" in config_storage:
-                logging.warning(
-                    f"[Bot] Redis initialization error: {traceback.format_exc()}"
+                logging.warning(  # noqa: LOG015
+                    f"[Bot] Redis initialization error: {traceback.format_exc()}",  # noqa: G004
                 )
 
     def register(
         self,
         command: Command,
-        contacts: list[str] | bool = True,
-        groups: list[str] | bool = True,
-        f: Callable[[Message], bool] | None = None,
+        contacts: list[str] | bool = True,  # noqa: FA102, FBT001, FBT002
+        groups: list[str] | bool = True,  # noqa: FA102, FBT001, FBT002
+        f: Callable[[Message], bool] | None = None,  # noqa: FA102
     ) -> None:
         command.bot = self
         command.setup()
@@ -136,8 +140,8 @@ class SignalBot:
                         if matched_group is not None:
                             group_ids.append(matched_group["id"])
                         else:
-                            logging.warning(
-                                f"[Bot] [{command.__class__.__name__}] '{group}' is not a valid group name or id"
+                            logging.warning(  # noqa: LOG015
+                                f"[Bot] [{command.__class__.__name__}] '{group}' is not a valid group name or id",  # noqa: E501, G004
                             )
 
             self.commands.append((command, contacts, group_ids, f))
@@ -151,27 +155,29 @@ class SignalBot:
 
     async def _check_signal_service(self) -> None:
         while (await self._signal.check_signal_service()) is False:
-            logging.error("Cannot connect to the signal-cli-rest-api service, retrying")
+            logging.error("Cannot connect to the signal-cli-rest-api service, retrying")  # noqa: LOG015
             await asyncio.sleep(self.config.get("retry_interval", 1))
 
     async def _check_signal_cli_rest_api_version(self) -> None:
         min_version = Version("0.94.0")
         version = await self._signal.get_signal_cli_rest_api_version()
         if Version(version) < min_version:
-            raise RuntimeError(
-                f"Incompatible signal-cli-rest-api version, found {version}, minimum required is {min_version}"
+            raise RuntimeError(  # noqa: TRY003
+                f"Incompatible signal-cli-rest-api version, found {version}, minimum required is {min_version}",  # noqa: E501, EM102
             )
 
     def _store_reference_to_task(
-        self, task: asyncio.Task, task_set: set[asyncio.Task]
+        self,
+        task: asyncio.Task,
+        task_set: set[asyncio.Task],
     ) -> None:
         # Keep a hard reference to the tasks, fixes Ruff's RUF006 rule
         task_set.add(task)
         task.add_done_callback(task_set.discard)
 
-    def start(self, run_forever: bool = True) -> None:
+    def start(self, run_forever: bool = True) -> None:  # noqa: FBT001, FBT002
         task = self._event_loop.create_task(
-            self._rerun_on_exception(self._async_post_init)
+            self._rerun_on_exception(self._async_post_init),
         )
         self._store_reference_to_task(task, self._running_tasks)
 
@@ -182,21 +188,21 @@ class SignalBot:
 
             self._event_loop.run_forever()
 
-    async def send(
+    async def send(  # noqa: PLR0913
         self,
         receiver: str,
         text: str,
-        base64_attachments: list | None = None,
-        link_preview: LinkPreview | None = None,
-        quote_author: str | None = None,
-        quote_mentions: list | None = None,
-        quote_message: str | None = None,
-        quote_timestamp: int | None = None,
+        base64_attachments: list | None = None,  # noqa: FA102
+        link_preview: LinkPreview | None = None,  # noqa: FA102
+        quote_author: str | None = None,  # noqa: FA102
+        quote_mentions: list | None = None,  # noqa: FA102
+        quote_message: str | None = None,  # noqa: FA102
+        quote_timestamp: int | None = None,  # noqa: FA102
         mentions: (
-            list[dict[str, Any]] | None
+            list[dict[str, Any]] | None  # noqa: FA102
         ) = None,  # [{ "author": "uuid" , "start": 0, "length": 1 }]
-        edit_timestamp: int | None = None,
-        text_mode: str = None,
+        edit_timestamp: int | None = None,  # noqa: FA102
+        text_mode: str = None,  # noqa: RUF013
     ) -> int:
         receiver = self._resolve_receiver(receiver)
         link_preview_raw = link_preview.model_dump() if link_preview else None
@@ -216,29 +222,31 @@ class SignalBot:
         )
         resp_payload = await resp.json()
         timestamp = int(resp_payload["timestamp"])
-        logging.info(f"[Bot] New message {timestamp} sent:\n{text}")
+        logging.info(f"[Bot] New message {timestamp} sent:\n{text}")  # noqa: G004, LOG015
 
         return timestamp
 
     async def react(self, message: Message, emoji: str) -> None:
-        # TODO: check that emoji is really an emoji
+        # TODO: check that emoji is really an emoji  # noqa: TD002, TD003
         recipient = message.recipient()
         recipient = self._resolve_receiver(recipient)
         target_author = message.source
         timestamp = message.timestamp
         await self._signal.react(recipient, emoji, target_author, timestamp)
-        logging.info(f"[Bot] New reaction: {emoji}")
+        logging.info(f"[Bot] New reaction: {emoji}")  # noqa: G004, LOG015
 
     async def receipt(
-        self, message: Message, receipt_type: Literal["read", "viewed"]
+        self,
+        message: Message,
+        receipt_type: Literal["read", "viewed"],
     ) -> None:
         if message.group is not None:
-            logging.warning(f"[Bot] Receipts are not supported for groups")
+            logging.warning("[Bot] Receipts are not supported for groups")  # noqa: LOG015
             return
 
         recipient = self._resolve_receiver(message.recipient())
         await self._signal.receipt(recipient, receipt_type, message.timestamp)
-        logging.info(f"[Bot] Receipt: {receipt_type}")
+        logging.info(f"[Bot] Receipt: {receipt_type}")  # noqa: G004, LOG015
 
     async def start_typing(self, receiver: str) -> None:
         receiver = self._resolve_receiver(receiver)
@@ -251,21 +259,23 @@ class SignalBot:
     async def update_contact(
         self,
         receiver: str,
-        expiration_in_seconds: int | None = None,
-        name: str | None = None,
+        expiration_in_seconds: int | None = None,  # noqa: FA102
+        name: str | None = None,  # noqa: FA102
     ) -> None:
         receiver = self._resolve_receiver(receiver)
         await self._signal.update_contact(
-            receiver, expiration_in_seconds=expiration_in_seconds, name=name
+            receiver,
+            expiration_in_seconds=expiration_in_seconds,
+            name=name,
         )
 
     async def update_group(
         self,
         group_id: str,
-        base64_avatar: str | None = None,
-        description: str | None = None,
-        expiration_in_seconds: int | None = None,
-        name: str | None = None,
+        base64_avatar: str | None = None,  # noqa: FA102
+        description: str | None = None,  # noqa: FA102
+        expiration_in_seconds: int | None = None,  # noqa: FA102
+        name: str | None = None,  # noqa: FA102
     ) -> None:
         group_id = self._resolve_receiver(group_id)
         await self._signal.update_group(
@@ -292,7 +302,7 @@ class SignalBot:
             self._groups_by_internal_id[group["internal_id"]] = group
             self._groups_by_name[group["name"]].append(group)
 
-        logging.info(f"[Bot] {len(self.groups)} groups detected")
+        logging.info(f"[Bot] {len(self.groups)} groups detected")  # noqa: G004, LOG015
 
     def _resolve_receiver(self, receiver: str) -> str:
         if self._is_phone_number(receiver):
@@ -315,7 +325,7 @@ class SignalBot:
         if group is not None:
             return group["id"]
 
-        raise SignalBotError(f"Cannot resolve receiver.")
+        raise SignalBotError("Cannot resolve receiver.")  # noqa: EM101, TRY003
 
     def _is_phone_number(self, phone_number: str) -> bool:
         try:
@@ -327,31 +337,31 @@ class SignalBot:
     def _is_valid_uuid(self, receiver_uuid: str) -> bool:
         try:
             uuid.UUID(str(receiver_uuid))
-            return True
+            return True  # noqa: TRY300
         except ValueError:
             return False
 
-    def _is_username(self, receiver_username: str) -> bool:
+    def _is_username(self, receiver_username: str) -> bool:  # noqa: PLR0911
         """
         Check if username has correct format, as described in
         https://support.signal.org/hc/en-us/articles/6712070553754-Phone-Number-Privacy-and-Usernames#username_req
         Additionally, cannot have more than 9 digits and the digits cannot be 00.
         """
         split_username = receiver_username.split(".")
-        if len(split_username) == 2:
+        if len(split_username) == 2:  # noqa: PLR2004
             characters = split_username[0]
             digits = split_username[1]
-            if len(characters) < 3 or len(characters) > 32:
+            if len(characters) < 3 or len(characters) > 32:  # noqa: PLR2004
                 return False
             if not re.match(r"^[A-Za-z\d_]+$", characters):
                 return False
-            if len(digits) < 2 or len(digits) > 9:
+            if len(digits) < 2 or len(digits) > 9:  # noqa: PLR2004
                 return False
             try:
                 digits = int(digits)
-                if digits == 0:
+                if digits == 0:  # noqa: SIM103
                     return False
-                return True
+                return True  # noqa: TRY300
             except ValueError:
                 return False
         else:
@@ -376,19 +386,19 @@ class SignalBot:
             return False
         return internal_id[-1] == "="
 
-    def _get_group_by_name(self, group_name: str) -> dict[str, Any] | None:
+    def _get_group_by_name(self, group_name: str) -> dict[str, Any] | None:  # noqa: FA102
         groups = self._groups_by_name.get(group_name)
         if groups is not None:
             if len(groups) > 1:
-                logging.warning(
-                    f"[Bot] There is more than one group named '{group_name}', using the first one."
+                logging.warning(  # noqa: LOG015
+                    f"[Bot] There is more than one group named '{group_name}', using the first one.",  # noqa: E501, G004
                 )
             return groups[0]
         return None
 
     # see https://stackoverflow.com/questions/55184226/catching-exceptions-in-individual-tasks-and-restarting-them
     @classmethod
-    async def _rerun_on_exception(cls, coro, *args, **kwargs):
+    async def _rerun_on_exception(cls, coro, *args, **kwargs):  # noqa: ANN001, ANN002, ANN003, ANN206
         """Restart coroutine by waiting an exponential time deplay"""
         max_sleep = 5 * 60  # sleep for at most 5 mins until rerun
         reset = 3 * 60  # reset after 3 minutes running successfully
@@ -402,7 +412,7 @@ class SignalBot:
                 return await coro(*args, **kwargs)
             except asyncio.CancelledError:
                 raise
-            except Exception:
+            except Exception:  # noqa: BLE001
                 traceback.print_exc()
 
             end_t = int(time.monotonic())  # seconds
@@ -414,11 +424,13 @@ class SignalBot:
                 next_sleep = init_sleep  # reset sleep time
                 sleep_t = next_sleep
 
-            logging.warning(f"Restarting coroutine in {sleep_t} seconds")
+            logging.warning(f"Restarting coroutine in {sleep_t} seconds")  # noqa: G004, LOG015
             await asyncio.sleep(sleep_t)
 
     async def _produce_consume_messages(
-        self, producers: int = 1, consumers: int = 3
+        self,
+        producers: int = 1,
+        consumers: int = 3,
     ) -> None:
         for task in itertools.chain(self._consume_tasks, self._produce_tasks):
             task.cancel()
@@ -438,10 +450,10 @@ class SignalBot:
             self._store_reference_to_task(consume_task, self._consume_tasks)
 
     async def _produce(self, name: int) -> None:
-        logging.info(f"[Bot] Producer #{name} started")
+        logging.info(f"[Bot] Producer #{name} started")  # noqa: G004, LOG015
         try:
             async for raw_message in self._signal.receive():
-                logging.info(f"[Raw Message] {raw_message}")
+                logging.info(f"[Raw Message] {raw_message}")  # noqa: G004, LOG015
 
                 try:
                     message = await Message.parse(self._signal, raw_message)
@@ -458,14 +470,14 @@ class SignalBot:
                 await self._ask_commands_to_handle(message)
 
         except ReceiveMessagesError as e:
-            # TODO: retry strategy
-            raise SignalBotError(f"Cannot receive messages: {e}")
+            # TODO: retry strategy  # noqa: TD002, TD003
+            raise SignalBotError(f"Cannot receive messages: {e}")  # noqa: B904, EM102, TRY003
 
     def _should_react_for_contact(
         self,
         message: Message,
-        contacts: list[str] | bool,
-        group_ids: list[str] | bool,
+        contacts: list[str] | bool,  # noqa: FA102, FBT001
+        group_ids: list[str] | bool,  # noqa: FA102, FBT001
     ) -> bool:
         """Is the command activated for a certain chat or group?"""
         # Case 1: Private message
@@ -494,7 +506,7 @@ class SignalBot:
     def _should_react_for_lambda(
         self,
         message: Message,
-        f: Callable[[Message], bool] | None = None,
+        f: Callable[[Message], bool] | None = None,  # noqa: FA102
     ) -> bool:
         if f is None:
             return True
@@ -512,17 +524,17 @@ class SignalBot:
             await self._q.put((command, message, time.perf_counter()))
 
     async def _consume(self, name: int) -> None:
-        logging.info(f"[Bot] Consumer #{name} started")
+        logging.info(f"[Bot] Consumer #{name} started")  # noqa: G004, LOG015
         while True:
             try:
                 await self._consume_new_item(name)
-            except Exception:
+            except Exception:  # noqa: BLE001, PERF203, S112
                 continue
 
     async def _consume_new_item(self, name: int) -> None:
         command, message, t = await self._q.get()
         now = time.perf_counter()
-        logging.info(f"[Bot] Consumer #{name} got new job in {now-t:0.5f} seconds")
+        logging.info(f"[Bot] Consumer #{name} got new job in {now - t:0.5f} seconds")  # noqa: G004, LOG015
 
         # handle Command
         try:
@@ -530,8 +542,8 @@ class SignalBot:
             await command.handle(context)
         except Exception as e:
             for log in "".join(traceback.format_exception(e)).rstrip().split("\n"):
-                logging.error(f"[{command.__class__.__name__}]: {log}")
-            raise e
+                logging.exception(f"[{command.__class__.__name__}]: {log}")  # noqa: G004, LOG015
+            raise e  # noqa: TRY201
 
         # done
         self._q.task_done()

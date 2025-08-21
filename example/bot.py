@@ -1,21 +1,23 @@
+import logging  # noqa: INP001
 import os
-from signalbot import SignalBot
+
 from commands import (
-    PingCommand,
-    TypingCommand,
-    TriggeredCommand,
-    ReplyCommand,
-    RegexTriggeredCommand,
     AttachmentCommand,
     EditCommand,
+    PingCommand,
+    RegexTriggeredCommand,
+    ReplyCommand,
+    TriggeredCommand,
+    TypingCommand,
 )
-import logging
+
+from signalbot import SignalBot
 
 logging.getLogger().setLevel(logging.INFO)
 logging.getLogger("apscheduler").setLevel(logging.WARNING)
 
 
-def main():
+def main():  # noqa: ANN201
     signal_service = os.environ["SIGNAL_SERVICE"]
     phone_number = os.environ["PHONE_NUMBER"]
 

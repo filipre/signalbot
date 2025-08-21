@@ -6,5 +6,5 @@ class RegexTriggeredCommand(Command):
         return "😤 RegexTriggered Command: Regular Expression Decorator Example"
 
     @regex_triggered(r"^[a-f0-9]{40}$", r"^[a-f0-9]{32}$")
-    async def handle(self, c: Context):
+    async def handle(self, c: Context):  # noqa: ANN201
         await c.send("I am triggered by regular expressions")

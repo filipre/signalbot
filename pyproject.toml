@@ -41,3 +41,12 @@ requires = ["poetry-core>=1.0.0"]
 
 [tool.poetry.extras]
 redis = ["redis"]
+
+[tool.ruff.lint]
+select = ["ALL"]
+ignore = [
+  "D",   # Docstrings
+  "FIX", # TODO, FIXME and other messages
+  "ERA001", # Commented out code
+  "COM812", # Trailing commas, the formatter already does this
+]

@@ -10,6 +10,7 @@ from signalbot.link_previews import LinkPreview
 class MessageType(Enum):
     SYNC_MESSAGE = 1
     DATA_MESSAGE = 2
+    EDIT_MESSAGE = 3
 
 
 class Message:
@@ -27,6 +28,7 @@ class Message:
         group: str | None = None,
         reaction: str | None = None,
         mentions: list[str] | None = None,
+        target_sent_timestamp: int | None = None,
         raw_message: str | None = None,
     ):
         # required
@@ -60,6 +62,8 @@ class Message:
         if self.link_previews is None:
             self.link_previews = []
 
+        self.target_sent_timestamp = target_sent_timestamp
+
     def recipient(self) -> str:
         # Case 1: Group chat
         if self.group:
@@ -90,6 +94,7 @@ class Message:
             raise UnknownMessageFormatError
 
         source_number = raw_message["envelope"].get("sourceNumber")
+        target_sent_timestamp = None
 
         # Option 1: syncMessage
         if "syncMessage" in raw_message["envelope"]:
@@ -127,31 +132,37 @@ class Message:
             )
 
         # Option 2: dataMessage
-        elif "dataMessage" in raw_message["envelope"]:
-            type = MessageType.DATA_MESSAGE
-            text = cls._parse_data_message(raw_message["envelope"]["dataMessage"])
-            group = cls._parse_group_information(raw_message["envelope"]["dataMessage"])
-            reaction = cls._parse_reaction(raw_message["envelope"]["dataMessage"])
-            mentions = cls._parse_mentions(raw_message["envelope"]["dataMessage"])
+        elif (
+            "dataMessage" in raw_message["envelope"]
+            or "editMessage" in raw_message["envelope"]
+        ):
+            if "dataMessage" in raw_message["envelope"]:
+                type = MessageType.DATA_MESSAGE
+                dataMessage = raw_message["envelope"]["dataMessage"]
+            else:
+                type = MessageType.EDIT_MESSAGE
+                dataMessage = raw_message["envelope"]["editMessage"]["dataMessage"]
+                target_sent_timestamp = raw_message["envelope"]["editMessage"][
+                    "targetSentTimestamp"
+                ]
+
+            text = cls._parse_data_message(dataMessage)
+            group = cls._parse_group_information(dataMessage)
+            reaction = cls._parse_reaction(dataMessage)
+            mentions = cls._parse_mentions(dataMessage)
             base64_attachments = (
-                await cls._parse_attachments(
-                    signal, raw_message["envelope"]["dataMessage"]
-                )
+                await cls._parse_attachments(signal, dataMessage)
                 if signal.download_attachments
                 else []
             )
             attachments_local_filenames = (
-                cls._parse_attachments_local_filenames(
-                    raw_message["envelope"]["dataMessage"]
-                )
+                cls._parse_attachments_local_filenames(dataMessage)
                 if signal.download_attachments
                 else []
             )
 
             link_previews = (
-                await cls._parse_previews(
-                    signal, raw_message["envelope"]["dataMessage"]
-                )
+                await cls._parse_previews(signal, dataMessage)
                 if signal.download_attachments
                 else []
             )
@@ -172,6 +183,7 @@ class Message:
             group,
             reaction,
             mentions,
+            target_sent_timestamp,
             raw_message_str,
         )
 

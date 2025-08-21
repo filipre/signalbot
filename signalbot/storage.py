@@ -33,8 +33,8 @@ class StorageError(Exception):
 
 
 class SQLiteStorage(Storage):
-    def __init__(self, database: str = ":memory:"):
-        self._sqlite = sqlite3.connect(database)
+    def __init__(self, database: str = ":memory:", check_same_thread: bool = True):
+        self._sqlite = sqlite3.connect(database, check_same_thread=check_same_thread)
         self._sqlite.execute(
             "CREATE TABLE IF NOT EXISTS signalbot (key text unique, value text)"
         )

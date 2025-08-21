@@ -1,8 +1,8 @@
-from signalbot import Command, Context
+from signalbot import Command, Context, triggered
 
 
 class EditCommand(Command):
+    @triggered(["edit"])
     async def handle(self, c: Context):
-        if c.message.text == "edit":
-            timestamp = await c.reply("This message will be edited.")
-            await c.edit("This message has been edited.", edit_timestamp=timestamp)
+        timestamp = await c.reply("This message will be edited.")
+        await c.edit("This message has been edited.", edit_timestamp=timestamp)

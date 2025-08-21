@@ -10,6 +10,7 @@ from signalbot.link_previews import LinkPreview
 class MessageType(Enum):
     SYNC_MESSAGE = 1
     DATA_MESSAGE = 2
+    EDIT_MESSAGE = 3
 
 
 class Message:
@@ -27,6 +28,7 @@ class Message:
         group: str | None = None,
         reaction: str | None = None,
         mentions: list[str] | None = None,
+        target_sent_timestamp: int | None = None,
         raw_message: str | None = None,
     ):
         # required
@@ -60,6 +62,8 @@ class Message:
         if self.link_previews is None:
             self.link_previews = []
 
+        self.target_sent_timestamp = target_sent_timestamp
+
     def recipient(self) -> str:
         # Case 1: Group chat
         if self.group:
@@ -81,81 +85,48 @@ class Message:
         except Exception:
             raise UnknownMessageFormatError
 
+        envelope = raw_message["envelope"]
         # General attributes
         try:
-            source = raw_message["envelope"]["source"]
-            source_uuid = raw_message["envelope"]["sourceUuid"]
-            timestamp = raw_message["envelope"]["timestamp"]
+            source = envelope["source"]
+            source_uuid = envelope["sourceUuid"]
+            timestamp = envelope["timestamp"]
         except Exception:
             raise UnknownMessageFormatError
 
-        source_number = raw_message["envelope"].get("sourceNumber")
+        source_number = envelope.get("sourceNumber")
 
-        # Option 1: syncMessage
-        if "syncMessage" in raw_message["envelope"]:
-            type = MessageType.SYNC_MESSAGE
-            text = cls._parse_sync_message(raw_message["envelope"]["syncMessage"])
-            group = cls._parse_group_information(
-                raw_message["envelope"]["syncMessage"]["sentMessage"]
-            )
-            reaction = cls._parse_reaction(
-                raw_message["envelope"]["syncMessage"]["sentMessage"]
-            )
-            mentions = cls._parse_mentions(
-                raw_message["envelope"]["syncMessage"]["sentMessage"]
-            )
-            base64_attachments = (
-                await cls._parse_attachments(
-                    signal, raw_message["envelope"]["syncMessage"]["sentMessage"]
-                )
-                if signal.download_attachments
-                else []
-            )
-            attachments_local_filenames = (
-                cls._parse_attachments_local_filenames(
-                    raw_message["envelope"]["syncMessage"]["sentMessage"]
-                )
-                if signal.download_attachments
-                else []
-            )
-            link_previews = (
-                await cls._parse_previews(
-                    signal, raw_message["envelope"]["syncMessage"]["sentMessage"]
-                )
-                if signal.download_attachments
-                else []
-            )
+        target_sent_timestamp = None
+        base64_attachments, attachments_local_filenames, link_previews = [], [], []
 
-        # Option 2: dataMessage
-        elif "dataMessage" in raw_message["envelope"]:
-            type = MessageType.DATA_MESSAGE
-            text = cls._parse_data_message(raw_message["envelope"]["dataMessage"])
-            group = cls._parse_group_information(raw_message["envelope"]["dataMessage"])
-            reaction = cls._parse_reaction(raw_message["envelope"]["dataMessage"])
-            mentions = cls._parse_mentions(raw_message["envelope"]["dataMessage"])
-            base64_attachments = (
-                await cls._parse_attachments(
-                    signal, raw_message["envelope"]["dataMessage"]
-                )
-                if signal.download_attachments
-                else []
-            )
-            attachments_local_filenames = (
-                cls._parse_attachments_local_filenames(
-                    raw_message["envelope"]["dataMessage"]
-                )
-                if signal.download_attachments
-                else []
-            )
+        if (
+            "syncMessage" in envelope
+            or "dataMessage" in envelope
+            or "editMessage" in envelope
+        ):
+            if "syncMessage" in envelope:
+                type = MessageType.SYNC_MESSAGE
+                dataMessage = envelope["syncMessage"]["sentMessage"]
+            elif "dataMessage" in envelope:
+                type = MessageType.DATA_MESSAGE
+                dataMessage = envelope["dataMessage"]
+            elif "editMessage" in envelope:
+                type = MessageType.EDIT_MESSAGE
+                dataMessage = envelope["editMessage"]["dataMessage"]
+                target_sent_timestamp = envelope["editMessage"]["targetSentTimestamp"]
+            else:
+                raise UnknownMessageFormatError
 
-            link_previews = (
-                await cls._parse_previews(
-                    signal, raw_message["envelope"]["dataMessage"]
+            text = cls._parse_data_message(dataMessage)
+            group = cls._parse_group_information(dataMessage)
+            reaction = cls._parse_reaction(dataMessage)
+            mentions = cls._parse_mentions(dataMessage)
+            if signal.download_attachments:
+                base64_attachments = await cls._parse_attachments(signal, dataMessage)
+                attachments_local_filenames = cls._parse_attachments_local_filenames(
+                    dataMessage
                 )
-                if signal.download_attachments
-                else []
-            )
-
+                link_previews = await cls._parse_previews(signal, dataMessage)
         else:
             raise UnknownMessageFormatError
 
@@ -172,6 +143,7 @@ class Message:
             group,
             reaction,
             mentions,
+            target_sent_timestamp,
             raw_message_str,
         )
 
@@ -194,14 +166,6 @@ class Message:
 
         # The ["id"] is the local filename and the ["filename"] is the remote filename
         return [attachment["id"] for attachment in data_message["attachments"]]
-
-    @classmethod
-    def _parse_sync_message(cls, sync_message: dict) -> str:
-        try:
-            text = sync_message["sentMessage"]["message"]
-            return text
-        except Exception:
-            raise UnknownMessageFormatError
 
     @classmethod
     def _parse_data_message(cls, data_message: dict) -> str:

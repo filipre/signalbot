@@ -34,6 +34,7 @@ class Context:
     async def edit(
         self,
         text: str,
+        edit_timestamp: int,
         base64_attachments: list[str] | None = None,
         link_preview: LinkPreview | None = None,
         mentions: list[dict[str, Any]] | None = None,
@@ -45,7 +46,7 @@ class Context:
             base64_attachments=base64_attachments,
             mentions=mentions,
             text_mode=text_mode,
-            edit_timestamp=self.message.timestamp,
+            edit_timestamp=edit_timestamp,
             link_preview=link_preview,
         )
 

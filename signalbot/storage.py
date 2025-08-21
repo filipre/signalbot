@@ -20,7 +20,11 @@ class Storage(ABC):
         pass
 
     @abstractmethod
-    def save(self, key: str, object: Any):
+    def save(self, key: str, object: Any) -> None:
+        pass
+
+    @abstractmethod
+    def delete(self, key: str) -> None:
         pass
 
 
@@ -49,7 +53,7 @@ class SQLiteStorage(Storage):
         except Exception as e:
             raise StorageError(f"SQLite load failed: {e}")
 
-    def save(self, key: str, object: Any):
+    def save(self, key: str, object: Any) -> None:
         try:
             value = json.dumps(object)
             self._sqlite.execute(
@@ -59,6 +63,13 @@ class SQLiteStorage(Storage):
             self._sqlite.commit()
         except Exception as e:
             raise StorageError(f"SQLite save failed: {e}")
+
+    def delete(self, key: str) -> None:
+        try:
+            self._sqlite.execute("DELETE FROM signalbot WHERE key = ?", [key])
+            self._sqlite.commit()
+        except Exception as e:
+            raise StorageError(f"SQLite delete failed: {e}")
 
 
 class RedisStorage(Storage):
@@ -77,9 +88,15 @@ class RedisStorage(Storage):
         except Exception as e:
             raise StorageError(f"Redis load failed: {e}")
 
-    def save(self, key: str, object: Any):
+    def save(self, key: str, object: Any) -> None:
         try:
             object_str = json.dumps(object)
             self._redis.set(key, object_str)
         except Exception as e:
             raise StorageError(f"Redis save failed: {e}")
+
+    def delete(self, key: str) -> None:
+        try:
+            self._redis.delete(key)
+        except Exception as e:
+            raise StorageError(f"Redis delete failed: {e}")

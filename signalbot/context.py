@@ -1,16 +1,17 @@
 from __future__ import annotations
-from typing import TYPE_CHECKING, Literal, Any
-from copy import deepcopy
-from signalbot.link_previews import LinkPreview
 
-from signalbot.message import Message
+from copy import deepcopy
+from typing import TYPE_CHECKING, Any, Literal
+
+from signalbot.link_previews import LinkPreview  # noqa: TC001
+from signalbot.message import Message  # noqa: TC001
 
 if TYPE_CHECKING:
     from signalbot.bot import SignalBot
 
 
 class Context:
-    def __init__(self, bot: SignalBot, message: Message):
+    def __init__(self, bot: SignalBot, message: Message):  # noqa: ANN204
         self.bot = bot
         self.message = message
 
@@ -31,7 +32,7 @@ class Context:
             link_preview=link_preview,
         )
 
-    async def edit(
+    async def edit(  # noqa: PLR0913
         self,
         text: str,
         edit_timestamp: int,
@@ -58,10 +59,10 @@ class Context:
         mentions: (
             list[dict[str, Any]] | None
         ) = None,  # [{ "author": "uuid" , "start": 0, "length": 1 }]
-        text_mode: str = None,
+        text_mode: str = None,  # noqa: RUF013
     ) -> int:
         send_mentions = self._convert_receive_mentions_into_send_mentions(
-            self.message.mentions
+            self.message.mentions,
         )
         return await self.bot.send(
             self.message.recipient(),
@@ -89,7 +90,8 @@ class Context:
         await self.bot.stop_typing(self.message.recipient())
 
     def _convert_receive_mentions_into_send_mentions(
-        self, mentions: list[dict[str, Any]] | None = None
+        self,
+        mentions: list[dict[str, Any]] | None = None,
     ) -> list[dict[str, Any]] | None:
         if mentions is None:
             return None

@@ -6,5 +6,5 @@ class PingCommand(Command):
         return "🏓 Ping Command: Listen for a ping"
 
     @triggered(["ping"])
-    async def handle(self, c: Context):
+    async def handle(self, c: Context):  # noqa: ANN201
         await c.send("pong")

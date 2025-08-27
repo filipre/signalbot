@@ -159,7 +159,7 @@ class SignalBot:
             await asyncio.sleep(self.config.get("retry_interval", 1))
 
     async def _check_signal_cli_rest_api_version(self) -> None:
-        min_version = Version("0.94.0")
+        min_version = Version("0.95.0")
         version = await self._signal.get_signal_cli_rest_api_version()
         if Version(version) < min_version:
             raise RuntimeError(  # noqa: TRY003

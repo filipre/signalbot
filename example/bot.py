@@ -3,6 +3,7 @@ import os
 
 from commands import (
     AttachmentCommand,
+    DeleteCommand,
     EditCommand,
     PingCommand,
     RegexTriggeredCommand,
@@ -44,6 +45,7 @@ def main():  # noqa: ANN201
     bot.register(RegexTriggeredCommand())
 
     bot.register(EditCommand())
+    bot.register(DeleteCommand())
     bot.start()
 
 

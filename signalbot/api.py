@@ -306,6 +306,25 @@ class SignalAPI:
         ):
             raise AboutError  # noqa: B904
 
+    async def remote_delete(
+        self, receiver: str, timestamp: int
+    ) -> aiohttp.ClientResponse:
+        uri = self._signal_api_uris.remote_delete_uri()
+        payload = {
+            "recipient": receiver,
+            "timestamp": timestamp,
+        }
+        try:
+            async with aiohttp.ClientSession() as session:
+                resp = await session.post(uri, json=payload)
+                resp.raise_for_status()
+                return resp
+        except (
+            aiohttp.ClientError,
+            aiohttp.http_exceptions.HttpProcessingError,
+        ):
+            raise RemoteDeleteError  # noqa: B904
+
 
 class SignalAPIURIs:
     def __init__(self, signal_service: str, phone_number: str, use_https: bool = True):  # noqa: ANN204, FBT001, FBT002
@@ -353,6 +372,9 @@ class SignalAPIURIs:
     def receipts_rest_uri(self) -> str:
         return f"{self.https_or_http}://{self.signal_service}/v1/receipts/{self.phone_number}"
 
+    def remote_delete_uri(self) -> str:
+        return f"{self.https_or_http}://{self.signal_service}/v1/remote-delete/{self.phone_number}"
+
     def about_rest_uri(self) -> str:
         return f"{self.https_or_http}://{self.signal_service}/v1/about"
 
@@ -394,6 +416,10 @@ class ContactUpdateError(Exception):
 
 
 class HealthCheckError(Exception):
+    pass
+
+
+class RemoteDeleteError(Exception):
     pass
 
 

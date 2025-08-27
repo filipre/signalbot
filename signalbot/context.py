@@ -89,6 +89,11 @@ class Context:
     async def stop_typing(self) -> None:
         await self.bot.stop_typing(self.message.recipient())
 
+    async def remote_delete(self, timestamp: int) -> int:
+        return await self.bot.remote_delete(
+            self.message.recipient(), timestamp=timestamp
+        )
+
     def _convert_receive_mentions_into_send_mentions(
         self,
         mentions: list[dict[str, Any]] | None = None,

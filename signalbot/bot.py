@@ -286,6 +286,19 @@ class SignalBot:
             name=name,
         )
 
+    async def remote_delete(self, receiver: str, timestamp: int) -> int:
+        receiver = self._resolve_receiver(receiver)
+
+        resp = await self._signal.remote_delete(
+            receiver,
+            timestamp=timestamp,
+        )
+        resp_payload = await resp.json()
+        ret_timestamp = int(resp_payload["timestamp"])
+        logging.info(f"[Bot] Deleted message with timestamp {timestamp}")  # noqa: G004, LOG015
+
+        return ret_timestamp
+
     async def delete_attachment(self, attachment_filename: str) -> None:
         # Delete the attachment from the local storage
         await self._signal.delete_attachment(attachment_filename)

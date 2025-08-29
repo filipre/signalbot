@@ -316,7 +316,7 @@ class SignalAPI:
         }
         try:
             async with aiohttp.ClientSession() as session:
-                resp = await session.post(uri, json=payload)
+                resp = await session.delete(uri, json=payload)
                 resp.raise_for_status()
                 return resp
         except (

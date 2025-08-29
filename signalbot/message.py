@@ -11,6 +11,7 @@ class MessageType(Enum):
     SYNC_MESSAGE = 1
     DATA_MESSAGE = 2
     EDIT_MESSAGE = 3
+    DELETE_MESSAGE = 4
 
 
 class Message:
@@ -29,6 +30,7 @@ class Message:
         reaction: str | None = None,
         mentions: list[str] | None = None,
         target_sent_timestamp: int | None = None,
+        remote_delete_timestamp: int | None = None,
         raw_message: str | None = None,
     ):
         # required
@@ -63,6 +65,7 @@ class Message:
             self.link_previews = []
 
         self.target_sent_timestamp = target_sent_timestamp
+        self.remote_delete_timestamp = remote_delete_timestamp
 
     def recipient(self) -> str:
         # Case 1: Group chat
@@ -96,7 +99,7 @@ class Message:
 
         source_number = envelope.get("sourceNumber")
 
-        target_sent_timestamp = None
+        target_sent_timestamp, remote_delete_timestamp = None, None
         base64_attachments, attachments_local_filenames, link_previews = [], [], []
 
         if (
@@ -105,28 +108,31 @@ class Message:
             or "editMessage" in envelope
         ):
             if "syncMessage" in envelope:
-                type = MessageType.SYNC_MESSAGE  # noqa: A001
-                dataMessage = envelope["syncMessage"]["sentMessage"]  # noqa: N806
+                message_type = MessageType.SYNC_MESSAGE
+                data_message = envelope["syncMessage"]["sentMessage"]
             elif "dataMessage" in envelope:
-                type = MessageType.DATA_MESSAGE  # noqa: A001
-                dataMessage = envelope["dataMessage"]  # noqa: N806
+                message_type = MessageType.DATA_MESSAGE
+                data_message = envelope["dataMessage"]
+                if "remoteDelete" in data_message:
+                    message_type = MessageType.DELETE_MESSAGE
+                    remote_delete_timestamp = data_message["remoteDelete"]["timestamp"]
             elif "editMessage" in envelope:
-                type = MessageType.EDIT_MESSAGE  # noqa: A001
-                dataMessage = envelope["editMessage"]["dataMessage"]  # noqa: N806
+                message_type = MessageType.EDIT_MESSAGE
+                data_message = envelope["editMessage"]["dataMessage"]
                 target_sent_timestamp = envelope["editMessage"]["targetSentTimestamp"]
             else:
                 raise UnknownMessageFormatError
 
-            text = cls._parse_data_message(dataMessage)
-            group = cls._parse_group_information(dataMessage)
-            reaction = cls._parse_reaction(dataMessage)
-            mentions = cls._parse_mentions(dataMessage)
+            text = cls._parse_data_message(data_message)
+            group = cls._parse_group_information(data_message)
+            reaction = cls._parse_reaction(data_message)
+            mentions = cls._parse_mentions(data_message)
             if signal.download_attachments:
-                base64_attachments = await cls._parse_attachments(signal, dataMessage)
+                base64_attachments = await cls._parse_attachments(signal, data_message)
                 attachments_local_filenames = cls._parse_attachments_local_filenames(
-                    dataMessage,
+                    data_message,
                 )
-                link_previews = await cls._parse_previews(signal, dataMessage)
+                link_previews = await cls._parse_previews(signal, data_message)
         else:
             raise UnknownMessageFormatError
 
@@ -135,7 +141,7 @@ class Message:
             source_number,
             source_uuid,
             timestamp,
-            type,
+            message_type,
             text,
             base64_attachments,
             attachments_local_filenames,
@@ -144,6 +150,7 @@ class Message:
             reaction,
             mentions,
             target_sent_timestamp,
+            remote_delete_timestamp,
             raw_message_str,
         )
 

@@ -6,6 +6,7 @@ from commands import (
     DeleteCommand,
     EditCommand,
     PingCommand,
+    ReceiveDeleteCommand,
     RegexTriggeredCommand,
     ReplyCommand,
     TriggeredCommand,
@@ -46,6 +47,7 @@ def main():  # noqa: ANN201
 
     bot.register(EditCommand())
     bot.register(DeleteCommand())
+    bot.register(ReceiveDeleteCommand())
     bot.start()
 
 

@@ -82,7 +82,7 @@ class Message:
         return bool(self.group)
 
     @classmethod
-    async def parse(cls, signal: SignalAPI, raw_message_str: str) -> Message:
+    async def parse(cls, signal: SignalAPI, raw_message_str: str) -> Message:  # noqa: C901
         try:
             raw_message = json.loads(raw_message_str)
         except Exception:  # noqa: BLE001

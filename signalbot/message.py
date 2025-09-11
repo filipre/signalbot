@@ -105,13 +105,22 @@ class Message:
             or "editMessage" in envelope
         ):
             if "syncMessage" in envelope:
-                if envelope["syncMessage"] == {}:
+                sync_message = envelope["syncMessage"]
+                if sync_message == {}:
                     # The server routinely sends empty syncMessages to linked devices.
                     # Ignore them by raising a known error.
                     raise UnknownMessageFormatError
 
                 message_type = MessageType.SYNC_MESSAGE
-                data_message = envelope["syncMessage"]["sentMessage"]
+                data_message = sync_message["sentMessage"]
+
+                if "editMessage" in data_message:
+                    message_type = MessageType.EDIT_MESSAGE
+                    target_sent_timestamp = data_message["editMessage"][
+                        "targetSentTimestamp"
+                    ]
+                    data_message = data_message["editMessage"]["dataMessage"]
+
             elif "dataMessage" in envelope:
                 message_type = MessageType.DATA_MESSAGE
                 data_message = envelope["dataMessage"]

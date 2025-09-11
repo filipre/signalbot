@@ -105,6 +105,11 @@ class Message:
             or "editMessage" in envelope
         ):
             if "syncMessage" in envelope:
+                if envelope["syncMessage"] == {}:
+                    # The server routinely sends empty syncMessages to linked devices.
+                    # Ignore them by raising a known error.
+                    raise UnknownMessageFormatError
+
                 message_type = MessageType.SYNC_MESSAGE
                 data_message = envelope["syncMessage"]["sentMessage"]
             elif "dataMessage" in envelope:

@@ -65,8 +65,8 @@ class Command(ABC):
         self.bot: SignalBot | None = None  # Available after calling bot.register()
 
     # optional
-    def setup(self) -> None:  # noqa: B027
-        pass
+    def setup(self) -> None:
+        return None
 
     # optional
     def describe(self) -> str | None:

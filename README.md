@@ -102,6 +102,10 @@ The package provides methods to easily listen for incoming messages and respondi
 - `bot.react(message, emoji)`: React to a message
 - `bot.start_typing(receiver)`: Start typing
 - `bot.stop_typing(receiver)`: Stop typing
+- `bot.edit(receiver, text, timestamp)`: Edit a previously sent message
+- `bot.receipt(message, receipt_type)`: Mark a message as read
+- `bot.update_group(group_id, avatar, description, expiration, name)`: Change group settings
+- `bot.delete_attachment(attachment_filename)`: Delete a previously downloaded attachment
 - `bot.scheduler`: APScheduler > AsyncIOScheduler, see [here](https://apscheduler.readthedocs.io/en/3.x/modules/schedulers/asyncio.html?highlight=AsyncIOScheduler#apscheduler.schedulers.asyncio.AsyncIOScheduler)
 
 ### Persistent storage

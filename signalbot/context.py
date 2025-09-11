@@ -10,7 +10,7 @@ if TYPE_CHECKING:
 
 
 class Context:
-    def __init__(self, bot: SignalBot, message: Message):  # noqa: ANN204
+    def __init__(self, bot: SignalBot, message: Message) -> None:
         self.bot = bot
         self.message = message
 

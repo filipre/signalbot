@@ -118,15 +118,16 @@ class Message:
             elif "dataMessage" in envelope:
                 message_type = MessageType.DATA_MESSAGE
                 data_message = envelope["dataMessage"]
-                if "remoteDelete" in data_message:
-                    message_type = MessageType.DELETE_MESSAGE
-                    remote_delete_timestamp = data_message["remoteDelete"]["timestamp"]
             elif "editMessage" in envelope:
                 message_type = MessageType.EDIT_MESSAGE
                 data_message = envelope["editMessage"]["dataMessage"]
                 target_sent_timestamp = envelope["editMessage"]["targetSentTimestamp"]
             else:
                 raise UnknownMessageFormatError
+
+            if "remoteDelete" in data_message:
+                message_type = MessageType.DELETE_MESSAGE
+                remote_delete_timestamp = data_message["remoteDelete"]["timestamp"]
 
             text = cls._parse_data_message(data_message)
             group = cls._parse_group_information(data_message)

@@ -207,7 +207,7 @@ class SignalBot:
             list[dict[str, Any]] | None
         ) = None,  # [{ "author": "uuid" , "start": 0, "length": 1 }]
         edit_timestamp: int | None = None,
-        text_mode: str = None,  # noqa: RUF013
+        text_mode: str | None = None,
         view_once: bool = False,
     ) -> int:
         receiver = self._resolve_receiver(receiver)

@@ -66,7 +66,7 @@ class Context:
         mentions: (
             list[dict[str, Any]] | None
         ) = None,  # [{ "author": "uuid" , "start": 0, "length": 1 }]
-        text_mode: str = None,  # noqa: RUF013
+        text_mode: str | None = None,
         view_once: bool = False,
     ) -> int:
         send_mentions = self._convert_receive_mentions_into_send_mentions(

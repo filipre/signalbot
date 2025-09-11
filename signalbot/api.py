@@ -35,6 +35,7 @@ class SignalAPI:
         self,
         receiver: str,
         message: str,
+        *,
         base64_attachments: list | None = None,  # noqa: FA102
         link_preview: dict[str, Any] | None = None,  # noqa: FA102
         quote_author: str | None = None,  # noqa: FA102
@@ -44,6 +45,7 @@ class SignalAPI:
         mentions: list[dict[str, Any]] | None = None,  # noqa: FA102
         text_mode: str | None = None,  # noqa: FA102
         edit_timestamp: int | None = None,  # noqa: FA102
+        view_once: bool = False,
     ) -> aiohttp.ClientResponse:
         uri = self._signal_api_uris.send_rest_uri()
         if base64_attachments is None:
@@ -72,6 +74,8 @@ class SignalAPI:
             payload["edit_timestamp"] = edit_timestamp
         if link_preview:
             payload["link_preview"] = link_preview
+        if view_once:
+            payload["view_once"] = True
 
         try:
             async with aiohttp.ClientSession() as session:

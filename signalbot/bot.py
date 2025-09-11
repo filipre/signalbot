@@ -192,6 +192,7 @@ class SignalBot:
         self,
         receiver: str,
         text: str,
+        *,
         base64_attachments: list | None = None,  # noqa: FA102
         link_preview: LinkPreview | None = None,  # noqa: FA102
         quote_author: str | None = None,  # noqa: FA102
@@ -203,6 +204,7 @@ class SignalBot:
         ) = None,  # [{ "author": "uuid" , "start": 0, "length": 1 }]
         edit_timestamp: int | None = None,  # noqa: FA102
         text_mode: str = None,  # noqa: RUF013
+        view_once: bool = False,
     ) -> int:
         receiver = self._resolve_receiver(receiver)
         link_preview_raw = link_preview.model_dump() if link_preview else None
@@ -219,6 +221,7 @@ class SignalBot:
             mentions=mentions,
             text_mode=text_mode,
             edit_timestamp=edit_timestamp,
+            view_once=view_once,
         )
         resp_payload = await resp.json()
         timestamp = int(resp_payload["timestamp"])

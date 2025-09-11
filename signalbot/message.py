@@ -22,8 +22,10 @@ class Message:
         timestamp: int,
         type: MessageType,  # noqa: A002
         text: str,
+        *,
         base64_attachments: list[str] | None = None,
         attachments_local_filenames: list[str] | None = None,
+        view_once: bool = False,
         link_previews: list[LinkPreview] | None = None,
         group: str | None = None,
         reaction: str | None = None,
@@ -47,6 +49,8 @@ class Message:
         self.attachments_local_filenames = attachments_local_filenames
         if self.attachments_local_filenames is None:
             self.attachments_local_filenames = []
+
+        self.view_once = view_once
 
         self.group = group
 
@@ -98,6 +102,7 @@ class Message:
 
         target_sent_timestamp = None
         base64_attachments, attachments_local_filenames, link_previews = [], [], []
+        view_once = False
 
         if (
             "syncMessage" in envelope
@@ -141,6 +146,7 @@ class Message:
                     data_message,
                 )
                 link_previews = await cls._parse_previews(signal, data_message)
+                view_once = data_message.get("viewOnce", False)
         else:
             raise UnknownMessageFormatError
 
@@ -153,6 +159,7 @@ class Message:
             text,
             base64_attachments,
             attachments_local_filenames,
+            view_once,
             link_previews,
             group,
             reaction,

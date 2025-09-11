@@ -2,9 +2,12 @@ from __future__ import annotations
 
 import json
 from enum import Enum
+from typing import TYPE_CHECKING
 
-from signalbot.api import SignalAPI  # noqa: TC001
 from signalbot.link_previews import LinkPreview
+
+if TYPE_CHECKING:
+    from signalbot.api import SignalAPI
 
 
 class MessageType(Enum):

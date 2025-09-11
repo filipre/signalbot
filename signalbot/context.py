@@ -3,11 +3,10 @@ from __future__ import annotations
 from copy import deepcopy
 from typing import TYPE_CHECKING, Any, Literal
 
-from signalbot.link_previews import LinkPreview  # noqa: TC001
-from signalbot.message import Message  # noqa: TC001
-
 if TYPE_CHECKING:
     from signalbot.bot import SignalBot
+    from signalbot.link_previews import LinkPreview
+    from signalbot.message import Message
 
 
 class Context:

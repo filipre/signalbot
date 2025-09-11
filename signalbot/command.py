@@ -5,10 +5,9 @@ import re
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING
 
-from signalbot.context import Context  # noqa: TC001
-
 if TYPE_CHECKING:
     from signalbot.bot import SignalBot
+    from signalbot.context import Context
 
 
 def regex_triggered(*by: str | re.Pattern[str]):  # noqa: ANN201

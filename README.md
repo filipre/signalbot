@@ -1,12 +1,14 @@
 # Signal Bot Framework
 
-Python package to build your own Signal bots. To run the the bot you need to start the [signal-cli-rest-api](https://github.com/bbernhard/signal-cli-rest-api) service and link your device with it. Please refer to that project for more details. The API server must run in `json-rpc` mode.
+Python package to build your own Signal bots.
 
 ## Getting Started
 
+Install it with `pip install signalbot`.
+
 Below you can find a minimal example on how to use the package.
 Save it as `bot.py`.
-There is also a bigger example in the `example` folder.
+There is also a bigger example in the [example folder](https://github.com/filipre/signalbot/tree/master/example).
 
 ```python
 import os
@@ -15,7 +17,7 @@ from signalbot import SignalBot, Command, Context, triggered
 
 class PingCommand(Command):
     @triggered(["Ping"])
-    async def handle(self, c: Context):
+    async def handle(self, c: Context) -> None:
         await c.send("Pong")
 
 
@@ -24,7 +26,7 @@ if __name__ == "__main__":
         "signal_service": os.environ["SIGNAL_SERVICE"],
         "phone_number": os.environ["PHONE_NUMBER"]
     })
-    bot.register(PingCommand()) # all contacts and groups
+    bot.register(PingCommand()) # Run the command for all contacts and groups
     bot.start()
 ```
 

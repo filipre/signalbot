@@ -17,13 +17,13 @@ class MessageType(Enum):
 
 
 class Message:
-    def __init__(  # noqa: ANN204, PLR0913
+    def __init__(  # noqa: PLR0913
         self,
         source: str,
         source_number: str | None,
         source_uuid: str,
         timestamp: int,
-        type: MessageType,  # noqa: A002
+        message_type: MessageType,
         text: str,
         *,
         base64_attachments: list[str] | None = None,
@@ -35,13 +35,13 @@ class Message:
         mentions: list[str] | None = None,
         target_sent_timestamp: int | None = None,
         raw_message: str | None = None,
-    ):
+    ) -> None:
         # required
         self.source = source
         self.source_number = source_number
         self.source_uuid = source_uuid
         self.timestamp = timestamp
-        self.type = type
+        self.type = message_type
         self.text = text
 
         # optional
@@ -89,8 +89,8 @@ class Message:
     async def parse(cls, signal: SignalAPI, raw_message_str: str) -> Message:
         try:
             raw_message = json.loads(raw_message_str)
-        except Exception:  # noqa: BLE001
-            raise UnknownMessageFormatError  # noqa: B904
+        except Exception as exc:
+            raise UnknownMessageFormatError from exc
 
         envelope = raw_message["envelope"]
         # General attributes
@@ -98,8 +98,8 @@ class Message:
             source = envelope["source"]
             source_uuid = envelope["sourceUuid"]
             timestamp = envelope["timestamp"]
-        except Exception:  # noqa: BLE001
-            raise UnknownMessageFormatError  # noqa: B904
+        except Exception as exc:
+            raise UnknownMessageFormatError from exc
 
         source_number = envelope.get("sourceNumber")
 
@@ -192,36 +192,32 @@ class Message:
     @classmethod
     def _parse_data_message(cls, data_message: dict) -> str:
         try:
-            text = data_message["message"]
-            return text  # noqa: RET504, TRY300
-        except Exception:  # noqa: BLE001
-            raise UnknownMessageFormatError  # noqa: B904
+            return data_message["message"]
+        except KeyError as exc:
+            raise UnknownMessageFormatError from exc
 
     @classmethod
     def _parse_group_information(cls, message: dict) -> str:
         try:
-            group = message["groupInfo"]["groupId"]
-            return group  # noqa: RET504, TRY300
-        except Exception:  # noqa: BLE001
+            return message["groupInfo"]["groupId"]
+        except KeyError:
             return None
 
     @classmethod
     def _parse_mentions(cls, data_message: dict) -> list:
         try:
-            mentions = data_message["mentions"]
-            return mentions  # noqa: RET504, TRY300
-        except Exception:  # noqa: BLE001
+            return data_message["mentions"]
+        except KeyError:
             return []
 
     @classmethod
-    def _parse_reaction(self, message: dict) -> str:  # noqa: N804
+    def _parse_reaction(cls, message: dict) -> str:
         try:
-            reaction = message["reaction"]["emoji"]
-            return reaction  # noqa: RET504, TRY300
-        except Exception:  # noqa: BLE001
+            return message["reaction"]["emoji"]
+        except KeyError:
             return None
 
-    def __str__(self):  # noqa: ANN204
+    def __str__(self) -> str:
         if self.text is None:
             return ""
         return self.text
@@ -242,7 +238,7 @@ class Message:
                     ),
                 )
             return parsed_previews  # noqa: TRY300
-        except Exception:  # noqa: BLE001
+        except KeyError:
             return []
 
 

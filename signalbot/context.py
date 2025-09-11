@@ -3,15 +3,14 @@ from __future__ import annotations
 from copy import deepcopy
 from typing import TYPE_CHECKING, Any, Literal
 
-from signalbot.link_previews import LinkPreview  # noqa: TC001
-from signalbot.message import Message  # noqa: TC001
-
 if TYPE_CHECKING:
     from signalbot.bot import SignalBot
+    from signalbot.link_previews import LinkPreview
+    from signalbot.message import Message
 
 
 class Context:
-    def __init__(self, bot: SignalBot, message: Message):  # noqa: ANN204
+    def __init__(self, bot: SignalBot, message: Message) -> None:
         self.bot = bot
         self.message = message
 
@@ -66,7 +65,7 @@ class Context:
         mentions: (
             list[dict[str, Any]] | None
         ) = None,  # [{ "author": "uuid" , "start": 0, "length": 1 }]
-        text_mode: str = None,  # noqa: RUF013
+        text_mode: str | None = None,
         view_once: bool = False,
     ) -> int:
         send_mentions = self._convert_receive_mentions_into_send_mentions(

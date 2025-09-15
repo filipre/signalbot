@@ -1,12 +1,14 @@
+import asyncio
 from datetime import datetime
 
 from signalbot import Command, Context, MessageType, triggered
 
 
 class DeleteCommand(Command):
-    @triggered(["delete"])
+    @triggered("delete")
     async def handle(self, c: Context) -> None:
-        timestamp = await c.reply("This message will be deleted.")
+        timestamp = await c.reply("This message will be deleted in two seconds.")
+        await asyncio.sleep(2)
         await c.remote_delete(timestamp=timestamp)
 
 

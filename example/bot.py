@@ -9,6 +9,7 @@ from commands import (
     ReceiveDeleteCommand,
     RegexTriggeredCommand,
     ReplyCommand,
+    StylesCommand,
     TriggeredCommand,
     TypingCommand,
 )
@@ -26,7 +27,6 @@ def main():  # noqa: ANN201
     config = {
         "signal_service": signal_service,
         "phone_number": phone_number,
-        "storage": None,
     }
     bot = SignalBot(config)
 
@@ -48,6 +48,7 @@ def main():  # noqa: ANN201
     bot.register(EditCommand())
     bot.register(DeleteCommand())
     bot.register(ReceiveDeleteCommand())
+    bot.register(StylesCommand())
     bot.start()
 
 

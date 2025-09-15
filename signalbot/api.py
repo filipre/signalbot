@@ -1,9 +1,13 @@
+from __future__ import annotations
+
 import base64
-from collections.abc import AsyncIterator
-from typing import Any, Literal
+from typing import TYPE_CHECKING, Any, Literal
 
 import aiohttp
 import websockets
+
+if TYPE_CHECKING:
+    from collections.abc import AsyncIterator
 
 
 class SignalAPI:
@@ -35,15 +39,17 @@ class SignalAPI:
         self,
         receiver: str,
         message: str,
-        base64_attachments: list | None = None,  # noqa: FA102
-        link_preview: dict[str, Any] | None = None,  # noqa: FA102
-        quote_author: str | None = None,  # noqa: FA102
-        quote_mentions: list | None = None,  # noqa: FA102
-        quote_message: str | None = None,  # noqa: FA102
-        quote_timestamp: int | None = None,  # noqa: FA102
-        mentions: list[dict[str, Any]] | None = None,  # noqa: FA102
-        text_mode: str | None = None,  # noqa: FA102
-        edit_timestamp: int | None = None,  # noqa: FA102
+        *,
+        base64_attachments: list | None = None,
+        link_preview: dict[str, Any] | None = None,
+        quote_author: str | None = None,
+        quote_mentions: list | None = None,
+        quote_message: str | None = None,
+        quote_timestamp: int | None = None,
+        mentions: list[dict[str, Any]] | None = None,
+        text_mode: str | None = None,
+        edit_timestamp: int | None = None,
+        view_once: bool = False,
     ) -> aiohttp.ClientResponse:
         uri = self._signal_api_uris.send_rest_uri()
         if base64_attachments is None:
@@ -72,6 +78,8 @@ class SignalAPI:
             payload["edit_timestamp"] = edit_timestamp
         if link_preview:
             payload["link_preview"] = link_preview
+        if view_once:
+            payload["view_once"] = True
 
         try:
             async with aiohttp.ClientSession() as session:
@@ -212,8 +220,8 @@ class SignalAPI:
     async def update_contact(
         self,
         receiver: str,
-        expiration_in_seconds: int | None = None,  # noqa: FA102
-        name: str | None = None,  # noqa: FA102
+        expiration_in_seconds: int | None = None,
+        name: str | None = None,
     ) -> None:
         uri = self._signal_api_uris.contacts_uri()
         payload = {"recipient": receiver}
@@ -238,10 +246,10 @@ class SignalAPI:
     async def update_group(
         self,
         group_id: str,
-        base64_avatar: str | None = None,  # noqa: FA102
-        description: str | None = None,  # noqa: FA102
-        expiration_in_seconds: int | None = None,  # noqa: FA102
-        name: str | None = None,  # noqa: FA102
+        base64_avatar: str | None = None,
+        description: str | None = None,
+        expiration_in_seconds: int | None = None,
+        name: str | None = None,
     ) -> None:
         uri = self._signal_api_uris.group_id_uri(group_id)
         payload = {}

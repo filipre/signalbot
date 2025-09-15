@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import asyncio
 import itertools
 import logging
@@ -7,7 +9,7 @@ import traceback
 import uuid
 from collections import defaultdict
 from collections.abc import Callable
-from typing import Any, Literal, TypeAlias
+from typing import TYPE_CHECKING, Any, Literal, TypeAlias
 
 import phonenumbers
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
@@ -16,9 +18,11 @@ from packaging.version import Version
 from signalbot.api import ReceiveMessagesError, SignalAPI
 from signalbot.command import Command
 from signalbot.context import Context
-from signalbot.link_previews import LinkPreview
 from signalbot.message import Message, UnknownMessageFormatError
 from signalbot.storage import RedisStorage, SQLiteStorage
+
+if TYPE_CHECKING:
+    from signalbot.link_previews import LinkPreview
 
 CommandList: TypeAlias = list[
     tuple[
@@ -114,9 +118,9 @@ class SignalBot:
     def register(
         self,
         command: Command,
-        contacts: list[str] | bool = True,  # noqa: FA102, FBT001, FBT002
-        groups: list[str] | bool = True,  # noqa: FA102, FBT001, FBT002
-        f: Callable[[Message], bool] | None = None,  # noqa: FA102
+        contacts: list[str] | bool = True,  # noqa: FBT001, FBT002
+        groups: list[str] | bool = True,  # noqa: FBT001, FBT002
+        f: Callable[[Message], bool] | None = None,
     ) -> None:
         command.bot = self
         command.setup()
@@ -192,17 +196,19 @@ class SignalBot:
         self,
         receiver: str,
         text: str,
-        base64_attachments: list | None = None,  # noqa: FA102
-        link_preview: LinkPreview | None = None,  # noqa: FA102
-        quote_author: str | None = None,  # noqa: FA102
-        quote_mentions: list | None = None,  # noqa: FA102
-        quote_message: str | None = None,  # noqa: FA102
-        quote_timestamp: int | None = None,  # noqa: FA102
+        *,
+        base64_attachments: list | None = None,
+        link_preview: LinkPreview | None = None,
+        quote_author: str | None = None,
+        quote_mentions: list | None = None,
+        quote_message: str | None = None,
+        quote_timestamp: int | None = None,
         mentions: (
-            list[dict[str, Any]] | None  # noqa: FA102
+            list[dict[str, Any]] | None
         ) = None,  # [{ "author": "uuid" , "start": 0, "length": 1 }]
-        edit_timestamp: int | None = None,  # noqa: FA102
-        text_mode: str = None,  # noqa: RUF013
+        edit_timestamp: int | None = None,
+        text_mode: str | None = None,
+        view_once: bool = False,
     ) -> int:
         receiver = self._resolve_receiver(receiver)
         link_preview_raw = link_preview.model_dump() if link_preview else None
@@ -219,6 +225,7 @@ class SignalBot:
             mentions=mentions,
             text_mode=text_mode,
             edit_timestamp=edit_timestamp,
+            view_once=view_once,
         )
         resp_payload = await resp.json()
         timestamp = int(resp_payload["timestamp"])
@@ -259,8 +266,8 @@ class SignalBot:
     async def update_contact(
         self,
         receiver: str,
-        expiration_in_seconds: int | None = None,  # noqa: FA102
-        name: str | None = None,  # noqa: FA102
+        expiration_in_seconds: int | None = None,
+        name: str | None = None,
     ) -> None:
         receiver = self._resolve_receiver(receiver)
         await self._signal.update_contact(
@@ -272,10 +279,10 @@ class SignalBot:
     async def update_group(
         self,
         group_id: str,
-        base64_avatar: str | None = None,  # noqa: FA102
-        description: str | None = None,  # noqa: FA102
-        expiration_in_seconds: int | None = None,  # noqa: FA102
-        name: str | None = None,  # noqa: FA102
+        base64_avatar: str | None = None,
+        description: str | None = None,
+        expiration_in_seconds: int | None = None,
+        name: str | None = None,
     ) -> None:
         group_id = self._resolve_receiver(group_id)
         await self._signal.update_group(
@@ -399,7 +406,7 @@ class SignalBot:
             return False
         return internal_id[-1] == "="
 
-    def _get_group_by_name(self, group_name: str) -> dict[str, Any] | None:  # noqa: FA102
+    def _get_group_by_name(self, group_name: str) -> dict[str, Any] | None:
         groups = self._groups_by_name.get(group_name)
         if groups is not None:
             if len(groups) > 1:
@@ -489,8 +496,8 @@ class SignalBot:
     def _should_react_for_contact(
         self,
         message: Message,
-        contacts: list[str] | bool,  # noqa: FA102, FBT001
-        group_ids: list[str] | bool,  # noqa: FA102, FBT001
+        contacts: list[str] | bool,  # noqa: FBT001
+        group_ids: list[str] | bool,  # noqa: FBT001
     ) -> bool:
         """Is the command activated for a certain chat or group?"""
         # Case 1: Private message
@@ -519,7 +526,7 @@ class SignalBot:
     def _should_react_for_lambda(
         self,
         message: Message,
-        f: Callable[[Message], bool] | None = None,  # noqa: FA102
+        f: Callable[[Message], bool] | None = None,
     ) -> bool:
         if f is None:
             return True

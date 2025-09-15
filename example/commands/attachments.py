@@ -8,8 +8,8 @@ class AttachmentCommand(Command):
     def describe(self) -> str:
         return "🦀 Congratulations sailor, you made it to friday!"
 
-    @triggered(["friday"])
-    async def handle(self, c: Context):  # noqa: ANN201
+    @triggered("friday")
+    async def handle(self, c: Context) -> None:
         with open(Path(__file__).parent / "image.jpeg", "rb") as f:  # noqa: ASYNC230, PTH123
             image = str(base64.b64encode(f.read()), encoding="utf-8")
 

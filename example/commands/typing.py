@@ -7,8 +7,8 @@ class TypingCommand(Command):
     def describe(self) -> str:
         return None
 
-    @triggered(["typing"])
-    async def handle(self, c: Context):  # noqa: ANN201
+    @triggered("typing")
+    async def handle(self, c: Context) -> None:
         await c.start_typing()
         seconds = 5
         await asyncio.sleep(seconds)

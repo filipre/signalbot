@@ -13,9 +13,8 @@ class TestQuote(unittest.TestCase):
         quote_data = json.loads(self.raw_quote_message)["envelope"]["syncMessage"][
             "sentMessage"
         ]["quote"]
-        quote = Quote.from_dict(quote_data)
+        quote = Quote.model_validate(quote_data)
 
-        assert quote is not None
         assert quote.id == 1632576001632  # noqa: PLR2004
         assert quote.author == "+490123456789"
         assert quote.author_number == "+490123456789"
@@ -29,9 +28,8 @@ class TestQuote(unittest.TestCase):
         quote_data = json.loads(self.raw_quote_text_message)["envelope"]["syncMessage"][
             "sentMessage"
         ]["quote"]
-        quote = Quote.from_dict(quote_data)
+        quote = Quote.model_validate(quote_data)
 
-        assert quote is not None
         assert quote.id == 1632576001632  # noqa: PLR2004
         assert quote.author == "+490123456789"
         assert quote.author_number == "+490123456789"
@@ -48,18 +46,14 @@ class TestQuote(unittest.TestCase):
             "text": "Test quote",
             "attachments": [],
         }
-        quote = Quote.from_dict(quote_dict)
-        assert quote is not None
+        quote = Quote.model_validate(quote_dict)
+
         assert quote.id == 123  # noqa: PLR2004
         assert quote.author == "+490123456789"
         assert quote.author_number == "+490123456789"
         assert quote.author_uuid == "<uuid>"
         assert quote.text == "Test quote"
         assert len(quote.attachments) == 0
-
-    def test_quote_from_dict_none(self):
-        quote = Quote.from_dict(None)
-        assert quote is None
 
 
 if __name__ == "__main__":

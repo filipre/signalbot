@@ -232,8 +232,8 @@ class Message:
     @classmethod
     def _parse_quote(cls, message: dict) -> Quote | None:
         try:
-            return Quote.from_dict(message["quote"])
-        except Exception:  # noqa: BLE001
+            return Quote.model_validate(message["quote"])
+        except KeyError:
             return None
 
     def __str__(self) -> str:

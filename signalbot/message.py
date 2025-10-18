@@ -61,9 +61,13 @@ class Message:
 
         self.group = group
         self.reaction = reaction
-        self.mentions = mentions or []
-        self.raw_message = raw_message
         self.quote = quote
+
+        self.mentions = mentions
+        if self.mentions is None:
+            self.mentions = []
+
+        self.raw_message = raw_message
 
         self.link_previews = link_previews
         if self.link_previews is None:

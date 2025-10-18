@@ -1,18 +1,19 @@
-from typing import Optional, List, Dict, Any
+from __future__ import annotations
+
+from typing import Any
 
 
 class Quote:
-
-    def __init__(
+    def __init__(  # noqa: PLR0913
         self,
-        id: int,
+        quote_id: int,
         author: str,
         author_number: str,
         author_uuid: str,
         text: str = "",
-        attachments: List[Dict[str, Any]] = None,
-    ):
-        self.id = id
+        attachments: list[dict[str, Any]] | None = None,
+    ) -> None:
+        self.id = quote_id
         self.author = author
         self.author_number = author_number
         self.author_uuid = author_uuid
@@ -20,7 +21,7 @@ class Quote:
         self.attachments = attachments or []
 
     @classmethod
-    def from_dict(cls, quote_dict: Optional[Dict[str, Any]]) -> Optional["Quote"]:
+    def from_dict(cls, quote_dict: dict[str, Any] | None) -> Quote | None:
         if not quote_dict:
             return None
 

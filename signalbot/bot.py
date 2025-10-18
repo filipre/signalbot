@@ -36,7 +36,7 @@ CommandList: TypeAlias = list[
 LOGGER_NAME = "signalbot"
 
 
-def enable_terminal_logging(level: int = logging.WARNING) -> None:
+def enable_console_logging(level: int = logging.WARNING) -> None:
     handler = logging.StreamHandler()
 
     formatter = logging.Formatter(

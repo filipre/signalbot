@@ -14,11 +14,11 @@ from commands import (
     TypingCommand,
 )
 
-from signalbot import SignalBot, enable_terminal_logging
+from signalbot import SignalBot, enable_console_logging
 
 
 def main() -> None:
-    enable_terminal_logging(logging.INFO)
+    enable_console_logging(logging.INFO)
 
     signal_service = os.environ["SIGNAL_SERVICE"]
     phone_number = os.environ["PHONE_NUMBER"]

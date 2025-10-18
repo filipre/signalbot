@@ -13,7 +13,7 @@ There is also a bigger example in the [example folder](https://github.com/filipr
 ```python
 import os
 import logging
-from signalbot import SignalBot, Command, Context, triggered, enable_terminal_logging
+from signalbot import SignalBot, Command, Context, triggered, enable_console_logging
 
 
 class PingCommand(Command):
@@ -23,7 +23,7 @@ class PingCommand(Command):
 
 
 if __name__ == "__main__":
-    enable_terminal_logging(logging.INFO)
+    enable_console_logging(logging.INFO)
 
     bot = SignalBot({
         "signal_service": os.environ["SIGNAL_SERVICE"],
@@ -131,7 +131,7 @@ To implement your own commands, you need to inherent `Command` and overwrite fol
 ### Logging
 
 The logger name for the library is `"signalbot"`.
-It does not have any handlers attached, for convenience the `enable_terminal_logging(level)` function is provided.
+It does not have any handlers attached, for convenience the `enable_console_logging(level)` function is provided.
 
 ### Unit Testing
 

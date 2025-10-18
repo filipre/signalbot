@@ -2,7 +2,7 @@ import asyncio
 import logging
 import unittest
 
-from signalbot import Command, Context, enable_terminal_logging, triggered
+from signalbot import Command, Context, enable_console_logging, triggered
 
 
 class SchnickSchnackSchnuckCommand(Command):
@@ -24,5 +24,5 @@ class SchnickSchnackSchnuckCommand(Command):
 
 
 if __name__ == "__main__":
-    enable_terminal_logging(logging.INFO)
+    enable_console_logging(logging.INFO)
     unittest.main()

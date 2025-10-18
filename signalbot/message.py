@@ -58,7 +58,6 @@ class Message:
             self.attachments_local_filenames = []
 
         self.view_once = view_once
-
         self.group = group
         self.reaction = reaction
         self.quote = quote

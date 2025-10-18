@@ -5,6 +5,7 @@ from enum import Enum
 from typing import TYPE_CHECKING
 
 from signalbot.link_previews import LinkPreview
+from signalbot.quote import Quote
 
 if TYPE_CHECKING:
     from signalbot.api import SignalAPI
@@ -34,6 +35,7 @@ class Message:
         group: str | None = None,
         reaction: str | None = None,
         mentions: list[str] | None = None,
+        quote: Quote | None = None,
         target_sent_timestamp: int | None = None,
         remote_delete_timestamp: int | None = None,
         raw_message: str | None = None,
@@ -56,10 +58,9 @@ class Message:
             self.attachments_local_filenames = []
 
         self.view_once = view_once
-
         self.group = group
-
         self.reaction = reaction
+        self.quote = quote
 
         self.mentions = mentions
         if self.mentions is None:
@@ -150,6 +151,7 @@ class Message:
             group = cls._parse_group_information(data_message)
             reaction = cls._parse_reaction(data_message)
             mentions = cls._parse_mentions(data_message)
+            quote = cls._parse_quote(data_message)
             if signal.download_attachments:
                 base64_attachments = await cls._parse_attachments(signal, data_message)
                 attachments_local_filenames = cls._parse_attachments_local_filenames(
@@ -174,6 +176,7 @@ class Message:
             group=group,
             reaction=reaction,
             mentions=mentions,
+            quote=quote,
             target_sent_timestamp=target_sent_timestamp,
             remote_delete_timestamp=remote_delete_timestamp,
             raw_message=raw_message_str,
@@ -222,6 +225,13 @@ class Message:
     def _parse_reaction(cls, message: dict) -> str:
         try:
             return message["reaction"]["emoji"]
+        except KeyError:
+            return None
+
+    @classmethod
+    def _parse_quote(cls, message: dict) -> Quote | None:
+        try:
+            return Quote.model_validate(message["quote"])
         except KeyError:
             return None
 

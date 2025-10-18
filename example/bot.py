@@ -14,13 +14,12 @@ from commands import (
     TypingCommand,
 )
 
-from signalbot import SignalBot
-
-logging.getLogger().setLevel(logging.INFO)
-logging.getLogger("apscheduler").setLevel(logging.WARNING)
+from signalbot import SignalBot, enable_terminal_logging
 
 
-def main():  # noqa: ANN201
+def main() -> None:
+    enable_terminal_logging(logging.INFO)
+
     signal_service = os.environ["SIGNAL_SERVICE"]
     phone_number = os.environ["PHONE_NUMBER"]
 

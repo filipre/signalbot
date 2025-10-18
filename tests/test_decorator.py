@@ -2,7 +2,7 @@ import logging
 import unittest
 from unittest.mock import patch
 
-from signalbot import Command, Context, triggered
+from signalbot import Command, Context, enable_terminal_logging, triggered
 from signalbot.command import regex_triggered
 from signalbot.utils import ChatTestCase, ReceiveMessagesMock, SendMessagesMock
 
@@ -119,5 +119,5 @@ class RegexTriggeredTest(ChatTestCase):
 
 
 if __name__ == "__main__":
-    logging.basicConfig(level="INFO")
+    enable_terminal_logging(logging.INFO)
     unittest.main()

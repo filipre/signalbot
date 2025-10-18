@@ -12,10 +12,10 @@ if TYPE_CHECKING:
 
 
 class MessageType(Enum):
-    SYNC_MESSAGE = 1
-    DATA_MESSAGE = 2
-    EDIT_MESSAGE = 3
-    DELETE_MESSAGE = 4
+    SYNC_MESSAGE = 1  # Message recieved in a linked device
+    DATA_MESSAGE = 2  # Message recieved in a primary device
+    EDIT_MESSAGE = 3  # Message received is an edit of a previous message
+    DELETE_MESSAGE = 4  # Message received is a remote delete of a previous message
 
 
 class Message:

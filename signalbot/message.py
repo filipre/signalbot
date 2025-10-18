@@ -14,6 +14,7 @@ class MessageType(Enum):
     SYNC_MESSAGE = 1
     DATA_MESSAGE = 2
     EDIT_MESSAGE = 3
+    DELETE_MESSAGE = 4
 
 
 class Message:
@@ -34,6 +35,7 @@ class Message:
         reaction: str | None = None,
         mentions: list[str] | None = None,
         target_sent_timestamp: int | None = None,
+        remote_delete_timestamp: int | None = None,
         raw_message: str | None = None,
     ) -> None:
         # required
@@ -70,6 +72,7 @@ class Message:
             self.link_previews = []
 
         self.target_sent_timestamp = target_sent_timestamp
+        self.remote_delete_timestamp = remote_delete_timestamp
 
     def recipient(self) -> str:
         # Case 1: Group chat
@@ -86,7 +89,7 @@ class Message:
         return bool(self.group)
 
     @classmethod
-    async def parse(cls, signal: SignalAPI, raw_message_str: str) -> Message:
+    async def parse(cls, signal: SignalAPI, raw_message_str: str) -> Message:  # noqa: C901
         try:
             raw_message = json.loads(raw_message_str)
         except Exception as exc:
@@ -103,7 +106,7 @@ class Message:
 
         source_number = envelope.get("sourceNumber")
 
-        target_sent_timestamp = None
+        target_sent_timestamp, remote_delete_timestamp = None, None
         base64_attachments, attachments_local_filenames, link_previews = [], [], []
         view_once = False
 
@@ -139,6 +142,10 @@ class Message:
             else:
                 raise UnknownMessageFormatError
 
+            if "remoteDelete" in data_message:
+                message_type = MessageType.DELETE_MESSAGE
+                remote_delete_timestamp = data_message["remoteDelete"]["timestamp"]
+
             text = cls._parse_data_message(data_message)
             group = cls._parse_group_information(data_message)
             reaction = cls._parse_reaction(data_message)
@@ -168,6 +175,7 @@ class Message:
             reaction=reaction,
             mentions=mentions,
             target_sent_timestamp=target_sent_timestamp,
+            remote_delete_timestamp=remote_delete_timestamp,
             raw_message=raw_message_str,
         )
 

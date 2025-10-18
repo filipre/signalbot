@@ -40,4 +40,4 @@ jobs:
       - name: Install dependencies
         run: poetry install --no-dev
       - name: Run unit tests
-        run: poetry run python -m unittest discover
+        run: poetry run python -m unittest discover --start-directory ./tests

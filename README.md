@@ -137,6 +137,12 @@ It does not have any handlers attached, for convenience the `enable_console_logg
 
 *Note: deprecated, the plan is to switch to pytest eventually*
 
+The tests can be executed with
+
+```bash
+poetry run python -m unittest discover --start-directory ./tests
+```
+
 In many cases, we can mock receiving and sending messages to speed up development time. To do so, you can use `signalbot.utils.ChatTestCase` which sets up a "skeleton" bot. Then, you can send messages using the `@chat` decorator in `signalbot.utils` like this:
 ```python
 class PingChatTest(ChatTestCase):

@@ -255,9 +255,10 @@ class Message:
                         id=preview["image"]["id"],
                     ),
                 )
-            return parsed_previews  # noqa: TRY300
         except KeyError:
             return []
+        else:
+            return parsed_previews
 
 
 class UnknownMessageFormatError(Exception):

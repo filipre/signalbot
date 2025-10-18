@@ -131,7 +131,7 @@ To implement your own commands, you need to inherent `Command` and overwrite fol
 ### Logging
 
 The logger name for the library is `"signalbot"`.
-It does not have any handlers attached, for convinience the `enable_terminal_logging(level)` function is provided.
+It does not have any handlers attached, for convenience the `enable_terminal_logging(level)` function is provided.
 
 ### Unit Testing
 

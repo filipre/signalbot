@@ -1,15 +1,22 @@
-from .ping import PingCommand
-from .typing import TypingCommand
-from .triggered import TriggeredCommand
-from .reply import ReplyCommand
-from .regex_triggered import RegexTriggeredCommand
 from .attachments import AttachmentCommand
+from .delete import DeleteCommand, ReceiveDeleteCommand
+from .edit import EditCommand
+from .multiple_triggered import TriggeredCommand
+from .ping import PingCommand
+from .regex_triggered import RegexTriggeredCommand
+from .reply import ReplyCommand
+from .styles import StylesCommand
+from .typing import TypingCommand
 
 __all__ = [
-    "PingCommand",
-    "TypingCommand",
-    "TriggeredCommand",
-    "ReplyCommand",
-    "RegexTriggeredCommand",
     "AttachmentCommand",
+    "DeleteCommand",
+    "EditCommand",
+    "PingCommand",
+    "ReceiveDeleteCommand",
+    "RegexTriggeredCommand",
+    "ReplyCommand",
+    "StylesCommand",
+    "TriggeredCommand",
+    "TypingCommand",
 ]

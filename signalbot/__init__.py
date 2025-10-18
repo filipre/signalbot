@@ -1,21 +1,22 @@
-from .bot import SignalBot
-from .command import Command, CommandError, triggered, regex_triggered
-from .message import Message, MessageType, UnknownMessageFormatError, Quote
-from .api import SignalAPI, ReceiveMessagesError, SendMessageError
-from .context import Context
+from signalbot.api import ReceiveMessagesError, SendMessageError, SignalAPI
+from signalbot.bot import SignalBot, enable_console_logging
+from signalbot.command import Command, CommandError, regex_triggered, triggered
+from signalbot.context import Context
+from signalbot.message import Message, MessageType, Quote, UnknownMessageFormatError
 
 __all__ = [
-    "SignalBot",
     "Command",
     "CommandError",
-    "regex_triggered",
-    "triggered",
+    "Context",
     "Message",
     "MessageType",
-    "UnknownMessageFormatError",
-    "SignalAPI",
+    "Quote",
     "ReceiveMessagesError",
     "SendMessageError",
-    "Context",
-    "Quote",
+    "SignalAPI",
+    "SignalBot",
+    "UnknownMessageFormatError",
+    "enable_console_logging",
+    "regex_triggered",
+    "triggered",
 ]

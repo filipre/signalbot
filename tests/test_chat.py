@@ -1,23 +1,20 @@
-import unittest
 import asyncio
 import logging
-from signalbot import Command, Context
+import unittest
+
+from signalbot import Command, Context, enable_console_logging, triggered
 
 
 class SchnickSchnackSchnuckCommand(Command):
-    triggers = ["schnick", "schnack"]
+    def __init__(self):  # noqa: ANN204
+        pass
 
-    def __init__(self, listen):
-        self.listen = listen
-
+    @triggered("schnick", "schnack")
     async def handle(self, c: Context) -> bool:
-        if not Command.triggered(c.message, self.triggers):
-            return
-
         text = c.message.text
         if text == "schnick":
             await asyncio.sleep(1)
-            await c.send("schnack", listen=self.listen)
+            await c.send("schnack")
             return
 
         if text == "schnack":
@@ -27,5 +24,5 @@ class SchnickSchnackSchnuckCommand(Command):
 
 
 if __name__ == "__main__":
-    logging.basicConfig(level="INFO")
+    enable_console_logging(logging.INFO)
     unittest.main()

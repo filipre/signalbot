@@ -1,27 +1,31 @@
+import logging  # noqa: INP001
 import os
-from signalbot import SignalBot
+
 from commands import (
-    PingCommand,
-    TypingCommand,
-    TriggeredCommand,
-    ReplyCommand,
-    RegexTriggeredCommand,
     AttachmentCommand,
+    DeleteCommand,
+    EditCommand,
+    PingCommand,
+    ReceiveDeleteCommand,
+    RegexTriggeredCommand,
+    ReplyCommand,
+    StylesCommand,
+    TriggeredCommand,
+    TypingCommand,
 )
-import logging
 
-logging.getLogger().setLevel(logging.INFO)
-logging.getLogger("apscheduler").setLevel(logging.WARNING)
+from signalbot import SignalBot, enable_console_logging
 
 
-def main():
+def main() -> None:
+    enable_console_logging(logging.INFO)
+
     signal_service = os.environ["SIGNAL_SERVICE"]
     phone_number = os.environ["PHONE_NUMBER"]
 
     config = {
         "signal_service": signal_service,
         "phone_number": phone_number,
-        "storage": None,
     }
     bot = SignalBot(config)
 
@@ -40,6 +44,10 @@ def main():
 
     bot.register(RegexTriggeredCommand())
 
+    bot.register(EditCommand())
+    bot.register(DeleteCommand())
+    bot.register(ReceiveDeleteCommand())
+    bot.register(StylesCommand())
     bot.start()
 
 

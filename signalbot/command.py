@@ -1,28 +1,33 @@
 from __future__ import annotations
-from typing import TYPE_CHECKING, Optional
+
 import functools
 import re
 from abc import ABC, abstractmethod
+from typing import TYPE_CHECKING, Callable, ParamSpec, TypeVar
 
-
-from .message import Message
-from .context import Context
+T = TypeVar("T")
+P = ParamSpec("P")
 
 if TYPE_CHECKING:
-    from .bot import SignalBot
+    from signalbot.bot import SignalBot
+    from signalbot.context import Context
 
 
-def regex_triggered(*by: str | re.Pattern[str]):
-    def decorator_regex_triggered(func):
+def regex_triggered(
+    *by: str | re.Pattern[str],
+) -> Callable[[Callable[P, T]], Callable[P, T]]:
+    def decorator_regex_triggered(func: Callable[P, T]) -> Callable[P, T]:
         @functools.wraps(func)
-        async def wrapper_regex_triggered(*args, **kwargs):
+        async def wrapper_regex_triggered(
+            *args: P.args, **kwargs: P.kwargs
+        ) -> T | None:
             c: Context = args[1]
             text = c.message.text
             if not isinstance(text, str):
-                return
+                return None
             matches = [bool(re.search(pattern, text)) for pattern in by]
             if True not in matches:
-                return
+                return None
             return await func(*args, **kwargs)
 
         return wrapper_regex_triggered
@@ -30,21 +35,23 @@ def regex_triggered(*by: str | re.Pattern[str]):
     return decorator_regex_triggered
 
 
-def triggered(*by: str, case_sensitive=False):
-    def decorator_triggered(func):
+def triggered(
+    *by: str, case_sensitive: bool = False
+) -> Callable[[Callable[P, T]], Callable[P, T]]:
+    def decorator_triggered(func: Callable[P, T]) -> Callable[P, T]:
         @functools.wraps(func)
-        async def wrapper_triggered(*args, **kwargs):
+        async def wrapper_triggered(*args: P.args, **kwargs: P.kwargs) -> T | None:
             c: Context = args[1]
             text = c.message.text
             if not isinstance(text, str):
-                return
+                return None
 
             by_words = by
             if not case_sensitive:
                 text = text.lower()
                 by_words = [t.lower() for t in by_words]
             if text not in by_words:
-                return
+                return None
 
             return await func(*args, **kwargs)
 
@@ -54,37 +61,21 @@ def triggered(*by: str, case_sensitive=False):
 
 
 class Command(ABC):
-    def __init__(self):
-        self.bot: Optional[SignalBot] = None  # Available after calling bot.register()
+    def __init__(self) -> None:
+        self.bot: SignalBot | None = None  # Available after calling bot.register()
 
     # optional
-    def setup(self):
-        pass
+    def setup(self) -> None:
+        return None
 
     # optional
-    def describe(self) -> str:
+    def describe(self) -> str | None:
         return None
 
     # overwrite
     @abstractmethod
-    async def handle(self, context: Context):
+    async def handle(self, context: Context) -> None:
         pass
-
-    # helper method
-    # deprecated: please use @triggered
-    @classmethod
-    def triggered(cls, message: Message, trigger_words: list[str]) -> bool:
-        # Message needs to be text
-        text = message.text
-        if not isinstance(text, str):
-            return False
-
-        # Text must match trigger words without capitalization
-        text = text.lower()
-        if text in trigger_words:
-            return True
-
-        return False
 
 
 class CommandError(Exception):

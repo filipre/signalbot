@@ -580,10 +580,9 @@ class SignalBot:
         try:
             context = Context(self, message)
             await command.handle(context)
-        except Exception as e:
-            for log in "".join(traceback.format_exception(e)).rstrip().split("\n"):
-                self._logger.exception(f"[{command.__class__.__name__}]: {log}")  # noqa: G004
-            raise e  # noqa: TRY201
+        except Exception:
+            self._logger.exception(f"[{command.__class__.__name__}]")  # noqa: G004
+            raise
 
         # done
         self._q.task_done()

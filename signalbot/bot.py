@@ -87,7 +87,9 @@ class SignalBot:
                 download_attachments,
             )
         except KeyError:
-            raise SignalBotError("Could not initialize SignalAPI with given config")  # noqa: B904, EM101, TRY003
+            raise SignalBotError(
+                "Could not initialize SignalAPI with given config"
+            )
 
         self._event_loop = asyncio.get_event_loop()
         self._q = asyncio.Queue()
@@ -98,8 +100,10 @@ class SignalBot:
 
         try:
             self.scheduler = AsyncIOScheduler(event_loop=self._event_loop)
-        except Exception as e:  # noqa: BLE001
-            raise SignalBotError(f"Could not initialize scheduler: {e}")  # noqa: B904, EM102, TRY003
+        except Exception as e:
+            raise SignalBotError(
+                f"Could not initialize scheduler: {e}"
+            ) from e
 
         config_storage = {}
         try:
@@ -129,14 +133,15 @@ class SignalBot:
                 )
             if "redis_host" in config_storage:
                 self._logger.warning(
-                    f"[Bot] Redis initialization error: {traceback.format_exc()}",  # noqa: G004
+                    "[Bot] Redis initialization error: %s",
+                    traceback.format_exc(),
                 )
 
     def register(
         self,
         command: Command,
         contacts: list[str] | bool = True,  # noqa: FBT001, FBT002
-        groups: list[str] | bool = True,  # noqa: FBT001, FBT002
+        groups: list[str] | bool = True,    # noqa: FBT001, FBT002
         f: Callable[[Message], bool] | None = None,
     ) -> None:
         command.bot = self
@@ -321,7 +326,10 @@ class SignalBot:
         )
         resp_payload = await resp.json()
         ret_timestamp = int(resp_payload["timestamp"])
-        self._logger.info(f"[Bot] Deleted message with timestamp {timestamp}")  # noqa: G004
+        self._logger.info(
+            "[Bot] Deleted message with timestamp %s",
+            timestamp,
+        )
 
         return ret_timestamp
 
@@ -436,7 +444,8 @@ class SignalBot:
         return None
 
     # see https://stackoverflow.com/questions/55184226/catching-exceptions-in-individual-tasks-and-restarting-them
-    async def _rerun_on_exception(self, coro, *args, **kwargs):  # noqa: ANN001, ANN002, ANN003, ANN202
+    async def _rerun_on_exception(self, coro: Callable[..., Any],
+                                  *args: Any, **kwargs: Any) -> Any:
         """Restart coroutine by waiting an exponential time deplay"""
         max_sleep = 5 * 60  # sleep for at most 5 mins until rerun
         reset = 3 * 60  # reset after 3 minutes running successfully
@@ -509,7 +518,7 @@ class SignalBot:
 
         except ReceiveMessagesError as e:
             # TODO: retry strategy  # noqa: TD002, TD003
-            raise SignalBotError(f"Cannot receive messages: {e}")  # noqa: B904, EM102, TRY003
+            raise SignalBotError("Cannot receive messages: %s" % e)
 
     def _should_react_for_contact(
         self,
@@ -573,7 +582,9 @@ class SignalBot:
         command, message, t = await self._q.get()
         now = time.perf_counter()
         self._logger.info(
-            f"[Bot] Consumer #{name} got new job in {now - t:0.5f} seconds"  # noqa: G004
+            "[Bot] Consumer #%s got new job in %.5f seconds",
+            name,
+            now - t,
         )
 
         # handle Command

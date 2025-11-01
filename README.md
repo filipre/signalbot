@@ -66,7 +66,7 @@ time="2022-03-07T13:02:24Z" level=info msg="Started Signal Messenger REST API"
 - `PHONE_NUMBER`: Phone number of the bot, e.g. `+49123456789`
 
 ```bash
-export SIGNAL_SERVICE="127.0.0.1"
+export SIGNAL_SERVICE="127.0.0.1:8080"
 export PHONE_NUMBER="+49123456789"
 pip install signalbot
 python bot.py

@@ -57,13 +57,13 @@ class TestQuote(unittest.TestCase):
         assert len(quote.attachments) == 0
     
     def test_quote_no_author_number(self):
-        quote_data = json.loads(self.raw_quote_no_author_number)["envelope"]["syncMessage"][
-            "sentMessage"
-        ]["quote"]
+        quote_data = json.loads(self.raw_quote_no_author_number)["envelope"][
+            "syncMessage"
+        ]["sentMessage"]["quote"]
         quote = Quote.model_validate(quote_data)
         assert quote.id == 1632576001632  # noqa: PLR2004
         assert quote.author == "+490123456789"
-        assert quote.author_number == None
+        assert quote.author_number is None
         assert quote.author_uuid == "<uuid>"
         assert quote.text == "Ping"
         assert len(quote.attachments) == 0

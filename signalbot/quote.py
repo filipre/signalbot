@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Any, Optional
+from typing import Any
 
 from pydantic import BaseModel, ConfigDict
 from pydantic.alias_generators import to_camel
@@ -11,7 +11,7 @@ class Quote(BaseModel):
 
     id: int
     author: str
-    author_number: Optional[str] = None
+    author_number: str | None = None
     author_uuid: str
     text: str
     attachments: list[dict[str, Any]]

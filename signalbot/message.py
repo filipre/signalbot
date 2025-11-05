@@ -16,6 +16,7 @@ class MessageType(Enum):
     DATA_MESSAGE = 2  # Message recieved in a primary device
     EDIT_MESSAGE = 3  # Message received is an edit of a previous message
     DELETE_MESSAGE = 4  # Message received is a remote delete of a previous message
+    READ_MESSAGE = 5  # User readed some messages
 
 
 class Message:
@@ -36,6 +37,7 @@ class Message:
         reaction: str | None = None,
         mentions: list[str] | None = None,
         quote: Quote | None = None,
+        read_messages: list[dict] | None = None,
         target_sent_timestamp: int | None = None,
         remote_delete_timestamp: int | None = None,
         raw_message: str | None = None,
@@ -61,6 +63,10 @@ class Message:
         self.group = group
         self.reaction = reaction
         self.quote = quote
+
+        self.read_messages = read_messages
+        if self.read_messages is None:
+            self.read_messages = []
 
         self.mentions = mentions
         if self.mentions is None:
@@ -90,7 +96,7 @@ class Message:
         return bool(self.group)
 
     @classmethod
-    async def parse(cls, signal: SignalAPI, raw_message_str: str) -> Message:  # noqa: C901
+    async def parse(cls, signal: SignalAPI, raw_message_str: str) -> Message:  # noqa: C901 PLR0912 PLR0915
         try:
             raw_message = json.loads(raw_message_str)
         except Exception as exc:
@@ -122,6 +128,28 @@ class Message:
                     # The server routinely sends empty syncMessages to linked devices.
                     # Ignore them by raising a known error.
                     raise UnknownMessageFormatError
+
+                if "readMessages" in sync_message:
+                    return cls(
+                        source,
+                        source_number,
+                        source_uuid,
+                        timestamp,
+                        message_type=MessageType.READ_MESSAGE,
+                        text="",
+                        base64_attachments=[],
+                        attachments_local_filenames=[],
+                        view_once=view_once,
+                        link_previews=[],
+                        group=None,
+                        reaction=None,
+                        mentions=[],
+                        quote=None,
+                        read_messages=sync_message["readMessages"],
+                        target_sent_timestamp=target_sent_timestamp,
+                        remote_delete_timestamp=None,
+                        raw_message=raw_message_str,
+                    )
 
                 message_type = MessageType.SYNC_MESSAGE
                 data_message = sync_message["sentMessage"]

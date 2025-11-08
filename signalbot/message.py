@@ -245,14 +245,22 @@ class Message:
         try:
             parsed_previews = []
             for preview in data_message["previews"]:
-                base64_thumbnail = await signal.get_attachment(preview["image"]["id"])
+                img = preview["image"]
+                img_id = None
+                if isinstance(img, dict):
+                    img_id = img["id"]
+
+                base64_thumbnail = None
+                if img_id:
+                    base64_thumbnail = await signal.get_attachment(img_id)
+
                 parsed_previews.append(
                     LinkPreview(
                         base64_thumbnail=base64_thumbnail,
                         title=preview["title"],
                         description=preview["description"],
                         url=preview["url"],
-                        id=preview["image"]["id"],
+                        id=img_id,
                     ),
                 )
             return parsed_previews  # noqa: TRY300

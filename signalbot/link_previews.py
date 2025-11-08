@@ -4,7 +4,7 @@ from pydantic import BaseModel
 
 
 class LinkPreview(BaseModel):
-    base64_thumbnail: str
+    base64_thumbnail: str | None
     title: str
     description: str
     url: str

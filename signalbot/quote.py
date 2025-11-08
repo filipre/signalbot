@@ -11,7 +11,7 @@ class Quote(BaseModel):
 
     id: int
     author: str
-    author_number: str
+    author_number: str | None = None
     author_uuid: str
     text: str
     attachments: list[dict[str, Any]]

@@ -5,6 +5,7 @@ from commands import (
     AttachmentCommand,
     DeleteCommand,
     EditCommand,
+    HelpCommand,
     PingCommand,
     ReceiveDeleteCommand,
     RegexTriggeredCommand,
@@ -28,6 +29,8 @@ def main() -> None:
         "phone_number": phone_number,
     }
     bot = SignalBot(config)
+
+    bot.register(HelpCommand())
 
     # enable a chat command for all contacts and all groups
     bot.register(PingCommand())

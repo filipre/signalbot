@@ -16,6 +16,7 @@ class MessageType(Enum):
     DATA_MESSAGE = 2  # Message recieved in a primary device
     EDIT_MESSAGE = 3  # Message received is an edit of a previous message
     DELETE_MESSAGE = 4  # Message received is a remote delete of a previous message
+    CONTACT_SYNC_MESSAGE = 5  # Message received is a contact sync
 
 
 class Message:
@@ -90,7 +91,7 @@ class Message:
         return bool(self.group)
 
     @classmethod
-    async def parse(cls, signal: SignalAPI, raw_message_str: str) -> Message:  # noqa: C901
+    async def parse(cls, signal: SignalAPI, raw_message_str: str) -> Message:  # noqa: C901 PLR0912 PLR0915
         try:
             raw_message = json.loads(raw_message_str)
         except Exception as exc:
@@ -121,6 +122,32 @@ class Message:
                 if sync_message == {}:
                     # The server routinely sends empty syncMessages to linked devices.
                     # Ignore them by raising a known error.
+                    raise UnknownMessageFormatError
+
+                if "type" in sync_message:
+                    sync_type = sync_message["type"]
+                    if sync_type == "CONTACTS_SYNC":
+                        return cls(
+                            source,
+                            source_number,
+                            source_uuid,
+                            timestamp,
+                            message_type=MessageType.CONTACT_SYNC_MESSAGE,
+                            text="",
+                            base64_attachments=[],
+                            attachments_local_filenames=[],
+                            view_once=view_once,
+                            link_previews=[],
+                            group=None,
+                            reaction=None,
+                            mentions=[],
+                            quote=None,
+                            target_sent_timestamp=envelope["timestamp"],
+                            remote_delete_timestamp=None,
+                            raw_message=raw_message_str,
+                        )
+
+                    # Unknow message type, a new?
                     raise UnknownMessageFormatError
 
                 message_type = MessageType.SYNC_MESSAGE

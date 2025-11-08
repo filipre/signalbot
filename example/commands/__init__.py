@@ -1,5 +1,5 @@
 from .attachments import AttachmentCommand
-from .delete import DeleteCommand, ReceiveDeleteCommand
+from .delete import DeleteCommand, DeleteLocalAttachmentCommand, ReceiveDeleteCommand
 from .edit import EditCommand
 from .help import HelpCommand
 from .multiple_triggered import TriggeredCommand
@@ -12,6 +12,7 @@ from .typing import TypingCommand
 __all__ = [
     "AttachmentCommand",
     "DeleteCommand",
+    "DeleteLocalAttachmentCommand",
     "EditCommand",
     "HelpCommand",
     "PingCommand",

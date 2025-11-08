@@ -4,6 +4,7 @@ import os
 from commands import (
     AttachmentCommand,
     DeleteCommand,
+    DeleteLocalAttachmentCommand,
     EditCommand,
     HelpCommand,
     PingCommand,
@@ -50,6 +51,7 @@ def main() -> None:
     bot.register(EditCommand())
     bot.register(DeleteCommand())
     bot.register(ReceiveDeleteCommand())
+    bot.register(DeleteLocalAttachmentCommand())
     bot.register(StylesCommand())
     bot.start()
 

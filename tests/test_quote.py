@@ -55,7 +55,7 @@ class TestQuote(unittest.TestCase):
         assert quote.author_uuid == "<uuid>"
         assert quote.text == "Test quote"
         assert len(quote.attachments) == 0
-    
+
     def test_quote_no_author_number(self):
         quote_data = json.loads(self.raw_quote_no_author_number)["envelope"][
             "syncMessage"
@@ -67,7 +67,6 @@ class TestQuote(unittest.TestCase):
         assert quote.author_uuid == "<uuid>"
         assert quote.text == "Ping"
         assert len(quote.attachments) == 0
-
 
 
 if __name__ == "__main__":

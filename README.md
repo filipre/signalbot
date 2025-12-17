@@ -107,7 +107,7 @@ The package provides methods to easily listen for incoming messages and respondi
 - `bot.react(message, emoji)`: React to a message
 - `bot.start_typing(receiver)`: Start typing
 - `bot.stop_typing(receiver)`: Stop typing
-- `bot.edit(receiver, text, timestamp)`: Edit a previously sent message
+- `bot.send(receiver, text, edit_timestamp=timestamp)`: Edit a previously sent message
 - `bot.remote_delete(receiver, timestamp)`: Delete a previously sent message
 - `bot.receipt(message, receipt_type)`: Mark a message as read
 - `bot.update_group(group_id, avatar, description, expiration, name)`: Change group settings
@@ -125,7 +125,7 @@ For persistent storage to disk, check the SQLite or Redis storage in `storage.py
 To implement your own commands, you need to inherent `Command` and overwrite following methods:
 
 - `setup(self)`: Start any task that requires to send messages already, optional
-- `handle(self, c: Context)`: Handle an incoming message. By default, any command will read any incoming message. `Context` can be used to easily send (`c.send(text)`), reply (`c.reply(text)`), react (`c.react(emoji)`) and to type in a group (`c.start_typing()` and `c.stop_typing()`). You can use the `@triggered` decorator to listen for specific commands, the `@regex_triggered` decorator to listen for regular expressions, or you can inspect `c.message.text`.
+- `handle(self, c: Context)`: Handle an incoming message. By default, any command will read any incoming message. `Context` can be used to easily send (`c.send(text)`), reply (`c.reply(text)`), react (`c.react(emoji)`), edit (`c.edit(text, timestamp)`) and to type in a group (`c.start_typing()` and `c.stop_typing()`). You can use the `@triggered` decorator to listen for specific commands, the `@regex_triggered` decorator to listen for regular expressions, or you can inspect `c.message.text`.
 
 ### Logging
 

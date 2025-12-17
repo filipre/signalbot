@@ -116,7 +116,7 @@ class Message:
             message_type,
             data_message,
             target_sent_timestamp,
-            remote_delete_timestamp
+            remote_delete_timestamp,
         )
 
     @classmethod

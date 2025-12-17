@@ -62,17 +62,12 @@ def triggered(
 
 class Command(ABC):
     def __init__(self) -> None:
-        self.bot: SignalBot | None = None  # Available after calling bot.register()
+        # The bot attribute is assigned after calling bot.register(Command())
+        self.bot: SignalBot | None = None
 
-    # optional
     def setup(self) -> None:
-        return None
+        return
 
-    # optional
-    def describe(self) -> str | None:
-        return None
-
-    # overwrite
     @abstractmethod
     async def handle(self, context: Context) -> None:
         pass

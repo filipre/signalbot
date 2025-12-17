@@ -19,7 +19,7 @@ class MessageType(Enum):
 
 
 class Message:
-    def __init__(  # noqa: PLR0913
+    def __init__(
         self,
         source: str,
         source_number: str | None,
@@ -49,29 +49,15 @@ class Message:
         self.text = text
 
         # optional
-        self.base64_attachments = base64_attachments
-        if self.base64_attachments is None:
-            self.base64_attachments = []
-
-        self.attachments_local_filenames = attachments_local_filenames
-        if self.attachments_local_filenames is None:
-            self.attachments_local_filenames = []
-
+        self.base64_attachments = base64_attachments or []
+        self.attachments_local_filenames = attachments_local_filenames or []
         self.view_once = view_once
         self.group = group
         self.reaction = reaction
         self.quote = quote
-
-        self.mentions = mentions
-        if self.mentions is None:
-            self.mentions = []
-
+        self.mentions = mentions or []
         self.raw_message = raw_message
-
-        self.link_previews = link_previews
-        if self.link_previews is None:
-            self.link_previews = []
-
+        self.link_previews = link_previews or []
         self.target_sent_timestamp = target_sent_timestamp
         self.remote_delete_timestamp = remote_delete_timestamp
 

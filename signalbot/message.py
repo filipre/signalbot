@@ -90,7 +90,9 @@ class Message:
 
             if "editMessage" in data_message:
                 message_type = MessageType.EDIT_MESSAGE
-                target_sent_timestamp = data_message["editMessage"]["targetSentTimestamp"]
+                target_sent_timestamp = data_message["editMessage"][
+                    "targetSentTimestamp"
+                ]
                 data_message = data_message["editMessage"]["dataMessage"]
 
         elif "dataMessage" in envelope:
@@ -110,7 +112,12 @@ class Message:
             message_type = MessageType.DELETE_MESSAGE
             remote_delete_timestamp = data_message["remoteDelete"]["timestamp"]
 
-        return message_type, data_message, target_sent_timestamp, remote_delete_timestamp
+        return (
+            message_type,
+            data_message,
+            target_sent_timestamp,
+            remote_delete_timestamp
+        )
 
     @classmethod
     async def parse(cls, signal: SignalAPI, raw_message_str: str) -> Message:
@@ -133,7 +140,7 @@ class Message:
         message_type, data_message, target_sent_timestamp, remote_delete_timestamp = (
             cls._extract_message_data(envelope)
         )
-        
+
         text = cls._parse_data_message(data_message)
         group = cls._parse_group_information(data_message)
         reaction = cls._parse_reaction(data_message)
@@ -149,7 +156,7 @@ class Message:
             )
             link_previews = await cls._parse_previews(signal, data_message)
             view_once = data_message.get("viewOnce", False)
-        
+
         return cls(
             source,
             source_number,

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+from dataclasses import dataclass, field
 from enum import Enum
 from typing import TYPE_CHECKING
 
@@ -18,48 +19,31 @@ class MessageType(Enum):
     DELETE_MESSAGE = 4  # Message received is a remote delete of a previous message
 
 
+@dataclass
 class Message:
-    def __init__(
-        self,
-        source: str,
-        source_number: str | None,
-        source_uuid: str,
-        timestamp: int,
-        message_type: MessageType,
-        text: str,
-        *,
-        base64_attachments: list[str] | None = None,
-        attachments_local_filenames: list[str] | None = None,
-        view_once: bool = False,
-        link_previews: list[LinkPreview] | None = None,
-        group: str | None = None,
-        reaction: str | None = None,
-        mentions: list[str] | None = None,
-        quote: Quote | None = None,
-        target_sent_timestamp: int | None = None,
-        remote_delete_timestamp: int | None = None,
-        raw_message: str | None = None,
-    ) -> None:
-        # required
-        self.source = source
-        self.source_number = source_number
-        self.source_uuid = source_uuid
-        self.timestamp = timestamp
-        self.type = message_type
-        self.text = text
+    # required
+    source: str
+    source_number: str | None
+    source_uuid: str
+    timestamp: int
+    message_type: MessageType
+    text: str
+    # optional
+    base64_attachments: list[str] = field(default_factory=list)
+    attachments_local_filenames: list[str] = field(default_factory=list)
+    view_once: bool = False
+    link_previews: list[LinkPreview] = field(default_factory=list)
+    group: str | None = None
+    reaction: str | None = None
+    mentions: list[str] = field(default_factory=list)
+    quote: Quote | None = None
+    target_sent_timestamp: int | None = None
+    remote_delete_timestamp: int | None = None
+    raw_message: str | None = None
 
-        # optional
-        self.base64_attachments = base64_attachments or []
-        self.attachments_local_filenames = attachments_local_filenames or []
-        self.view_once = view_once
-        self.group = group
-        self.reaction = reaction
-        self.quote = quote
-        self.mentions = mentions or []
-        self.raw_message = raw_message
-        self.link_previews = link_previews or []
-        self.target_sent_timestamp = target_sent_timestamp
-        self.remote_delete_timestamp = remote_delete_timestamp
+    def __post_init__(self) -> None:
+        # Maintain backward compatibility: store message_type as 'type'
+        self.type = self.message_type
 
     def recipient(self) -> str:
         # Case 1: Group chat

@@ -242,8 +242,8 @@ class Message:
 
     @classmethod
     async def _parse_previews(cls, signal: SignalAPI, data_message: dict) -> list:
+        parsed_previews = []
         try:
-            parsed_previews = []
             for preview in data_message["previews"]:
                 base64_thumbnail = await signal.get_attachment(preview["image"]["id"])
                 parsed_previews.append(
@@ -255,9 +255,10 @@ class Message:
                         id=preview["image"]["id"],
                     ),
                 )
-            return parsed_previews  # noqa: TRY300
         except KeyError:
             return []
+
+        return parsed_previews
 
 
 class UnknownMessageFormatError(Exception):

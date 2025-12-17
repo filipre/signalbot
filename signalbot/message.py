@@ -76,7 +76,44 @@ class Message:
         return bool(self.group)
 
     @classmethod
-    async def parse(cls, signal: SignalAPI, raw_message_str: str) -> Message:  # noqa: C901
+    def _extract_message_data(cls, envelope: dict) -> tuple:
+        """Extract message type, data_message, and timestamps from envelope."""
+        target_sent_timestamp = None
+
+        if "syncMessage" in envelope:
+            sync_message = envelope["syncMessage"]
+            if sync_message == {}:
+                raise UnknownMessageFormatError
+
+            message_type = MessageType.SYNC_MESSAGE
+            data_message = sync_message["sentMessage"]
+
+            if "editMessage" in data_message:
+                message_type = MessageType.EDIT_MESSAGE
+                target_sent_timestamp = data_message["editMessage"]["targetSentTimestamp"]
+                data_message = data_message["editMessage"]["dataMessage"]
+
+        elif "dataMessage" in envelope:
+            message_type = MessageType.DATA_MESSAGE
+            data_message = envelope["dataMessage"]
+
+        elif "editMessage" in envelope:
+            message_type = MessageType.EDIT_MESSAGE
+            data_message = envelope["editMessage"]["dataMessage"]
+            target_sent_timestamp = envelope["editMessage"]["targetSentTimestamp"]
+
+        else:
+            raise UnknownMessageFormatError
+
+        remote_delete_timestamp = None
+        if "remoteDelete" in data_message:
+            message_type = MessageType.DELETE_MESSAGE
+            remote_delete_timestamp = data_message["remoteDelete"]["timestamp"]
+
+        return message_type, data_message, target_sent_timestamp, remote_delete_timestamp
+
+    @classmethod
+    async def parse(cls, signal: SignalAPI, raw_message_str: str) -> Message:
         try:
             raw_message = json.loads(raw_message_str)
         except Exception as exc:
@@ -93,61 +130,26 @@ class Message:
 
         source_number = envelope.get("sourceNumber")
 
-        target_sent_timestamp, remote_delete_timestamp = None, None
+        message_type, data_message, target_sent_timestamp, remote_delete_timestamp = (
+            cls._extract_message_data(envelope)
+        )
+        
+        text = cls._parse_data_message(data_message)
+        group = cls._parse_group_information(data_message)
+        reaction = cls._parse_reaction(data_message)
+        mentions = cls._parse_mentions(data_message)
+        quote = cls._parse_quote(data_message)
+
         base64_attachments, attachments_local_filenames, link_previews = [], [], []
         view_once = False
-
-        if (
-            "syncMessage" in envelope
-            or "dataMessage" in envelope
-            or "editMessage" in envelope
-        ):
-            if "syncMessage" in envelope:
-                sync_message = envelope["syncMessage"]
-                if sync_message == {}:
-                    # The server routinely sends empty syncMessages to linked devices.
-                    # Ignore them by raising a known error.
-                    raise UnknownMessageFormatError
-
-                message_type = MessageType.SYNC_MESSAGE
-                data_message = sync_message["sentMessage"]
-
-                if "editMessage" in data_message:
-                    message_type = MessageType.EDIT_MESSAGE
-                    target_sent_timestamp = data_message["editMessage"][
-                        "targetSentTimestamp"
-                    ]
-                    data_message = data_message["editMessage"]["dataMessage"]
-
-            elif "dataMessage" in envelope:
-                message_type = MessageType.DATA_MESSAGE
-                data_message = envelope["dataMessage"]
-            elif "editMessage" in envelope:
-                message_type = MessageType.EDIT_MESSAGE
-                data_message = envelope["editMessage"]["dataMessage"]
-                target_sent_timestamp = envelope["editMessage"]["targetSentTimestamp"]
-            else:
-                raise UnknownMessageFormatError
-
-            if "remoteDelete" in data_message:
-                message_type = MessageType.DELETE_MESSAGE
-                remote_delete_timestamp = data_message["remoteDelete"]["timestamp"]
-
-            text = cls._parse_data_message(data_message)
-            group = cls._parse_group_information(data_message)
-            reaction = cls._parse_reaction(data_message)
-            mentions = cls._parse_mentions(data_message)
-            quote = cls._parse_quote(data_message)
-            if signal.download_attachments:
-                base64_attachments = await cls._parse_attachments(signal, data_message)
-                attachments_local_filenames = cls._parse_attachments_local_filenames(
-                    data_message,
-                )
-                link_previews = await cls._parse_previews(signal, data_message)
-                view_once = data_message.get("viewOnce", False)
-        else:
-            raise UnknownMessageFormatError
-
+        if signal.download_attachments:
+            base64_attachments = await cls._parse_attachments(signal, data_message)
+            attachments_local_filenames = cls._parse_attachments_local_filenames(
+                data_message,
+            )
+            link_previews = await cls._parse_previews(signal, data_message)
+            view_once = data_message.get("viewOnce", False)
+        
         return cls(
             source,
             source_number,

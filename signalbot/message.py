@@ -60,7 +60,7 @@ class Message:
         return bool(self.group)
 
     @classmethod
-    def _extract_message_data(cls, envelope: dict) -> tuple:
+    def _extract_message_data(cls, envelope: dict) -> tuple[MessageType, dict, int | None, int | None]:
         """Extract message type, data_message, and timestamps from envelope."""
         target_sent_timestamp = None
 

@@ -26,7 +26,7 @@ class Message:
     source_number: str | None
     source_uuid: str
     timestamp: int
-    message_type: MessageType
+    type: MessageType
     text: str
     # optional
     base64_attachments: list[str] = field(default_factory=list)
@@ -40,10 +40,6 @@ class Message:
     target_sent_timestamp: int | None = None
     remote_delete_timestamp: int | None = None
     raw_message: str | None = None
-
-    def __post_init__(self) -> None:
-        # Maintain backward compatibility: store message_type as 'type'
-        self.type = self.message_type
 
     def recipient(self) -> str:
         # Case 1: Group chat

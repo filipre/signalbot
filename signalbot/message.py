@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+from dataclasses import dataclass, field
 from enum import Enum
 from typing import TYPE_CHECKING
 
@@ -18,62 +19,27 @@ class MessageType(Enum):
     DELETE_MESSAGE = 4  # Message received is a remote delete of a previous message
 
 
+@dataclass
 class Message:
-    def __init__(  # noqa: PLR0913
-        self,
-        source: str,
-        source_number: str | None,
-        source_uuid: str,
-        timestamp: int,
-        message_type: MessageType,
-        text: str,
-        *,
-        base64_attachments: list[str] | None = None,
-        attachments_local_filenames: list[str] | None = None,
-        view_once: bool = False,
-        link_previews: list[LinkPreview] | None = None,
-        group: str | None = None,
-        reaction: str | None = None,
-        mentions: list[str] | None = None,
-        quote: Quote | None = None,
-        target_sent_timestamp: int | None = None,
-        remote_delete_timestamp: int | None = None,
-        raw_message: str | None = None,
-    ) -> None:
-        # required
-        self.source = source
-        self.source_number = source_number
-        self.source_uuid = source_uuid
-        self.timestamp = timestamp
-        self.type = message_type
-        self.text = text
-
-        # optional
-        self.base64_attachments = base64_attachments
-        if self.base64_attachments is None:
-            self.base64_attachments = []
-
-        self.attachments_local_filenames = attachments_local_filenames
-        if self.attachments_local_filenames is None:
-            self.attachments_local_filenames = []
-
-        self.view_once = view_once
-        self.group = group
-        self.reaction = reaction
-        self.quote = quote
-
-        self.mentions = mentions
-        if self.mentions is None:
-            self.mentions = []
-
-        self.raw_message = raw_message
-
-        self.link_previews = link_previews
-        if self.link_previews is None:
-            self.link_previews = []
-
-        self.target_sent_timestamp = target_sent_timestamp
-        self.remote_delete_timestamp = remote_delete_timestamp
+    # required
+    source: str
+    source_number: str | None
+    source_uuid: str
+    timestamp: int
+    type: MessageType
+    text: str
+    # optional
+    base64_attachments: list[str] = field(default_factory=list)
+    attachments_local_filenames: list[str] = field(default_factory=list)
+    view_once: bool = False
+    link_previews: list[LinkPreview] = field(default_factory=list)
+    group: str | None = None
+    reaction: str | None = None
+    mentions: list[str] = field(default_factory=list)
+    quote: Quote | None = None
+    target_sent_timestamp: int | None = None
+    remote_delete_timestamp: int | None = None
+    raw_message: str | None = None
 
     def recipient(self) -> str:
         # Case 1: Group chat
@@ -90,7 +56,53 @@ class Message:
         return bool(self.group)
 
     @classmethod
-    async def parse(cls, signal: SignalAPI, raw_message_str: str) -> Message:  # noqa: C901
+    def _extract_message_data(
+        cls, envelope: dict
+    ) -> tuple[MessageType, dict, int | None, int | None]:
+        """Extract message type, data_message, and timestamps from envelope."""
+        target_sent_timestamp = None
+
+        if "syncMessage" in envelope:
+            sync_message = envelope["syncMessage"]
+            if sync_message == {}:
+                raise UnknownMessageFormatError
+
+            message_type = MessageType.SYNC_MESSAGE
+            data_message = sync_message["sentMessage"]
+
+            if "editMessage" in data_message:
+                message_type = MessageType.EDIT_MESSAGE
+                target_sent_timestamp = data_message["editMessage"][
+                    "targetSentTimestamp"
+                ]
+                data_message = data_message["editMessage"]["dataMessage"]
+
+        elif "dataMessage" in envelope:
+            message_type = MessageType.DATA_MESSAGE
+            data_message = envelope["dataMessage"]
+
+        elif "editMessage" in envelope:
+            message_type = MessageType.EDIT_MESSAGE
+            data_message = envelope["editMessage"]["dataMessage"]
+            target_sent_timestamp = envelope["editMessage"]["targetSentTimestamp"]
+
+        else:
+            raise UnknownMessageFormatError
+
+        remote_delete_timestamp = None
+        if "remoteDelete" in data_message:
+            message_type = MessageType.DELETE_MESSAGE
+            remote_delete_timestamp = data_message["remoteDelete"]["timestamp"]
+
+        return (
+            message_type,
+            data_message,
+            target_sent_timestamp,
+            remote_delete_timestamp,
+        )
+
+    @classmethod
+    async def parse(cls, signal: SignalAPI, raw_message_str: str) -> Message:
         try:
             raw_message = json.loads(raw_message_str)
         except Exception as exc:
@@ -107,60 +119,25 @@ class Message:
 
         source_number = envelope.get("sourceNumber")
 
-        target_sent_timestamp, remote_delete_timestamp = None, None
+        message_type, data_message, target_sent_timestamp, remote_delete_timestamp = (
+            cls._extract_message_data(envelope)
+        )
+
+        text = cls._parse_data_message(data_message)
+        group = cls._parse_group_information(data_message)
+        reaction = cls._parse_reaction(data_message)
+        mentions = cls._parse_mentions(data_message)
+        quote = cls._parse_quote(data_message)
+
         base64_attachments, attachments_local_filenames, link_previews = [], [], []
         view_once = False
-
-        if (
-            "syncMessage" in envelope
-            or "dataMessage" in envelope
-            or "editMessage" in envelope
-        ):
-            if "syncMessage" in envelope:
-                sync_message = envelope["syncMessage"]
-                if sync_message == {}:
-                    # The server routinely sends empty syncMessages to linked devices.
-                    # Ignore them by raising a known error.
-                    raise UnknownMessageFormatError
-
-                message_type = MessageType.SYNC_MESSAGE
-                data_message = sync_message["sentMessage"]
-
-                if "editMessage" in data_message:
-                    message_type = MessageType.EDIT_MESSAGE
-                    target_sent_timestamp = data_message["editMessage"][
-                        "targetSentTimestamp"
-                    ]
-                    data_message = data_message["editMessage"]["dataMessage"]
-
-            elif "dataMessage" in envelope:
-                message_type = MessageType.DATA_MESSAGE
-                data_message = envelope["dataMessage"]
-            elif "editMessage" in envelope:
-                message_type = MessageType.EDIT_MESSAGE
-                data_message = envelope["editMessage"]["dataMessage"]
-                target_sent_timestamp = envelope["editMessage"]["targetSentTimestamp"]
-            else:
-                raise UnknownMessageFormatError
-
-            if "remoteDelete" in data_message:
-                message_type = MessageType.DELETE_MESSAGE
-                remote_delete_timestamp = data_message["remoteDelete"]["timestamp"]
-
-            text = cls._parse_data_message(data_message)
-            group = cls._parse_group_information(data_message)
-            reaction = cls._parse_reaction(data_message)
-            mentions = cls._parse_mentions(data_message)
-            quote = cls._parse_quote(data_message)
-            if signal.download_attachments:
-                base64_attachments = await cls._parse_attachments(signal, data_message)
-                attachments_local_filenames = cls._parse_attachments_local_filenames(
-                    data_message,
-                )
-                link_previews = await cls._parse_previews(signal, data_message)
-                view_once = data_message.get("viewOnce", False)
-        else:
-            raise UnknownMessageFormatError
+        if signal.download_attachments:
+            base64_attachments = await cls._parse_attachments(signal, data_message)
+            attachments_local_filenames = cls._parse_attachments_local_filenames(
+                data_message,
+            )
+            link_previews = await cls._parse_previews(signal, data_message)
+            view_once = data_message.get("viewOnce", False)
 
         return cls(
             source,
@@ -242,8 +219,8 @@ class Message:
 
     @classmethod
     async def _parse_previews(cls, signal: SignalAPI, data_message: dict) -> list:
+        parsed_previews = []
         try:
-            parsed_previews = []
             for preview in data_message["previews"]:
                 base64_thumbnail = await signal.get_attachment(preview["image"]["id"])
                 parsed_previews.append(
@@ -255,9 +232,10 @@ class Message:
                         id=preview["image"]["id"],
                     ),
                 )
-            return parsed_previews  # noqa: TRY300
         except KeyError:
             return []
+
+        return parsed_previews
 
 
 class UnknownMessageFormatError(Exception):

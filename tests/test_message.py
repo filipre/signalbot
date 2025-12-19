@@ -38,9 +38,7 @@ class TestMessage(unittest.IsolatedAsyncioTestCase):
     # Own Message
     async def test_parse_source_own_message(self):
         message = await Message.parse(self.signal_api, TestMessage.raw_sync_message)
-        self.assertEqual(
-            message.timestamp, TestMessage.expected_timestamp
-        )  # noqa: PT009
+        self.assertEqual(message.timestamp, TestMessage.expected_timestamp)  # noqa: PT009
 
     async def test_parse_timestamp_own_message(self):
         message = await Message.parse(self.signal_api, TestMessage.raw_sync_message)
@@ -61,9 +59,7 @@ class TestMessage(unittest.IsolatedAsyncioTestCase):
     # Foreign Messages
     async def test_parse_source_foreign_message(self):
         message = await Message.parse(self.signal_api, TestMessage.raw_data_message)
-        self.assertEqual(
-            message.timestamp, TestMessage.expected_timestamp
-        )  # noqa: PT009
+        self.assertEqual(message.timestamp, TestMessage.expected_timestamp)  # noqa: PT009
 
     async def test_parse_timestamp_foreign_message(self):
         message = await Message.parse(self.signal_api, TestMessage.raw_data_message)
@@ -102,9 +98,7 @@ class TestMessage(unittest.IsolatedAsyncioTestCase):
             self.signal_api,
             TestMessage.raw_attachment_message,
         )
-        self.assertEqual(
-            message.base64_attachments, [expected_base64_str]
-        )  # noqa: PT009
+        self.assertEqual(message.base64_attachments, [expected_base64_str])  # noqa: PT009
 
         self.assertEqual(len(message.attachments_local_filenames), 1)  # noqa: PT009
         self.assertEqual(  # noqa: PT009
@@ -126,9 +120,7 @@ class TestMessage(unittest.IsolatedAsyncioTestCase):
         self.assertIsNone(message.group)  # noqa: PT009
 
     async def test_message_read(self):
-        message = await Message.parse(
-            self.signal_api, TestMessage.raw_user_read_message
-        )
+        message = await Message.parse(self.signal_api, TestMessage.raw_user_read_message)
 
         self.assertEqual(message.type, MessageType.READ_MESSAGE)  # noqa: PT009
         self.assertEqual(message.text, "")  # noqa: PT009
@@ -138,9 +130,7 @@ class TestMessage(unittest.IsolatedAsyncioTestCase):
         rm = message.read_messages[0]
         self.assertEqual(rm.get("sender"), "+49987654321")  # noqa: PT009
         self.assertEqual(rm.get("senderNumber"), "+49987654321")  # noqa: PT009
-        self.assertEqual(
-            rm.get("timestamp"), TestMessage.expected_timestamp
-        )  # noqa: PT009
+        self.assertEqual(rm.get("timestamp"), TestMessage.expected_timestamp)  # noqa: PT009
         self.assertIn("senderUuid", rm)  # noqa: PT009
 
 

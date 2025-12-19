@@ -70,18 +70,14 @@ class Message:
                 raise UnknownMessageFormatError
 
             if "readMessages" in sync_message:
-                return (
-                    MessageType.READ_MESSAGE,
-                    {
+                message_type = MessageType.READ_MESSAGE
+                data_message =    {
                         "message": "",
                         "readMessages": sync_message["readMessages"],
-                    },
-                    None,
-                    None,
-                )
-
-            message_type = MessageType.SYNC_MESSAGE
-            data_message = sync_message["sentMessage"]
+                    }
+           else:
+                message_type = MessageType.SYNC_MESSAGE
+                data_message = sync_message["sentMessage"]
 
             if "editMessage" in data_message:
                 message_type = MessageType.EDIT_MESSAGE

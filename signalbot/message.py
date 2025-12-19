@@ -13,10 +13,11 @@ if TYPE_CHECKING:
 
 
 class MessageType(Enum):
-    SYNC_MESSAGE = 1  # Message recieved in a linked device
-    DATA_MESSAGE = 2  # Message recieved in a primary device
+    SYNC_MESSAGE = 1  # Message received in a linked device
+    DATA_MESSAGE = 2  # Message received in a primary device
     EDIT_MESSAGE = 3  # Message received is an edit of a previous message
     DELETE_MESSAGE = 4  # Message received is a remote delete of a previous message
+    READ_MESSAGE = 5  # User read some messages
 
 
 @dataclass
@@ -37,6 +38,7 @@ class Message:
     reaction: str | None = None
     mentions: list[str] = field(default_factory=list)
     quote: Quote | None = None
+    read_messages: list[dict] | None = None
     target_sent_timestamp: int | None = None
     remote_delete_timestamp: int | None = None
     raw_message: str | None = None
@@ -66,6 +68,16 @@ class Message:
             sync_message = envelope["syncMessage"]
             if sync_message == {}:
                 raise UnknownMessageFormatError
+
+            if "readMessages" in sync_message:
+                return (
+                    MessageType.READ_MESSAGE,
+                    {
+                        "readMessages": sync_message["readMessages"],
+                    },
+                    None,
+                    None,
+                )
 
             message_type = MessageType.SYNC_MESSAGE
             data_message = sync_message["sentMessage"]
@@ -128,6 +140,7 @@ class Message:
         reaction = cls._parse_reaction(data_message)
         mentions = cls._parse_mentions(data_message)
         quote = cls._parse_quote(data_message)
+        read_messages = data_message.get("readMessages")
 
         base64_attachments, attachments_local_filenames, link_previews = [], [], []
         view_once = False
@@ -154,6 +167,7 @@ class Message:
             reaction=reaction,
             mentions=mentions,
             quote=quote,
+            read_messages=read_messages,
             target_sent_timestamp=target_sent_timestamp,
             remote_delete_timestamp=remote_delete_timestamp,
             raw_message=raw_message_str,

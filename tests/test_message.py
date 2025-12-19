@@ -114,13 +114,13 @@ class TestMessage(unittest.IsolatedAsyncioTestCase):
         )
         self.assertEqual(message.source, TestMessage.expected_source)  # noqa: PT009
         self.assertEqual(message.text, TestMessage.expected_text)  # noqa: PT009
-        self.assertEqual(
-            message.timestamp, TestMessage.expected_timestamp
-        )  # noqa: PT009
+        self.assertEqual(message.timestamp, TestMessage.expected_timestamp)  # noqa: PT009
         self.assertIsNone(message.group)  # noqa: PT009
 
     async def test_message_read(self):
-        message = await Message.parse(self.signal_api, TestMessage.raw_user_read_message)
+        message = await Message.parse(
+            self.signal_api, TestMessage.raw_user_read_message
+        )
 
         self.assertEqual(message.type, MessageType.READ_MESSAGE)  # noqa: PT009
         self.assertEqual(message.text, "")  # noqa: PT009

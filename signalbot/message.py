@@ -73,6 +73,7 @@ class Message:
                 return (
                     MessageType.READ_MESSAGE,
                     {
+                        "message": "",
                         "readMessages": sync_message["readMessages"],
                     },
                     None,

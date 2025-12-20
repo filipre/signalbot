@@ -71,10 +71,10 @@ class Message:
 
             if "readMessages" in sync_message:
                 message_type = MessageType.READ_MESSAGE
-                data_message =    {
-                        "message": "",
-                        "readMessages": sync_message["readMessages"],
-                    }
+                data_message = {
+                    "message": "",
+                    "readMessages": sync_message["readMessages"],
+                }
            else:
                 message_type = MessageType.SYNC_MESSAGE
                 data_message = sync_message["sentMessage"]

@@ -75,7 +75,7 @@ class Message:
                     "message": "",
                     "readMessages": sync_message["readMessages"],
                 }
-           else:
+            else:
                 message_type = MessageType.SYNC_MESSAGE
                 data_message = sync_message["sentMessage"]
 

@@ -1,11 +1,12 @@
 import asyncio
 
-from signalbot import Command, Context, triggered
+from commands.help import CommandWithHelpMessage
+from signalbot import Context, triggered
 
 
-class TypingCommand(Command):
-    def describe(self) -> str:
-        return None
+class TypingCommand(CommandWithHelpMessage):
+    def help_message(self) -> str:
+        return "typing: ⌨️ Demonstrates typing indicator for a few seconds."
 
     @triggered("typing")
     async def handle(self, c: Context) -> None:

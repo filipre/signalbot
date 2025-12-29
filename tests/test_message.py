@@ -15,6 +15,7 @@ class TestMessage(unittest.IsolatedAsyncioTestCase):
     raw_user_chat_message = '{"envelope":{"source":"+490123456789","sourceNumber":"+490123456789","sourceUuid":"<uuid>","sourceName":"<name>","sourceDevice":1,"timestamp":1632576001632,"dataMessage":{"timestamp":1632576001632,"message":"Uhrzeit","expiresInSeconds":0,"viewOnce":false}},"account":"+49987654321","subscription":0}'  # noqa: E501
     raw_attachment_message = '{"envelope":{"source":"+490123456789","sourceNumber":"+490123456789","sourceUuid":"<uuid>","sourceName":"<name>","sourceDevice":1,"timestamp":1632576001632,"dataMessage":{"timestamp":1632576001632,"message":"Uhrzeit","expiresInSeconds":0,"viewOnce":false, "attachments": [{"contentType": "image/png", "filename": "image.png", "id": "1qeCjjWOOo9Gxv8pfdCw.png","size": 12005}]}},"account":"+49987654321","subscription":0}'  # noqa: E501
     raw_preview_no_image_message = '{"envelope":{"source":"+490123456789","sourceNumber":"+490123456789","sourceUuid":"<uuid>","sourceName":"<name>","sourceDevice":1,"timestamp":1632576001632,"serverReceivedTimestamp":1632576001632,"serverDeliveredTimestamp":1632576001632,"dataMessage":{"timestamp":1632576001632,"message":"https://example.com is nice","expiresInSeconds":0,"viewOnce":false,"previews":[{"url":"https://example.com","title":"Example.com - Super example","description":"","image":null}],"account":"+41774289587"}}}'  # noqa: E501
+    raw_user_read_message = '{"envelope":{"source":"+490123456789","sourceNumber":"+490123456789","sourceUuid":"<uuid>","sourceName":"<name>","sourceDevice":1,"timestamp":1632576001632,"serverReceivedTimestamp":1632576001632,"serverDeliveredTimestamp":1632576001632,"syncMessage":{"readMessages":[{"sender":"+49987654321","senderNumber":"+49987654321","senderUuid":"<uuid>","timestamp":1632576001632}]}},"account":"+49987654321"}'  # noqa: E501
 
     expected_source = "+490123456789"
     expected_timestamp = 1632576001632
@@ -130,6 +131,22 @@ class TestMessage(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(getattr(lp, "url", None), "https://example.com")  # noqa: PT009
         self.assertEqual(getattr(lp, "title", None), "Example.com - Super example")  # noqa: PT009
         self.assertEqual(getattr(lp, "description", None), "")  # noqa: PT009
+
+    async def test_message_read(self):
+        message = await Message.parse(
+            self.signal_api, TestMessage.raw_user_read_message
+        )
+
+        self.assertEqual(message.type, MessageType.READ_MESSAGE)  # noqa: PT009
+        self.assertEqual(message.text, "")  # noqa: PT009
+        self.assertIsInstance(message.read_messages, list)  # noqa: PT009
+        self.assertEqual(len(message.read_messages), 1)  # noqa: PT009
+
+        rm = message.read_messages[0]
+        self.assertEqual(rm.get("sender"), "+49987654321")  # noqa: PT009
+        self.assertEqual(rm.get("senderNumber"), "+49987654321")  # noqa: PT009
+        self.assertEqual(rm.get("timestamp"), TestMessage.expected_timestamp)  # noqa: PT009
+        self.assertIn("senderUuid", rm)  # noqa: PT009
 
 
 if __name__ == "__main__":

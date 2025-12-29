@@ -4,7 +4,9 @@ import os
 from commands import (
     AttachmentCommand,
     DeleteCommand,
+    DeleteLocalAttachmentCommand,
     EditCommand,
+    HelpCommand,
     PingCommand,
     ReceiveDeleteCommand,
     RegexTriggeredCommand,
@@ -29,6 +31,8 @@ def main() -> None:
     }
     bot = SignalBot(config)
 
+    bot.register(HelpCommand())
+
     # enable a chat command for all contacts and all groups
     bot.register(PingCommand())
     bot.register(ReplyCommand())
@@ -47,6 +51,7 @@ def main() -> None:
     bot.register(EditCommand())
     bot.register(DeleteCommand())
     bot.register(ReceiveDeleteCommand())
+    bot.register(DeleteLocalAttachmentCommand())
     bot.register(StylesCommand())
     bot.start()
 

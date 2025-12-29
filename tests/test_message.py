@@ -125,7 +125,7 @@ class TestMessage(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(len(message.link_previews), 1)  # noqa: PT009
 
         lp = message.link_previews[0]
-        self.assertIsNone(getattr(lp, "id", None))  # noqa: PT009
+        self.assertIsNone(lp.id))  # noqa: PT009
         self.assertIsNone(getattr(lp, "base64_thumbnail", None))  # noqa: PT009
         self.assertEqual(getattr(lp, "url", None), "https://example.com")  # noqa: PT009
         self.assertEqual(getattr(lp, "title", None), "Example.com - Super example")  # noqa: PT009

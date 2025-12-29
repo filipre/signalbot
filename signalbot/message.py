@@ -18,6 +18,7 @@ class MessageType(Enum):
     EDIT_MESSAGE = 3  # Message received is an edit of a previous message
     DELETE_MESSAGE = 4  # Message received is a remote delete of a previous message
     READ_MESSAGE = 5  # User read some messages
+    CONTACT_SYNC_MESSAGE = 6  # Message received is a contact sync
 
 
 @dataclass
@@ -67,6 +68,18 @@ class Message:
         if "syncMessage" in envelope:
             sync_message = envelope["syncMessage"]
             if sync_message == {}:
+                raise UnknownMessageFormatError
+
+            if "type" in sync_message:
+                sync_type = sync_message["type"]
+                if sync_type == "CONTACTS_SYNC":
+                    return (
+                        MessageType.CONTACT_SYNC_MESSAGE,
+                        {"message": ""},
+                        envelope.get("timestamp"),
+                        None,
+                    )
+                # Unknown sync subtype
                 raise UnknownMessageFormatError
 
             if "readMessages" in sync_message:
@@ -171,7 +184,9 @@ class Message:
         )
 
     @classmethod
-    async def _parse_attachments(cls, signal: SignalAPI, data_message: dict) -> str:
+    async def _parse_attachments(
+        cls, signal: SignalAPI, data_message: dict
+    ) -> list[str]:
         if "attachments" not in data_message:
             return []
 

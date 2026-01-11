@@ -343,11 +343,11 @@ class SignalBot:
 
         self._logger.info(f"[Bot] {len(self.groups)} groups detected")  # noqa: G004
 
-    async def _update_group(self, group_id: str) -> None:
+    async def _update_group(self, group_internal_id: str) -> None:
         # look up group that requires update
-        group = await self._signal.get_group(group_id)
+        group = await self._signal.get_group(self._groups_by_internal_id[group_internal_id]["id"])
 
-        self.groups = [group if g["id"] == group_id else g for g in self.groups]
+        self.groups = [group if g["internal_id"] == group_internal_id else g for g in self.groups]
         self._groups_by_id[group["id"]] = group
         self._groups_by_internal_id[group["internal_id"]] = group
         self._groups_by_name[group["name"]].append(group)

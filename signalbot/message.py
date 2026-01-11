@@ -18,6 +18,7 @@ class MessageType(Enum):
     EDIT_MESSAGE = 3  # Message received is an edit of a previous message
     DELETE_MESSAGE = 4  # Message received is a remote delete of a previous message
     READ_MESSAGE = 5  # User read some messages
+    GROUP_UPDATE_MESSAGE = 6  # An update has been made to a group
 
 
 @dataclass
@@ -41,6 +42,7 @@ class Message:
     read_messages: list[dict] | None = None
     target_sent_timestamp: int | None = None
     remote_delete_timestamp: int | None = None
+    updated_group_id: str | None = None
     raw_message: str | None = None
 
     def recipient(self) -> str:
@@ -60,7 +62,7 @@ class Message:
     @classmethod
     def _extract_message_data(
         cls, envelope: dict
-    ) -> tuple[MessageType, dict, int | None, int | None]:
+    ) -> tuple[MessageType, dict, int | None, int | None, str | None]:
         """Extract message type, data_message, and timestamps from envelope."""
         target_sent_timestamp = None
 
@@ -103,11 +105,17 @@ class Message:
             message_type = MessageType.DELETE_MESSAGE
             remote_delete_timestamp = data_message["remoteDelete"]["timestamp"]
 
+        updated_group_id = None
+        if "groupInfo" in data_message and data_message["groupInfo"]["type"] == "UPDATE":
+            message_type = MessageType.GROUP_UPDATE_MESSAGE
+            updated_group_id = data_message["groupInfo"]["groupId"]
+
         return (
             message_type,
             data_message,
             target_sent_timestamp,
             remote_delete_timestamp,
+            updated_group_id
         )
 
     @classmethod
@@ -128,7 +136,7 @@ class Message:
 
         source_number = envelope.get("sourceNumber")
 
-        message_type, data_message, target_sent_timestamp, remote_delete_timestamp = (
+        message_type, data_message, target_sent_timestamp, remote_delete_timestamp, updated_group_id = (
             cls._extract_message_data(envelope)
         )
 
@@ -167,6 +175,7 @@ class Message:
             read_messages=read_messages,
             target_sent_timestamp=target_sent_timestamp,
             remote_delete_timestamp=remote_delete_timestamp,
+            updated_group_id=updated_group_id,
             raw_message=raw_message_str,
         )
 

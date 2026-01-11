@@ -18,7 +18,7 @@ from packaging.version import Version
 from signalbot.api import ReceiveMessagesError, SignalAPI
 from signalbot.command import Command
 from signalbot.context import Context
-from signalbot.message import Message, UnknownMessageFormatError
+from signalbot.message import Message, UnknownMessageFormatError, MessageType
 from signalbot.storage import RedisStorage, SQLiteStorage
 
 if TYPE_CHECKING:
@@ -343,6 +343,21 @@ class SignalBot:
 
         self._logger.info(f"[Bot] {len(self.groups)} groups detected")  # noqa: G004
 
+    async def _update_group(self, group_id: str) -> None:
+        # look up group that requires update
+        group = await self._signal.get_group(group_id)
+
+        self.groups = [group if g["id"] == group_id else g for g in self.groups]
+        self._groups_by_id[group["id"]] = group
+        self._groups_by_internal_id[group["internal_id"]] = group
+        self._groups_by_name[group["name"]].append(group)
+
+        self._logger.info(f"[Bot] group updated")
+
+    async def _process_updates(self, message: Message):
+        if message.type == MessageType.GROUP_UPDATE_MESSAGE:
+            await self._update_group(message.updated_group_id)
+
     def _resolve_receiver(self, receiver: str) -> str:
         if self._is_phone_number(receiver):
             return receiver
@@ -583,6 +598,8 @@ class SignalBot:
         except Exception:
             self._logger.exception(f"[{command.__class__.__name__}]")  # noqa: G004
             raise
+
+        await self._process_updates(message)
 
         # done
         self._q.task_done()

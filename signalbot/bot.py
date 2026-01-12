@@ -348,7 +348,7 @@ class SignalBot:
         group = await self._signal.get_group(self._groups_by_internal_id[group_internal_id]["id"])
 
         current_group_name = self._groups_by_internal_id[group_internal_id]["name"]  # group name may have been updated
-        self._groups_by_name[current_group_name] = [g for g in self._groups_by_name[current_group_name] if g["id"] != group["id"]]
+        self._groups_by_name[current_group_name] = [g for g in self._groups_by_name[current_group_name] if g["id"] != group["id"]]  # noqa: G004
         self.groups = [group if g["internal_id"] == group_internal_id else g for g in self.groups]
         self._groups_by_id[group["id"]] = group
         self._groups_by_internal_id[group["internal_id"]] = group

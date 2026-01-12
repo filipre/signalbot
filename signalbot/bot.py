@@ -169,7 +169,7 @@ class SignalBot:
 
     async def _async_post_init(self) -> None:
         await self._check_signal_service()
-        await self._check_signal_cli_rest_api_version()
+        # await self._check_signal_cli_rest_api_version()
         await self._detect_groups()
         await self._resolve_commands()
         await self._produce_consume_messages()
@@ -347,6 +347,8 @@ class SignalBot:
         # look up group that requires update
         group = await self._signal.get_group(self._groups_by_internal_id[group_internal_id]["id"])
 
+        current_group_name = self._groups_by_internal_id[group_internal_id]["name"]  # group name may have been updated
+        self._groups_by_name[current_group_name] = [g for g in self._groups_by_name[current_group_name] if g["id"] != group["id"]]
         self.groups = [group if g["internal_id"] == group_internal_id else g for g in self.groups]
         self._groups_by_id[group["id"]] = group
         self._groups_by_internal_id[group["internal_id"]] = group
@@ -356,6 +358,7 @@ class SignalBot:
 
     async def _process_updates(self, message: Message):
         if message.type == MessageType.GROUP_UPDATE_MESSAGE:
+            logging.warning("Attempting to update group")
             await self._update_group(message.updated_group_id)
 
     def _resolve_receiver(self, receiver: str) -> str:

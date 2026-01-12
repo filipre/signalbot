@@ -354,11 +354,17 @@ class SignalBot:
         self._groups_by_internal_id[group["internal_id"]] = group
         self._groups_by_name[group["name"]].append(group)
 
-        self._logger.info(f"[Bot] group updated")
+        self._logger.info(f"[Bot] Group updated")
 
     async def _process_updates(self, message: Message):
+        # Update groups if message is from an unknown group
+        if (
+                message.is_group()
+                and self._groups_by_internal_id.get(message.group) is None
+        ):
+            await self._detect_groups()
+
         if message.type == MessageType.GROUP_UPDATE_MESSAGE:
-            logging.warning("Attempting to update group")
             await self._update_group(message.updated_group_id)
 
     def _resolve_receiver(self, receiver: str) -> str:
@@ -516,12 +522,7 @@ class SignalBot:
                 except UnknownMessageFormatError:
                     continue
 
-                # Update groups if message is from an unknown group
-                if (
-                    message.is_group()
-                    and self._groups_by_internal_id.get(message.group) is None
-                ):
-                    await self._detect_groups()
+                await self._process_updates(message)
 
                 await self._ask_commands_to_handle(message)
 
@@ -601,8 +602,6 @@ class SignalBot:
         except Exception:
             self._logger.exception(f"[{command.__class__.__name__}]")  # noqa: G004
             raise
-
-        await self._process_updates(message)
 
         # done
         self._q.task_done()

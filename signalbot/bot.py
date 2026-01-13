@@ -169,7 +169,7 @@ class SignalBot:
 
     async def _async_post_init(self) -> None:
         await self._check_signal_service()
-        # await self._check_signal_cli_rest_api_version()
+        await self._check_signal_cli_rest_api_version()
         await self._detect_groups()
         await self._resolve_commands()
         await self._produce_consume_messages()

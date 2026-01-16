@@ -18,7 +18,7 @@ from packaging.version import Version
 from signalbot.api import ReceiveMessagesError, SignalAPI
 from signalbot.command import Command
 from signalbot.context import Context
-from signalbot.message import Message, UnknownMessageFormatError
+from signalbot.message import Message, MessageType, UnknownMessageFormatError
 from signalbot.storage import RedisStorage, SQLiteStorage
 
 if TYPE_CHECKING:
@@ -343,6 +343,40 @@ class SignalBot:
 
         self._logger.info(f"[Bot] {len(self.groups)} groups detected")  # noqa: G004
 
+    async def _update_group(self, group_internal_id: str) -> None:
+        # look up group that requires update
+        group = await self._signal.get_group(
+            self._groups_by_internal_id[group_internal_id]["id"]
+        )
+
+        current_group_name = self._groups_by_internal_id[group_internal_id][
+            "name"
+        ]  # group name may have been updated
+        self._groups_by_name[current_group_name] = [
+            g
+            for g in self._groups_by_name[current_group_name]
+            if g["id"] != group["id"]
+        ]
+        self.groups = [
+            group if g["internal_id"] == group_internal_id else g for g in self.groups
+        ]
+        self._groups_by_id[group["id"]] = group
+        self._groups_by_internal_id[group["internal_id"]] = group
+        self._groups_by_name[group["name"]].append(group)
+
+        self._logger.info("[Bot] Group updated")
+
+    async def _process_updates(self, message: Message) -> None:
+        # Update groups if message is from an unknown group
+        if (
+            message.is_group()
+            and self._groups_by_internal_id.get(message.group) is None
+        ):
+            await self._detect_groups()
+
+        if message.type == MessageType.GROUP_UPDATE_MESSAGE:
+            await self._update_group(message.updated_group_id)
+
     def _resolve_receiver(self, receiver: str) -> str:
         if self._is_phone_number(receiver):
             return receiver
@@ -498,12 +532,7 @@ class SignalBot:
                 except UnknownMessageFormatError:
                     continue
 
-                # Update groups if message is from an unknown group
-                if (
-                    message.is_group()
-                    and self._groups_by_internal_id.get(message.group) is None
-                ):
-                    await self._detect_groups()
+                await self._process_updates(message)
 
                 await self._ask_commands_to_handle(message)
 

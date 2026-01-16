@@ -186,6 +186,19 @@ class SignalAPI:
         ):
             raise GroupsError  # noqa: B904
 
+    async def get_group(self, group_id: str) -> dict[str, Any]:
+        uri = self._signal_api_uris.group_id_uri(group_id)
+        try:
+            async with aiohttp.ClientSession() as session:
+                resp = await session.get(uri)
+                resp.raise_for_status()
+                return await resp.json()
+        except (
+            aiohttp.ClientError,
+            aiohttp.http_exceptions.HttpProcessingError,
+        ):
+            raise GroupsError  # noqa: B904
+
     async def get_attachment(self, attachment_id: str) -> str:
         uri = f"{self._signal_api_uris.attachment_rest_uri()}/{attachment_id}"
         try:

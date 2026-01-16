@@ -84,8 +84,10 @@ class TestMessage(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(message.reaction, "👍")  # noqa: PT009
 
     async def test_group_update(self):
-        message = await Message.parse(self.signal_api, TestMessage.raw_group_update_message)
-        self.assertEqual(message.updated_group_id, TestMessage.expected_group)
+        message = await Message.parse(
+            self.signal_api, TestMessage.raw_group_update_message
+        )
+        self.assertEqual(message.updated_group_id, TestMessage.expected_group)  # noqa: PT009
 
     @patch("aiohttp.ClientSession.get", new_callable=AsyncMock)
     async def test_attachments(self, mock_get):  # noqa: ANN001

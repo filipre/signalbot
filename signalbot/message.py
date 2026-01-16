@@ -106,7 +106,10 @@ class Message:
             remote_delete_timestamp = data_message["remoteDelete"]["timestamp"]
 
         updated_group_id = None
-        if "groupInfo" in data_message and data_message["groupInfo"]["type"] == "UPDATE":
+        if (
+            "groupInfo" in data_message
+            and data_message["groupInfo"]["type"] == "UPDATE"
+        ):
             message_type = MessageType.GROUP_UPDATE_MESSAGE
             updated_group_id = data_message["groupInfo"]["groupId"]
 
@@ -115,7 +118,7 @@ class Message:
             data_message,
             target_sent_timestamp,
             remote_delete_timestamp,
-            updated_group_id
+            updated_group_id,
         )
 
     @classmethod
@@ -136,9 +139,13 @@ class Message:
 
         source_number = envelope.get("sourceNumber")
 
-        message_type, data_message, target_sent_timestamp, remote_delete_timestamp, updated_group_id = (
-            cls._extract_message_data(envelope)
-        )
+        (
+            message_type,
+            data_message,
+            target_sent_timestamp,
+            remote_delete_timestamp,
+            updated_group_id,
+        ) = cls._extract_message_data(envelope)
 
         text = cls._parse_data_message(data_message)
         group = cls._parse_group_information(data_message)

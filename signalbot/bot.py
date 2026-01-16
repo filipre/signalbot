@@ -89,7 +89,12 @@ class SignalBot:
         except KeyError:
             raise SignalBotError("Could not initialize SignalAPI with given config")  # noqa: B904, EM101, TRY003
 
-        self._event_loop = asyncio.get_event_loop()
+        try:
+            self._event_loop = asyncio.get_event_loop()
+        except RuntimeError:
+            self._event_loop = asyncio.new_event_loop()
+            asyncio.set_event_loop(self._event_loop)
+
         self._q = asyncio.Queue()
         self._running_tasks: set[asyncio.Task] = set()
 
@@ -205,8 +210,6 @@ class SignalBot:
         self._store_reference_to_task(task, self._running_tasks)
 
         if run_forever:
-            # Add more scheduler tasks here
-            # self.scheduler.add_job(...)
             self.scheduler.start()
 
             self._event_loop.run_forever()

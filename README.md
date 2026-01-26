@@ -3,7 +3,7 @@
 [![PyPI Downloads](https://img.shields.io/pypi/dm/signalbot?logo=python)](https://pepy.tech/projects/signalbot)
 [![image](https://img.shields.io/pypi/v/signalbot.svg)](https://pypi.python.org/pypi/signalbot)
 [![image](https://img.shields.io/pypi/l/signalbot.svg)](https://pypi.python.org/pypi/signalbot)
-[![CI](https://github.com/filipre/signalbot/actions/workflows/run-tests.yaml/badge.svg)](https://github.com/filipre/signalbot/actions/workflows/run-tests.yaml)
+[![CI](https://github.com/filipre/signalbot/actions/workflows/ci.yaml/badge.svg)](https://github.com/filipre/signalbot/actions/workflows/ci.yaml)
 
 Python package to build your own Signal bots.
 

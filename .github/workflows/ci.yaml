@@ -1,4 +1,4 @@
-name: Run Tests
+name: CI
 
 on:
   # tests can be called from other workflows

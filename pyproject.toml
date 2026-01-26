@@ -12,7 +12,7 @@ keywords = [
   "Framework",
   "Home Automation",
 ]
-license = "MIT"
+license = { text = "MIT" }
 maintainers = [{name = "René Filip"}, {name = "Era Dorta"}]
 name = "signalbot"
 readme = "README.md"

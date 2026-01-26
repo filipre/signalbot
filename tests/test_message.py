@@ -134,10 +134,10 @@ class TestMessage(unittest.IsolatedAsyncioTestCase):
 
         lp = message.link_previews[0]
         self.assertIsNone(lp.id)  # noqa: PT009
-        self.assertIsNone(getattr(lp, "base64_thumbnail", None))  # noqa: PT009
-        self.assertEqual(getattr(lp, "url", None), "https://example.com")  # noqa: PT009
-        self.assertEqual(getattr(lp, "title", None), "Example.com - Super example")  # noqa: PT009
-        self.assertEqual(getattr(lp, "description", None), "")  # noqa: PT009
+        self.assertIsNone(lp.base64_thumbnail)  # noqa: PT009
+        self.assertEqual(lp.url, "https://example.com")  # noqa: PT009
+        self.assertEqual(lp.title, "Example.com - Super example")  # noqa: PT009
+        self.assertEqual(lp.description, "")  # noqa: PT009
 
     async def test_message_read(self):
         message = await Message.parse(

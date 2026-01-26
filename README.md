@@ -173,11 +173,11 @@ In `signalbot.utils`, check out `ReceiveMessagesMock`, `SendMessagesMock` and `R
 ## Local development
 
 1. Install [uv](https://docs.astral.sh/uv/).
-2. Create a venv and install signalbot with it's dependencies in it
+2. Create a venv and install signalbot with its dependencies in it
     ```bash
     uv sync
     ```
-3. Install the prek hook
+3. Install the prek hook for linting and formatting
     ```bash
     uv run prek install
     ```

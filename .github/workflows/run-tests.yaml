@@ -13,7 +13,7 @@ on:
     branches: [master]
 
 jobs:
-  pre-commit:
+  prek:
     name: Run code checks
     runs-on: ubuntu-latest
     steps:
@@ -22,7 +22,7 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: 3.13.1
-      - uses: pre-commit/action@v3.0.1
+      - uses: j178/prek-action@v1
 
   unittest:
     name: Run unit tests

@@ -174,7 +174,7 @@ In `signalbot.utils`, check out `ReceiveMessagesMock`, `SendMessagesMock` and `R
 
 ```bash
 poetry install
-poetry run pre-commit install
+poetry run prek install
 ```
 
 ## Real world bot examples

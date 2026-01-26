@@ -32,8 +32,8 @@ class SignalAPI:
                 async for raw_message in websocket:
                     yield raw_message
 
-        except Exception as e:  # noqa: BLE001
-            raise ReceiveMessagesError(e)  # noqa: B904
+        except Exception as e:
+            raise ReceiveMessagesError from e
 
     async def send(  # noqa: C901, PLR0913
         self,
@@ -90,8 +90,8 @@ class SignalAPI:
             aiohttp.ClientError,
             aiohttp.http_exceptions.HttpProcessingError,
             KeyError,
-        ):
-            raise SendMessageError  # noqa: B904
+        ) as exc:
+            raise SendMessageError from exc
 
     async def react(
         self,
@@ -115,8 +115,8 @@ class SignalAPI:
         except (
             aiohttp.ClientError,
             aiohttp.http_exceptions.HttpProcessingError,
-        ):
-            raise ReactionError  # noqa: B904
+        ) as exc:
+            raise ReactionError from exc
 
     async def receipt(
         self,
@@ -138,8 +138,8 @@ class SignalAPI:
         except (
             aiohttp.ClientError,
             aiohttp.http_exceptions.HttpProcessingError,
-        ):
-            raise ReactionError  # noqa: B904
+        ) as exc:
+            raise ReactionError from exc
 
     async def start_typing(self, receiver: str) -> aiohttp.ClientResponse:
         uri = self._signal_api_uris.typing_indicator_uri()
@@ -154,8 +154,8 @@ class SignalAPI:
         except (
             aiohttp.ClientError,
             aiohttp.http_exceptions.HttpProcessingError,
-        ):
-            raise StartTypingError  # noqa: B904
+        ) as exc:
+            raise StartTypingError from exc
 
     async def stop_typing(self, receiver: str) -> aiohttp.ClientResponse:
         uri = self._signal_api_uris.typing_indicator_uri()
@@ -170,8 +170,8 @@ class SignalAPI:
         except (
             aiohttp.ClientError,
             aiohttp.http_exceptions.HttpProcessingError,
-        ):
-            raise StopTypingError  # noqa: B904
+        ) as exc:
+            raise StopTypingError from exc
 
     async def get_groups(self) -> list[dict[str, Any]]:
         uri = self._signal_api_uris.groups_uri()
@@ -183,8 +183,8 @@ class SignalAPI:
         except (
             aiohttp.ClientError,
             aiohttp.http_exceptions.HttpProcessingError,
-        ):
-            raise GroupsError  # noqa: B904
+        ) as exc:
+            raise GroupsError from exc
 
     async def get_group(self, group_id: str) -> dict[str, Any]:
         uri = self._signal_api_uris.group_id_uri(group_id)
@@ -196,8 +196,8 @@ class SignalAPI:
         except (
             aiohttp.ClientError,
             aiohttp.http_exceptions.HttpProcessingError,
-        ):
-            raise GroupsError  # noqa: B904
+        ) as exc:
+            raise GroupsError from exc
 
     async def get_attachment(self, attachment_id: str) -> str:
         uri = f"{self._signal_api_uris.attachment_rest_uri()}/{attachment_id}"
@@ -209,8 +209,8 @@ class SignalAPI:
         except (
             aiohttp.ClientError,
             aiohttp.http_exceptions.HttpProcessingError,
-        ):
-            raise GetAttachmentError  # noqa: B904
+        ) as exc:
+            raise GetAttachmentError from exc
 
         base64_bytes = base64.b64encode(content)
         base64_string = str(base64_bytes, encoding="utf-8")
@@ -227,8 +227,8 @@ class SignalAPI:
         except (
             aiohttp.ClientError,
             aiohttp.http_exceptions.HttpProcessingError,
-        ):
-            raise GetAttachmentError  # noqa: B904
+        ) as exc:
+            raise GetAttachmentError from exc
 
     async def update_contact(
         self,
@@ -253,8 +253,8 @@ class SignalAPI:
         except (
             aiohttp.ClientError,
             aiohttp.http_exceptions.HttpProcessingError,
-        ):
-            raise ContactUpdateError  # noqa: B904
+        ) as exc:
+            raise ContactUpdateError from exc
 
     async def update_group(
         self,
@@ -287,8 +287,8 @@ class SignalAPI:
         except (
             aiohttp.ClientError,
             aiohttp.http_exceptions.HttpProcessingError,
-        ):
-            raise ContactUpdateError  # noqa: B904
+        ) as exc:
+            raise ContactUpdateError from exc
 
     async def health_check(self) -> aiohttp.ClientResponse:
         uri = self._signal_api_uris.health_check_uri()
@@ -300,8 +300,8 @@ class SignalAPI:
         except (
             aiohttp.ClientError,
             aiohttp.http_exceptions.HttpProcessingError,
-        ):
-            raise HealthCheckError  # noqa: B904
+        ) as exc:
+            raise HealthCheckError from exc
 
     async def check_signal_service(self) -> bool:
         self._signal_api_uris.use_https = True
@@ -324,8 +324,8 @@ class SignalAPI:
         except (
             aiohttp.ClientError,
             aiohttp.http_exceptions.HttpProcessingError,
-        ):
-            raise AboutError  # noqa: B904
+        ) as exc:
+            raise AboutError from exc
 
     async def remote_delete(
         self, receiver: str, timestamp: int
@@ -343,8 +343,8 @@ class SignalAPI:
         except (
             aiohttp.ClientError,
             aiohttp.http_exceptions.HttpProcessingError,
-        ):
-            raise RemoteDeleteError  # noqa: B904
+        ) as exc:
+            raise RemoteDeleteError from exc
 
 
 class SignalAPIURIs:

@@ -40,39 +40,29 @@ jobs:
         with:
           ref: ${{ github.event.client_payload.pull_request.head.ref }}
 
-      - name: Set up Python
-        uses: actions/setup-python@v5
+      - name: Install the latest version of uv
+        uses: astral-sh/setup-uv@v3
         with:
-          python-version: 3.13.1
-
-      - name: Install Poetry
-        uses: abatilo/actions-poetry@v4
-        with:
-          poetry-version: 1.8.4
+          version: latest
 
       - name: Install dependencies
-        run: poetry install --no-dev
+        run: uv sync --no-dev
 
       - name: Create custom version
         id: create-custom-version
         run: |
-          pr_version=$(poetry version -s)a$(date +%s)
+          pr_version=$(uv version --short)a$(date +%s)
           echo "The custom version is ${pr_version}"
           echo "pr_version=${pr_version}" >> "$GITHUB_OUTPUT"
 
       - name: Set new version
-        run: poetry version ${{ steps.create-custom-version.outputs.pr_version }}
+        run: uv version ${{ steps.create-custom-version.outputs.pr_version }}
 
       - name: Build package
-        run: poetry build
-
-      - name: Add test.pypi.org to Poetry
-        run: |
-          poetry config repositories.testpypi https://test.pypi.org/legacy/
-          poetry config pypi-token.testpypi ${{ secrets.API_TOKEN }}
+        run: uv build
 
       - name: Publish package
-        run: poetry publish -r testpypi
+        run: uv publish --index testpypi --token ${{ secrets.API_TOKEN }}
 
       - name: Write comment in Pull Request
         uses: peter-evans/create-or-update-comment@v4

@@ -139,7 +139,7 @@ It does not have any handlers attached, for convenience the `enable_console_logg
 The tests can be executed with
 
 ```bash
-poetry run python -m unittest discover --start-directory ./tests
+uv run python -m unittest discover --start-directory ./tests
 ```
 
 In many cases, we can mock receiving and sending messages to speed up development time. To do so, you can use `signalbot.utils.ChatTestCase` which sets up a "skeleton" bot. Then, you can send messages using the `@chat` decorator in `signalbot.utils` like this:
@@ -172,10 +172,15 @@ In `signalbot.utils`, check out `ReceiveMessagesMock`, `SendMessagesMock` and `R
 
 ## Local development
 
-```bash
-poetry install
-poetry run prek install
-```
+1. Install [uv](https://docs.astral.sh/uv/).
+2. Create a venv and install signalbot with it's dependencies in it
+    ```bash
+    uv sync
+    ```
+3. Install the prek hook
+    ```bash
+    uv run prek install
+    ```
 
 ## Real world bot examples
 

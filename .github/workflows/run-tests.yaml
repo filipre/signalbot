@@ -25,15 +25,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Set up Python
-        uses: actions/setup-python@v5
+      - name: Install the latest version of uv
+        uses: astral-sh/setup-uv@v3
         with:
-          python-version: 3.13.1
-      - name: Install Poetry
-        uses: abatilo/actions-poetry@v4
-        with:
-          poetry-version: 1.8.4
+          version: latest
       - name: Install dependencies
-        run: poetry install --no-dev
+        run: uv sync --no-dev
       - name: Run unit tests
-        run: poetry run python -m unittest discover --start-directory ./tests
+        run: uv run python -m unittest discover --start-directory ./tests

@@ -5,14 +5,14 @@ on:
     types: [published]
 
 jobs:
-  run-tests:
-    name: Run Tests
-    uses: filipre/signalbot/.github/workflows/run-tests.yaml@master
+  ci:
+    name: CI
+    uses: filipre/signalbot/.github/workflows/ci.yaml@master
 
   publish-test-pypi:
     name: Publish (test.pypi.org)
     runs-on: ubuntu-latest
-    needs: run-tests
+    needs: ci
     environment:
       name: test.pypi.org
       url: https://test.pypi.org/project/signalbot/${{ steps.get-version.outputs.package_version }}/

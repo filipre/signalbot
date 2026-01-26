@@ -1,5 +1,7 @@
 # Signal Bot Framework
 
+[![PyPI Downloads](https://img.shields.io/pypi/dm/signalbot?logo=python)](https://pepy.tech/projects/signalbot)
+
 Python package to build your own Signal bots.
 
 ## Getting Started

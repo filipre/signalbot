@@ -17,3 +17,9 @@ repos:
     rev: 0.9.28
     hooks:
       - id: uv-lock
+
+  - repo: https://github.com/adrienverge/yamllint
+    rev: v1.38.0
+    hooks:
+      - id: yamllint
+        args: [--no-warnings]

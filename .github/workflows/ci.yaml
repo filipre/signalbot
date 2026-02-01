@@ -32,4 +32,4 @@ jobs:
       - name: Install dependencies
         run: uv sync --no-dev
       - name: Run unit tests
-        run: uv run coverage run --source ./src/signalbot/ -m pytest && uv run coverage report
+        run: uv run pytest --cov=src/signalbot

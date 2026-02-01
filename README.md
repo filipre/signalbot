@@ -142,7 +142,7 @@ It does not have any handlers attached, for convenience the `enable_console_logg
 The tests can be executed with
 
 ```bash
-uv run python pytest ./tests
+uv run python pytest
 ```
 
 ## Troubleshooting

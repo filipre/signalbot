@@ -6,11 +6,9 @@ repos:
       - id: trailing-whitespace
 
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.12.10
+    rev: v0.14.14
     hooks:
-      # Run the linter.
       - id: ruff-check
         types_or: [python]
-        args: ["--fix", "--show-fixes"]
-      # Run the formatter.
+        args: ["--fix"]
       - id: ruff-format

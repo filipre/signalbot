@@ -8,6 +8,7 @@ from signalbot import Message, MessageType
 from signalbot.api import SignalAPI
 
 
+@pytest.mark.asyncio
 class TestMessage:
     raw_sync_message = '{"envelope":{"source":"+490123456789","sourceNumber":"+490123456789","sourceUuid":"<uuid>","sourceName":"<name>","sourceDevice":1,"timestamp":1632576001632,"syncMessage":{"sentMessage":{"timestamp":1632576001632,"message":"Uhrzeit","expiresInSeconds":0,"viewOnce":false,"mentions":[],"attachments":[],"contacts":[],"groupInfo":{"groupId":"<groupid>","type":"DELIVER"},"destination":null,"destinationNumber":null,"destinationUuid":null}}}}'  # noqa: E501
     raw_data_message = '{"envelope":{"source":"+490123456789","sourceNumber":"+490123456789","sourceUuid":"<uuid>","sourceName":"<name>","sourceDevice":1,"timestamp":1632576001632,"dataMessage":{"timestamp":1632576001632,"message":"Uhrzeit","expiresInSeconds":0,"viewOnce":false,"mentions":[],"attachments":[],"contacts":[],"groupInfo":{"groupId":"<groupid>","type":"DELIVER"}}}}'  # noqa: E501
@@ -39,70 +40,59 @@ class TestMessage:
         )
 
     # Own Message
-    @pytest.mark.asyncio
+
     async def test_parse_source_own_message(self):
         message = await Message.parse(self.signal_api, TestMessage.raw_sync_message)
         assert message.timestamp == TestMessage.expected_timestamp
 
-    @pytest.mark.asyncio
     async def test_parse_timestamp_own_message(self):
         message = await Message.parse(self.signal_api, TestMessage.raw_sync_message)
         assert message.source == TestMessage.expected_source
 
-    @pytest.mark.asyncio
     async def test_parse_type_own_message(self):
         message = await Message.parse(self.signal_api, TestMessage.raw_sync_message)
         assert message.type == MessageType.SYNC_MESSAGE
 
-    @pytest.mark.asyncio
     async def test_parse_text_own_message(self):
         message = await Message.parse(self.signal_api, TestMessage.raw_sync_message)
         assert message.text == TestMessage.expected_text
 
-    @pytest.mark.asyncio
     async def test_parse_group_own_message(self):
         message = await Message.parse(self.signal_api, TestMessage.raw_sync_message)
         assert message.group == TestMessage.expected_group
 
     # Foreign Messages
-    @pytest.mark.asyncio
+
     async def test_parse_source_foreign_message(self):
         message = await Message.parse(self.signal_api, TestMessage.raw_data_message)
         assert message.timestamp == TestMessage.expected_timestamp
 
-    @pytest.mark.asyncio
     async def test_parse_timestamp_foreign_message(self):
         message = await Message.parse(self.signal_api, TestMessage.raw_data_message)
         assert message.source == TestMessage.expected_source
 
-    @pytest.mark.asyncio
     async def test_parse_type_foreign_message(self):
         message = await Message.parse(self.signal_api, TestMessage.raw_data_message)
         assert message.type == MessageType.DATA_MESSAGE
 
-    @pytest.mark.asyncio
     async def test_parse_text_foreign_message(self):
         message = await Message.parse(self.signal_api, TestMessage.raw_data_message)
         assert message.text == TestMessage.expected_text
 
-    @pytest.mark.asyncio
     async def test_parse_group_foreign_message(self):
         message = await Message.parse(self.signal_api, TestMessage.raw_data_message)
         assert message.group == TestMessage.expected_group
 
-    @pytest.mark.asyncio
     async def test_read_reaction(self):
         message = await Message.parse(self.signal_api, TestMessage.raw_reaction_message)
         assert message.reaction == "👍"
 
-    @pytest.mark.asyncio
     async def test_group_update(self):
         message = await Message.parse(
             self.signal_api, TestMessage.raw_group_update_message
         )
         assert message.updated_group_id == TestMessage.expected_group
 
-    @pytest.mark.asyncio
     async def test_attachments(self, mocker: MockerFixture):
         attachment_bytes_str = b"test"
 
@@ -133,7 +123,7 @@ class TestMessage:
         )
 
     # User Chats
-    @pytest.mark.asyncio
+
     async def test_parse_user_chat_message(self):
         message = await Message.parse(
             self.signal_api,
@@ -144,7 +134,6 @@ class TestMessage:
         assert message.timestamp == TestMessage.expected_timestamp
         assert message.group is None
 
-    @pytest.mark.asyncio
     async def test_preview_no_image(self):
         message = await Message.parse(
             self.signal_api, TestMessage.raw_preview_no_image_message
@@ -159,7 +148,6 @@ class TestMessage:
         assert lp.title == "Example.com - Super example"
         assert lp.description == ""
 
-    @pytest.mark.asyncio
     async def test_message_read(self):
         message = await Message.parse(
             self.signal_api, TestMessage.raw_user_read_message

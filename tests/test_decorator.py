@@ -24,6 +24,7 @@ class RegexTriggeredCommand(Command):
         await c.send("I am triggered by regular expressions")
 
 
+@pytest.mark.asyncio
 class TestCommon(ChatTestCase):
     def setup(self):
         super().setup()
@@ -48,7 +49,6 @@ class TestTriggered(TestCommon):
         super().setup()
         self.signal_bot.register(TriggeredCommand(), contacts=True, groups=True)
 
-    @pytest.mark.asyncio
     async def test_triggered(self, mocker: MockerFixture):
         send_mock, receive_mock = self.mock_send_receive(mocker)
         receive_mock.define(["Trump"])
@@ -56,7 +56,6 @@ class TestTriggered(TestCommon):
         await self.run_bot()
         assert send_mock.call_count == 1
 
-    @pytest.mark.asyncio
     async def test_also_triggered(self, mocker: MockerFixture):
         send_mock, receive_mock = self.mock_send_receive(mocker)
         receive_mock.define(["Biden"])
@@ -64,7 +63,6 @@ class TestTriggered(TestCommon):
         await self.run_bot()
         assert send_mock.call_count == 1
 
-    @pytest.mark.asyncio
     async def test_not_triggered(self, mocker: MockerFixture):
         send_mock, receive_mock = self.mock_send_receive(mocker)
         receive_mock.define(["Scholz"])
@@ -78,7 +76,6 @@ class TestTriggeredCaseSensitive(TestCommon):
         super().setup()
         self.signal_bot.register(TriggeredCaseSensitiveCommand())
 
-    @pytest.mark.asyncio
     async def test_triggered(self, mocker: MockerFixture):
         send_mock, receive_mock = self.mock_send_receive(mocker)
         receive_mock.define(["Trump"])
@@ -86,7 +83,6 @@ class TestTriggeredCaseSensitive(TestCommon):
         await self.run_bot()
         assert send_mock.call_count == 1
 
-    @pytest.mark.asyncio
     async def test_not_triggered(self, mocker: MockerFixture):
         send_mock, receive_mock = self.mock_send_receive(mocker)
         receive_mock.define(["trump"])
@@ -100,7 +96,6 @@ class TestRegexTriggered(TestCommon):
         super().setup()
         self.signal_bot.register(RegexTriggeredCommand())
 
-    @pytest.mark.asyncio
     async def test_regex_triggered_email(self, mocker: MockerFixture):
         send_mock, receive_mock = self.mock_send_receive(mocker)
         receive_mock.define(["potus@whitehouse.tld"])
@@ -108,7 +103,6 @@ class TestRegexTriggered(TestCommon):
         await self.run_bot()
         assert send_mock.call_count == 1
 
-    @pytest.mark.asyncio
     async def test_regex_triggered_phone(self, mocker: MockerFixture):
         send_mock, receive_mock = self.mock_send_receive(mocker)
         receive_mock.define(["123-555-1234"])
@@ -116,7 +110,6 @@ class TestRegexTriggered(TestCommon):
         await self.run_bot()
         assert send_mock.call_count == 1
 
-    @pytest.mark.asyncio
     async def test_not_regex_triggered(self, mocker: MockerFixture):
         send_mock, receive_mock = self.mock_send_receive(mocker)
         receive_mock.define(["11-222"])

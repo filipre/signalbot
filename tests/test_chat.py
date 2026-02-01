@@ -16,16 +16,14 @@ class SchnickSchnackSchnuckCommand(Command):
             await c.send("schnuck")
 
 
+@pytest.mark.asyncio
+@pytest.mark.filterwarnings("ignore:There is no current event loop:DeprecationWarning")
 class TestSchnickSchnackSchnuckCommand(ChatTestCase):
     @pytest.fixture(autouse=True)
     def setup(self):
         super().setup()
         self.signal_bot.register(SchnickSchnackSchnuckCommand())
 
-    @pytest.mark.asyncio
-    @pytest.mark.filterwarnings(
-        "ignore:There is no current event loop:DeprecationWarning"
-    )
     @chat("schnick")
     async def test_schnick(
         self,
@@ -40,10 +38,6 @@ class TestSchnickSchnackSchnuckCommand(ChatTestCase):
             assert recipient == ChatTestCase.group_secret
             assert message == "schnack"
 
-    @pytest.mark.asyncio
-    @pytest.mark.filterwarnings(
-        "ignore:There is no current event loop:DeprecationWarning"
-    )
     @chat("schnack")
     async def test_schnack(
         self,

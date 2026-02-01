@@ -33,6 +33,7 @@ redis = ["redis>=5.2.0"]
 [dependency-groups]
 dev = [
   "prek>=0.3.0",
+  "pytest>=8.4.2",
 ]
 
 [project.urls]

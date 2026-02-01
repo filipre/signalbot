@@ -32,4 +32,4 @@ jobs:
       - name: Install dependencies
         run: uv sync --no-dev
       - name: Run unit tests
-        run: uv run python -m unittest discover --start-directory ./tests
+        run: uv run pytest --cov=src/signalbot

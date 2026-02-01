@@ -139,31 +139,16 @@ It does not have any handlers attached, for convenience the `enable_console_logg
 
 ### Unit Testing
 
-*Note: deprecated, the plan is to switch to pytest eventually*
-
 The tests can be executed with
 
 ```bash
-uv run python -m unittest discover --start-directory ./tests
+uv run pytest
 ```
 
-In many cases, we can mock receiving and sending messages to speed up development time. To do so, you can use `signalbot.utils.ChatTestCase` which sets up a "skeleton" bot. Then, you can send messages using the `@chat` decorator in `signalbot.utils` like this:
-```python
-class PingChatTest(ChatTestCase):
-    def setUp(self):
-        # initialize self.singal_bot
-        super().setUp()
-        # all that is left to do is to register the commands that you want to test
-        self.signal_bot.register(PingCommand())
-
-    @chat("ping", "ping")
-    async def test_ping(self, query, replies, reactions):
-        self.assertEqual(replies.call_count, 2)
-        for recipient, message in replies.results():
-            self.assertEqual(recipient, ChatTestCase.group_secret)
-            self.assertEqual(message, "pong")
-```
-In `signalbot.utils`, check out `ReceiveMessagesMock`, `SendMessagesMock` and `ReactMessageMock` to learn more about their API.
+In many cases, we can mock receiving and sending messages to speed up development time.
+To do so, you can use `signalbot.utils.ChatTestCase` which sets up a "skeleton" bot.
+Then, you can send messages using the `@chat` decorator in `signalbot.utils`.
+You can find an example implementation in `tests/test_chat.py`.
 
 ## Troubleshooting
 

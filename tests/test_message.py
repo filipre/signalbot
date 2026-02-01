@@ -1,14 +1,15 @@
 import base64
-import unittest
-from unittest.mock import AsyncMock, Mock, patch
 
 import aiohttp
+import pytest
+from pytest_mock import MockerFixture
 
 from signalbot import Message, MessageType
 from signalbot.api import SignalAPI
 
 
-class TestMessage(unittest.IsolatedAsyncioTestCase):
+@pytest.mark.asyncio
+class TestMessage:
     raw_sync_message = '{"envelope":{"source":"+490123456789","sourceNumber":"+490123456789","sourceUuid":"<uuid>","sourceName":"<name>","sourceDevice":1,"timestamp":1632576001632,"syncMessage":{"sentMessage":{"timestamp":1632576001632,"message":"Uhrzeit","expiresInSeconds":0,"viewOnce":false,"mentions":[],"attachments":[],"contacts":[],"groupInfo":{"groupId":"<groupid>","type":"DELIVER"},"destination":null,"destinationNumber":null,"destinationUuid":null}}}}'  # noqa: E501
     raw_data_message = '{"envelope":{"source":"+490123456789","sourceNumber":"+490123456789","sourceUuid":"<uuid>","sourceName":"<name>","sourceDevice":1,"timestamp":1632576001632,"dataMessage":{"timestamp":1632576001632,"message":"Uhrzeit","expiresInSeconds":0,"viewOnce":false,"mentions":[],"attachments":[],"contacts":[],"groupInfo":{"groupId":"<groupid>","type":"DELIVER"}}}}'  # noqa: E501
     raw_reaction_message = '{"envelope":{"source":"<source>","sourceNumber":"<source>","sourceUuid":"<uuid>","sourceName":"<name>","sourceDevice":1,"timestamp":1632576001632,"syncMessage":{"sentMessage":{"timestamp":1632576001632,"message":null,"expiresInSeconds":0,"viewOnce":false,"reaction":{"emoji":"👍","targetAuthor":"<target>","targetAuthorNumber":"<target>","targetAuthorUuid":"<uuid>","targetSentTimestamp":1632576001632,"isRemove":false},"mentions":[],"attachments":[],"contacts":[],"groupInfo":{"groupId":"<groupid>","type":"DELIVER"},"destination":null,"destinationNumber":null,"destinationUuid":null}}}}'  # noqa: E501
@@ -31,73 +32,80 @@ class TestMessage(unittest.IsolatedAsyncioTestCase):
     group_secret = "group.group_secret1"  # noqa: S105
     groups = {group_id: group_secret}  # noqa: RUF012
 
-    def setUp(self):
+    @pytest.fixture(autouse=True)
+    def setup(self):
         self.signal_api = SignalAPI(
             TestMessage.signal_service,
             TestMessage.phone_number,
         )
 
     # Own Message
+
     async def test_parse_source_own_message(self):
         message = await Message.parse(self.signal_api, TestMessage.raw_sync_message)
-        self.assertEqual(message.timestamp, TestMessage.expected_timestamp)  # noqa: PT009
+        assert message.timestamp == TestMessage.expected_timestamp
 
     async def test_parse_timestamp_own_message(self):
         message = await Message.parse(self.signal_api, TestMessage.raw_sync_message)
-        self.assertEqual(message.source, TestMessage.expected_source)  # noqa: PT009
+        assert message.source == TestMessage.expected_source
 
     async def test_parse_type_own_message(self):
         message = await Message.parse(self.signal_api, TestMessage.raw_sync_message)
-        self.assertEqual(message.type, MessageType.SYNC_MESSAGE)  # noqa: PT009
+        assert message.type == MessageType.SYNC_MESSAGE
 
     async def test_parse_text_own_message(self):
         message = await Message.parse(self.signal_api, TestMessage.raw_sync_message)
-        self.assertEqual(message.text, TestMessage.expected_text)  # noqa: PT009
+        assert message.text == TestMessage.expected_text
 
     async def test_parse_group_own_message(self):
         message = await Message.parse(self.signal_api, TestMessage.raw_sync_message)
-        self.assertEqual(message.group, TestMessage.expected_group)  # noqa: PT009
+        assert message.group == TestMessage.expected_group
 
     # Foreign Messages
+
     async def test_parse_source_foreign_message(self):
         message = await Message.parse(self.signal_api, TestMessage.raw_data_message)
-        self.assertEqual(message.timestamp, TestMessage.expected_timestamp)  # noqa: PT009
+        assert message.timestamp == TestMessage.expected_timestamp
 
     async def test_parse_timestamp_foreign_message(self):
         message = await Message.parse(self.signal_api, TestMessage.raw_data_message)
-        self.assertEqual(message.source, TestMessage.expected_source)  # noqa: PT009
+        assert message.source == TestMessage.expected_source
 
     async def test_parse_type_foreign_message(self):
         message = await Message.parse(self.signal_api, TestMessage.raw_data_message)
-        self.assertEqual(message.type, MessageType.DATA_MESSAGE)  # noqa: PT009
+        assert message.type == MessageType.DATA_MESSAGE
 
     async def test_parse_text_foreign_message(self):
         message = await Message.parse(self.signal_api, TestMessage.raw_data_message)
-        self.assertEqual(message.text, TestMessage.expected_text)  # noqa: PT009
+        assert message.text == TestMessage.expected_text
 
     async def test_parse_group_foreign_message(self):
         message = await Message.parse(self.signal_api, TestMessage.raw_data_message)
-        self.assertEqual(message.group, TestMessage.expected_group)  # noqa: PT009
+        assert message.group == TestMessage.expected_group
 
     async def test_read_reaction(self):
         message = await Message.parse(self.signal_api, TestMessage.raw_reaction_message)
-        self.assertEqual(message.reaction, "👍")  # noqa: PT009
+        assert message.reaction == "👍"
 
     async def test_group_update(self):
         message = await Message.parse(
             self.signal_api, TestMessage.raw_group_update_message
         )
-        self.assertEqual(message.updated_group_id, TestMessage.expected_group)  # noqa: PT009
+        assert message.updated_group_id == TestMessage.expected_group
 
-    @patch("aiohttp.ClientSession.get", new_callable=AsyncMock)
-    async def test_attachments(self, mock_get):  # noqa: ANN001
+    async def test_attachments(self, mocker: MockerFixture):
         attachment_bytes_str = b"test"
 
-        mock_response = AsyncMock(spec=aiohttp.ClientResponse)
-        mock_response.raise_for_status = Mock()
-        mock_response.content.read = AsyncMock(return_value=attachment_bytes_str)
+        mock_response = mocker.AsyncMock(spec=aiohttp.ClientResponse)
+        mock_response.raise_for_status = mocker.Mock()
+        mock_response.content.read = mocker.AsyncMock(return_value=attachment_bytes_str)
 
-        mock_get.return_value = mock_response
+        mock_session = mocker.AsyncMock()
+        mock_session.get = mocker.AsyncMock(return_value=mock_response)
+        mock_session.__aenter__.return_value = mock_session
+        mock_session.__aexit__.return_value = None
+
+        mocker.patch("aiohttp.ClientSession", return_value=mock_session)
 
         expected_base64_bytes = base64.b64encode(attachment_bytes_str)
         expected_base64_str = str(expected_base64_bytes, encoding="utf-8")
@@ -106,55 +114,52 @@ class TestMessage(unittest.IsolatedAsyncioTestCase):
             self.signal_api,
             TestMessage.raw_attachment_message,
         )
-        self.assertEqual(message.base64_attachments, [expected_base64_str])  # noqa: PT009
+        assert message.base64_attachments == [expected_base64_str]
 
-        self.assertEqual(len(message.attachments_local_filenames), 1)  # noqa: PT009
-        self.assertEqual(  # noqa: PT009
-            message.attachments_local_filenames[0],
-            TestMessage.expected_local_filename,
+        assert len(message.attachments_local_filenames) == 1
+        assert (
+            message.attachments_local_filenames[0]
+            == TestMessage.expected_local_filename
         )
 
     # User Chats
+
     async def test_parse_user_chat_message(self):
         message = await Message.parse(
             self.signal_api,
             TestMessage.raw_user_chat_message,
         )
-        self.assertEqual(message.source, TestMessage.expected_source)  # noqa: PT009
-        self.assertEqual(message.text, TestMessage.expected_text)  # noqa: PT009
-        self.assertEqual(message.timestamp, TestMessage.expected_timestamp)  # noqa: PT009
-        self.assertIsNone(message.group)  # noqa: PT009
+        assert message.source == TestMessage.expected_source
+        assert message.text == TestMessage.expected_text
+        assert message.timestamp == TestMessage.expected_timestamp
+        assert message.group is None
 
     async def test_preview_no_image(self):
         message = await Message.parse(
             self.signal_api, TestMessage.raw_preview_no_image_message
         )
-        self.assertIsInstance(message.link_previews, list)  # noqa: PT009
-        self.assertEqual(len(message.link_previews), 1)  # noqa: PT009
+        assert isinstance(message.link_previews, list)
+        assert len(message.link_previews) == 1
 
         lp = message.link_previews[0]
-        self.assertIsNone(lp.id)  # noqa: PT009
-        self.assertIsNone(lp.base64_thumbnail)  # noqa: PT009
-        self.assertEqual(lp.url, "https://example.com")  # noqa: PT009
-        self.assertEqual(lp.title, "Example.com - Super example")  # noqa: PT009
-        self.assertEqual(lp.description, "")  # noqa: PT009
+        assert lp.id is None
+        assert lp.base64_thumbnail is None
+        assert lp.url == "https://example.com"
+        assert lp.title == "Example.com - Super example"
+        assert lp.description == ""
 
     async def test_message_read(self):
         message = await Message.parse(
             self.signal_api, TestMessage.raw_user_read_message
         )
 
-        self.assertEqual(message.type, MessageType.READ_MESSAGE)  # noqa: PT009
-        self.assertEqual(message.text, "")  # noqa: PT009
-        self.assertIsInstance(message.read_messages, list)  # noqa: PT009
-        self.assertEqual(len(message.read_messages), 1)  # noqa: PT009
+        assert message.type == MessageType.READ_MESSAGE
+        assert message.text == ""
+        assert isinstance(message.read_messages, list)
+        assert len(message.read_messages) == 1
 
         rm = message.read_messages[0]
-        self.assertEqual(rm.get("sender"), "+49987654321")  # noqa: PT009
-        self.assertEqual(rm.get("senderNumber"), "+49987654321")  # noqa: PT009
-        self.assertEqual(rm.get("timestamp"), TestMessage.expected_timestamp)  # noqa: PT009
-        self.assertIn("senderUuid", rm)  # noqa: PT009
-
-
-if __name__ == "__main__":
-    unittest.main()
+        assert rm.get("sender") == "+49987654321"
+        assert rm.get("senderNumber") == "+49987654321"
+        assert rm.get("timestamp") == TestMessage.expected_timestamp
+        assert "senderUuid" in rm

@@ -36,7 +36,7 @@ def chat(*messages):  # noqa: ANN002, ANN201
     return decorator_chat
 
 
-class ChatTestCase(unittest.IsolatedAsyncioTestCase):
+class ChatTestCase:
     signal_service = "127.0.0.1:8080"
     phone_number = "+49123456789"
 
@@ -48,7 +48,7 @@ class ChatTestCase(unittest.IsolatedAsyncioTestCase):
         "storage": {"type": "in-memory"},
     }
 
-    def setUp(self):  # noqa: ANN201
+    def setup(self):  # noqa: ANN201
         self.signal_bot = SignalBot(ChatTestCase.config)
 
     async def run_bot(self):  # noqa: ANN201

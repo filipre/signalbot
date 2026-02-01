@@ -27,8 +27,8 @@ class RegexTriggeredCommand(Command):
 class TestCommon(ChatTestCase):
     def setup(self):
         super().setup()
-        group = {"id": "asdf", "name": "Test"}
-        self.signal_bot._groups_by_internal_id = {"group_id1=": group}  # noqa: SLF001
+        group = {"id": ChatTestCase.group_id, "name": ChatTestCase.group_name}
+        self.signal_bot._groups_by_internal_id = {ChatTestCase.group_internal_id: group}  # noqa: SLF001
 
     def mock_send_receive(
         self, mocker: MockerFixture

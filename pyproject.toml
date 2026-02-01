@@ -67,3 +67,8 @@ ignore = [
     "S101",   # Use of assert is detected
     "INP001", # Missing __init__.py file
 ]
+"example/commands/tests/**.py" = [
+    "ANN201", # Missing return type annotation for public function
+    "S101",   # Use of assert is detected
+    "INP001", # Missing __init__.py file
+]

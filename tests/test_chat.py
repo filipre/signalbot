@@ -1,8 +1,6 @@
 import asyncio
-import logging
-import unittest
 
-from signalbot import Command, Context, enable_console_logging, triggered
+from signalbot import Command, Context, triggered
 
 
 class SchnickSchnackSchnuckCommand(Command):
@@ -21,8 +19,3 @@ class SchnickSchnackSchnuckCommand(Command):
             await asyncio.sleep(1)
             await c.send("schnuck")
             return
-
-
-if __name__ == "__main__":
-    enable_console_logging(logging.INFO)
-    unittest.main()

@@ -32,4 +32,8 @@ jobs:
       - name: Install dependencies
         run: uv sync --no-dev
       - name: Run unit tests
-        run: uv run pytest --cov=src/signalbot
+        run: uv run pytest --cov=src/signalbot --cov-branch --cov-report=xml
+      - name: Upload coverage reports to Codecov
+        uses: codecov/codecov-action@v5
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}

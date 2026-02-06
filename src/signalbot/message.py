@@ -61,7 +61,7 @@ class Message:
         return bool(self.group)
 
     @classmethod
-    def _extract_message_data(  # noqa: C901
+    def _extract_message_data(  # noqa: C901, PLR0912
         cls, envelope: dict
     ) -> tuple[MessageType, dict, int | None, int | None, str | None]:
         """Extract message type, data_message, and timestamps from envelope."""
@@ -73,16 +73,12 @@ class Message:
                 raise UnknownMessageFormatError
 
             if "type" in sync_message:
-                sync_type = sync_message["type"]
-                if sync_type == "CONTACTS_SYNC":
-                    return (
-                        MessageType.CONTACT_SYNC_MESSAGE,
-                        {"message": ""},
-                        envelope.get("timestamp"),
-                        None,
-                    )
-                # Unknown sync subtype
-                raise UnknownMessageFormatError
+                if sync_message["type"] == "CONTACTS_SYNC":
+                    message_type = MessageType.CONTACT_SYNC_MESSAGE
+                    data_message = {"message": ""}
+                    target_sent_timestamp = envelope.get("timestamp")
+                else:
+                    raise UnknownMessageFormatError
 
             if "readMessages" in sync_message:
                 message_type = MessageType.READ_MESSAGE

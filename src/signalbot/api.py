@@ -314,18 +314,24 @@ class SignalAPI:
             except HealthCheckError:
                 return False
 
-    async def get_signal_cli_rest_api_version(self) -> str:
+    async def get_signal_cli_about(self) -> dict[str, Any]:
         uri = self._signal_api_uris.about_rest_uri()
         try:
             async with aiohttp.ClientSession() as session:
                 resp = await session.get(uri)
                 resp.raise_for_status()
-                return (await resp.json())["version"]
+                return await resp.json()
         except (
             aiohttp.ClientError,
             aiohttp.http_exceptions.HttpProcessingError,
         ) as exc:
             raise AboutError from exc
+
+    async def get_signal_cli_rest_api_version(self) -> str:
+        return (await self.get_signal_cli_about())["version"]
+
+    async def get_signal_cli_rest_api_mode(self) -> str:
+        return (await self.get_signal_cli_about())["mode"]
 
     async def remote_delete(
         self, receiver: str, timestamp: int

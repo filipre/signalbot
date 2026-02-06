@@ -175,6 +175,7 @@ class SignalBot:
     async def _async_post_init(self) -> None:
         await self._check_signal_service()
         await self._check_signal_cli_rest_api_version()
+        await self._check_signal_cli_rest_api_mode()
         await self._detect_groups()
         await self._resolve_commands()
         await self._produce_consume_messages()
@@ -193,6 +194,14 @@ class SignalBot:
             raise RuntimeError(  # noqa: TRY003
                 f"Incompatible signal-cli-rest-api version, found {version}, minimum required is {min_version}",  # noqa: E501, EM102
             )
+
+    async def _check_signal_cli_rest_api_mode(self) -> None:
+        mode = await self._signal.get_signal_cli_rest_api_mode()
+        if mode != "json-rpc":
+            error_msg = (
+                f"Wrong signal-cli-rest-api mode, found '{mode}', expected 'json-rpc'"
+            )
+            raise RuntimeError(error_msg)
 
     def _store_reference_to_task(
         self,

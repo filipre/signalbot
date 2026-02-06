@@ -79,8 +79,7 @@ class Message:
                     target_sent_timestamp = envelope.get("timestamp")
                 else:
                     raise UnknownMessageFormatError
-
-            if "readMessages" in sync_message:
+            elif "readMessages" in sync_message:
                 message_type = MessageType.READ_MESSAGE
                 data_message = {
                     "message": "",

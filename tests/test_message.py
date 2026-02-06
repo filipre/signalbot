@@ -154,8 +154,8 @@ class TestMessage:
             self.signal_api, TestMessage.raw_contact_sync_message
         )
 
-        self.assertEqual(message.type, MessageType.CONTACT_SYNC_MESSAGE)  # noqa: PT009
-        self.assertEqual(message.text, "")  # noqa: PT009
+        assert message.type == MessageType.CONTACT_SYNC_MESSAGE
+        assert message.text == ""
 
     async def test_message_read(self):
         message = await Message.parse(

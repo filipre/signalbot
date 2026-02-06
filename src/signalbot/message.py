@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import json
 from dataclasses import dataclass, field
-from enum import Enum
+from enum import Enum, auto
 from typing import TYPE_CHECKING
 
 from signalbot.link_previews import LinkPreview
@@ -13,12 +13,13 @@ if TYPE_CHECKING:
 
 
 class MessageType(Enum):
-    SYNC_MESSAGE = 1  # Message received in a linked device
-    DATA_MESSAGE = 2  # Message received in a primary device
-    EDIT_MESSAGE = 3  # Message received is an edit of a previous message
-    DELETE_MESSAGE = 4  # Message received is a remote delete of a previous message
-    READ_MESSAGE = 5  # User read some messages
-    GROUP_UPDATE_MESSAGE = 6  # An update has been made to a group
+    SYNC_MESSAGE = auto()  # Message received in a linked device
+    DATA_MESSAGE = auto()  # Message received in a primary device
+    EDIT_MESSAGE = auto()  # Message received is an edit of a previous message
+    DELETE_MESSAGE = auto()  # Message received is a remote delete of a previous message
+    READ_MESSAGE = auto()  # User read some messages
+    GROUP_UPDATE_MESSAGE = auto()  # An update has been made to a group
+    CONTACT_SYNC_MESSAGE = auto()  # Message received is a contact sync
 
 
 @dataclass
@@ -60,7 +61,7 @@ class Message:
         return bool(self.group)
 
     @classmethod
-    def _extract_message_data(
+    def _extract_message_data(  # noqa: C901, PLR0912
         cls, envelope: dict
     ) -> tuple[MessageType, dict, int | None, int | None, str | None]:
         """Extract message type, data_message, and timestamps from envelope."""
@@ -77,6 +78,13 @@ class Message:
                     "message": "",
                     "readMessages": sync_message["readMessages"],
                 }
+            elif "type" in sync_message:
+                if sync_message["type"] == "CONTACTS_SYNC":
+                    message_type = MessageType.CONTACT_SYNC_MESSAGE
+                    data_message = {"message": ""}
+                    target_sent_timestamp = envelope.get("timestamp")
+                else:
+                    raise UnknownMessageFormatError
             else:
                 message_type = MessageType.SYNC_MESSAGE
                 data_message = sync_message["sentMessage"]
@@ -187,7 +195,9 @@ class Message:
         )
 
     @classmethod
-    async def _parse_attachments(cls, signal: SignalAPI, data_message: dict) -> str:
+    async def _parse_attachments(
+        cls, signal: SignalAPI, data_message: dict
+    ) -> list[str]:
         if "attachments" not in data_message:
             return []
 

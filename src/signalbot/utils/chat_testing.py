@@ -1,11 +1,11 @@
 import functools
 import json
 import time
-import unittest
 import uuid
-from unittest.mock import AsyncMock, MagicMock, patch
+from unittest.mock import AsyncMock, MagicMock
 
 import aiohttp
+from pytest_mock import MockerFixture
 
 from signalbot.bot import Command, Context, SignalBot
 
@@ -15,32 +15,48 @@ def chat(*messages):  # noqa: ANN002, ANN201
         signalbot_package = ".".join(__package__.split(".")[:-1])
 
         @functools.wraps(func)
-        @patch(f"{signalbot_package}.SignalAPI.react", new_callable=ReactMessageMock)
-        @patch(f"{signalbot_package}.SignalAPI.send", new_callable=SendMessagesMock)
-        @patch(
-            f"{signalbot_package}.SignalAPI.receive",
-            new_callable=ReceiveMessagesMock,
-        )
-        async def wrapper_chat(*args, **kwargs):  # noqa: ANN002, ANN003, ANN202
-            chat_test_case = args[0]
-            receive_mock = args[1]
+        async def wrapper_chat(self, mocker: MockerFixture, *args, **kwargs):  # noqa: ANN001, ANN002, ANN003, ANN202
+            mocker.patch(
+                f"{signalbot_package}.SignalAPI.react", new_callable=ReactMessageMock
+            )
+            mocker.patch(
+                f"{signalbot_package}.SignalAPI.send", new_callable=SendMessagesMock
+            )
+            mocker.patch(
+                f"{signalbot_package}.SignalAPI.receive",
+                new_callable=ReceiveMessagesMock,
+            )
+            mocker.patch(
+                f"{signalbot_package}.SignalAPI.get_groups",
+                new_callable=AsyncMock,
+                return_value=[
+                    {
+                        "id": ChatTestCase.group_secret,
+                        "internal_id": ChatTestCase.group_internal_id,
+                        "name": ChatTestCase.group_name,
+                    }
+                ],
+            )
 
+            receive_mock = self.signal_bot._signal.receive  # noqa: SLF001
             receive_mock.define(messages)
-            await chat_test_case.run_bot()
+            await self.signal_bot._resolve_commands()  # noqa: SLF001
+            await self.run_bot()
 
-            value = func(*args, **kwargs)
-            return value  # noqa: RET504
+            return await func(self, mocker, *args, **kwargs)
 
         return wrapper_chat
 
     return decorator_chat
 
 
-class ChatTestCase(unittest.IsolatedAsyncioTestCase):
+class ChatTestCase:
     signal_service = "127.0.0.1:8080"
     phone_number = "+49123456789"
 
-    group_id = "group_id1="
+    group_internal_id = "group_id1="
+    group_id = "asdf"
+    group_name = "Test"
     group_secret = "group.group_secret1="  # noqa: S105
     config = {  # noqa: RUF012
         "signal_service": signal_service,
@@ -48,7 +64,7 @@ class ChatTestCase(unittest.IsolatedAsyncioTestCase):
         "storage": {"type": "in-memory"},
     }
 
-    def setUp(self):  # noqa: ANN201
+    def setup(self):  # noqa: ANN201
         self.signal_bot = SignalBot(ChatTestCase.config)
 
     async def run_bot(self):  # noqa: ANN201
@@ -80,7 +96,7 @@ class ChatTestCase(unittest.IsolatedAsyncioTestCase):
                         "attachments": [],
                         "contacts": [],
                         "groupInfo": {
-                            "groupId": ChatTestCase.group_id,
+                            "groupId": ChatTestCase.group_internal_id,
                             "type": "DELIVER",
                         },
                         "destination": None,

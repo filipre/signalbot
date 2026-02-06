@@ -1,46 +1,56 @@
-[tool.poetry]
-authors = ["René Filip"]
+[project]
+authors = [{name = "René Filip"}]
 classifiers = [
   "Programming Language :: Python :: 3",
   "License :: OSI Approved :: MIT License",
   "Operating System :: OS Independent",
 ]
 description = "Framework to create your own Signal bots"
-exclude = ["tests/"]
 keywords = [
   "Signal",
   "Bot",
   "Framework",
   "Home Automation",
 ]
-license = "MIT"
-maintainers = ["René Filip", "Era Dorta"]
+license = { text = "MIT" }
+maintainers = [{name = "René Filip"}, {name = "Era Dorta"}]
 name = "signalbot"
 readme = "README.md"
-repository = "https://github.com/filipre/signalbot"
-version = "0.21.0"
+requires-python = ">=3.9"
+version = "0.22.0"
+dependencies = [
+  "APScheduler>=3.11.0",
+  "aiohttp>=3.11.9",
+  "websockets>=14.1",
+  "phonenumbers>=8.13.54",
+  "pydantic>=2.12.3",
+  "packaging>=25.0",
+]
 
-[tool.poetry.dependencies]
-APScheduler = ">=3.11.0"
-aiohttp = ">=3.11.9"
-python = ">=3.9"
-redis = {version=">=5.2.0", optional=true}
-websockets = ">=14.1"
-phonenumbers = ">=8.13.54"
-pydantic = ">=2.12.3"
-packaging = ">=25.0"
+[project.optional-dependencies]
+redis = ["redis>=5.2.0"]
 
-[tool.poetry.group.dev.dependencies]
-black = ">=24.10.0"
-flake8 = ">=7.1.1"
-pre-commit = ">=4.0.1"
+[dependency-groups]
+dev = [
+  "prek>=0.3.0",
+  "pytest>=8.4.2",
+  "pytest-asyncio>=1.2.0",
+  "pytest-mock>=3.15.1",
+  "pytest-cov>=7.0.0",
+]
+
+[project.urls]
+repository = "https://github.com/signalbot-org/signalbot"
 
 [build-system]
-build-backend = "poetry.core.masonry.api"
-requires = ["poetry-core>=1.0.0"]
+requires = ["uv_build>=0.9.26,<0.10.0"]
+build-backend = "uv_build"
 
-[tool.poetry.extras]
-redis = ["redis"]
+[[tool.uv.index]]
+name = "testpypi"
+url = "https://test.pypi.org/simple/"
+publish-url = "https://test.pypi.org/legacy/"
+explicit = true
 
 [tool.ruff.lint]
 select = ["ALL"]
@@ -53,7 +63,7 @@ ignore = [
 
 [tool.ruff.lint.per-file-ignores]
 # Tests can ignore a few extra rules
-"tests/**.py" = [
+"**/tests/**.py" = [
     "ANN201", # Missing return type annotation for public function
     "S101",   # Use of assert is detected
     "INP001", # Missing __init__.py file

@@ -4,9 +4,9 @@ from pydantic import BaseModel
 
 
 class LinkPreview(BaseModel):
-    base64_thumbnail: str
+    base64_thumbnail: str | None
     title: str
-    description: str
+    description: str | None
     url: str
 
     #  This is the local filename for a received link preview

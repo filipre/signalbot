@@ -18,7 +18,8 @@ class MessageType(Enum):
     EDIT_MESSAGE = 3  # Message received is an edit of a previous message
     DELETE_MESSAGE = 4  # Message received is a remote delete of a previous message
     READ_MESSAGE = 5  # User read some messages
-    CONTACT_SYNC_MESSAGE = 6  # Message received is a contact sync
+    GROUP_UPDATE_MESSAGE = 6  # An update has been made to a group
+    CONTACT_SYNC_MESSAGE = 7  # Message received is a contact sync
 
 
 @dataclass
@@ -42,6 +43,7 @@ class Message:
     read_messages: list[dict] | None = None
     target_sent_timestamp: int | None = None
     remote_delete_timestamp: int | None = None
+    updated_group_id: str | None = None
     raw_message: str | None = None
 
     def recipient(self) -> str:
@@ -59,9 +61,9 @@ class Message:
         return bool(self.group)
 
     @classmethod
-    def _extract_message_data(
+    def _extract_message_data(  # noqa: C901
         cls, envelope: dict
-    ) -> tuple[MessageType, dict, int | None, int | None]:
+    ) -> tuple[MessageType, dict, int | None, int | None, str | None]:
         """Extract message type, data_message, and timestamps from envelope."""
         target_sent_timestamp = None
 
@@ -116,11 +118,20 @@ class Message:
             message_type = MessageType.DELETE_MESSAGE
             remote_delete_timestamp = data_message["remoteDelete"]["timestamp"]
 
+        updated_group_id = None
+        if (
+            "groupInfo" in data_message
+            and data_message["groupInfo"]["type"] == "UPDATE"
+        ):
+            message_type = MessageType.GROUP_UPDATE_MESSAGE
+            updated_group_id = data_message["groupInfo"]["groupId"]
+
         return (
             message_type,
             data_message,
             target_sent_timestamp,
             remote_delete_timestamp,
+            updated_group_id,
         )
 
     @classmethod
@@ -141,9 +152,13 @@ class Message:
 
         source_number = envelope.get("sourceNumber")
 
-        message_type, data_message, target_sent_timestamp, remote_delete_timestamp = (
-            cls._extract_message_data(envelope)
-        )
+        (
+            message_type,
+            data_message,
+            target_sent_timestamp,
+            remote_delete_timestamp,
+            updated_group_id,
+        ) = cls._extract_message_data(envelope)
 
         text = cls._parse_data_message(data_message)
         group = cls._parse_group_information(data_message)
@@ -180,6 +195,7 @@ class Message:
             read_messages=read_messages,
             target_sent_timestamp=target_sent_timestamp,
             remote_delete_timestamp=remote_delete_timestamp,
+            updated_group_id=updated_group_id,
             raw_message=raw_message_str,
         )
 
@@ -248,14 +264,22 @@ class Message:
         parsed_previews = []
         try:
             for preview in data_message["previews"]:
-                base64_thumbnail = await signal.get_attachment(preview["image"]["id"])
+                img = preview["image"]
+                img_id = None
+                if isinstance(img, dict):
+                    img_id = img["id"]
+
+                base64_thumbnail = None
+                if img_id:
+                    base64_thumbnail = await signal.get_attachment(img_id)
+
                 parsed_previews.append(
                     LinkPreview(
                         base64_thumbnail=base64_thumbnail,
                         title=preview["title"],
                         description=preview["description"],
                         url=preview["url"],
-                        id=preview["image"]["id"],
+                        id=img_id,
                     ),
                 )
         except KeyError:

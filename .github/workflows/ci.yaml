@@ -1,0 +1,35 @@
+name: CI
+
+on:
+  # tests can be called from other workflows
+  workflow_call:
+
+  # always run tests for every push to main
+  push:
+    branches: [main]
+
+  # always run tests for every PR
+  pull_request:
+    branches: [main]
+
+jobs:
+  prek:
+    name: Run code checks
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: j178/prek-action@v1
+
+  unittest:
+    name: Run unit tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install the latest version of uv
+        uses: astral-sh/setup-uv@v3
+        with:
+          version: latest
+      - name: Install dependencies
+        run: uv sync --no-dev
+      - name: Run unit tests
+        run: uv run pytest --cov=src/signalbot

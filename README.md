@@ -1,5 +1,10 @@
 # Signal Bot Framework
 
+[![PyPI Downloads](https://img.shields.io/pypi/dm/signalbot?logo=python)](https://pepy.tech/projects/signalbot)
+[![image](https://img.shields.io/pypi/v/signalbot.svg)](https://pypi.python.org/pypi/signalbot)
+[![image](https://img.shields.io/pypi/l/signalbot.svg)](https://pypi.python.org/pypi/signalbot)
+[![CI](https://github.com/signalbot-org/signalbot/actions/workflows/ci.yaml/badge.svg)](https://github.com/signalbot-org/signalbot/actions/workflows/ci.yaml)
+
 Python package to build your own Signal bots.
 
 ## Getting Started
@@ -8,7 +13,7 @@ Install it with `pip install signalbot`.
 
 Below you can find a minimal example on how to use the package.
 Save it as `bot.py`.
-There is also a bigger example in the [example folder](https://github.com/filipre/signalbot/tree/master/example).
+There is also a bigger example in the [example folder](https://github.com/signalbot-org/signalbot/tree/main/example).
 
 ```python
 import os
@@ -134,31 +139,16 @@ It does not have any handlers attached, for convenience the `enable_console_logg
 
 ### Unit Testing
 
-*Note: deprecated, the plan is to switch to pytest eventually*
-
 The tests can be executed with
 
 ```bash
-poetry run python -m unittest discover --start-directory ./tests
+uv run pytest
 ```
 
-In many cases, we can mock receiving and sending messages to speed up development time. To do so, you can use `signalbot.utils.ChatTestCase` which sets up a "skeleton" bot. Then, you can send messages using the `@chat` decorator in `signalbot.utils` like this:
-```python
-class PingChatTest(ChatTestCase):
-    def setUp(self):
-        # initialize self.singal_bot
-        super().setUp()
-        # all that is left to do is to register the commands that you want to test
-        self.signal_bot.register(PingCommand())
-
-    @chat("ping", "ping")
-    async def test_ping(self, query, replies, reactions):
-        self.assertEqual(replies.call_count, 2)
-        for recipient, message in replies.results():
-            self.assertEqual(recipient, ChatTestCase.group_secret)
-            self.assertEqual(message, "pong")
-```
-In `signalbot.utils`, check out `ReceiveMessagesMock`, `SendMessagesMock` and `ReactMessageMock` to learn more about their API.
+In many cases, we can mock receiving and sending messages to speed up development time.
+To do so, you can use `signalbot.utils.ChatTestCase` which sets up a "skeleton" bot.
+Then, you can send messages using the `@chat` decorator in `signalbot.utils`.
+You can find an example implementation in `tests/test_chat.py`.
 
 ## Troubleshooting
 
@@ -172,15 +162,20 @@ In `signalbot.utils`, check out `ReceiveMessagesMock`, `SendMessagesMock` and `R
 
 ## Local development
 
-```bash
-poetry install
-poetry run pre-commit install
-```
+1. Install [uv](https://docs.astral.sh/uv/).
+2. Create a venv and install signalbot with its dependencies in it
+    ```bash
+    uv sync
+    ```
+3. Install the prek hook for linting and formatting
+    ```bash
+    uv run prek install
+    ```
 
 ## Real world bot examples
 
 There are many real world examples of bot implementations using this library.
-Check the whole list at https://github.com/filipre/signalbot/network/dependents
+Check the whole list at https://github.com/signalbot-org/signalbot/network/dependents
 
 ## Other Projects
 

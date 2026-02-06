@@ -5,41 +5,33 @@ on:
     types: [published]
 
 jobs:
-  run-tests:
-    name: Run Tests
-    uses: filipre/signalbot/.github/workflows/run-tests.yaml@master
+  ci:
+    name: CI
+    uses: signalbot-org/signalbot/.github/workflows/ci.yaml@main
 
   publish-test-pypi:
     name: Publish (test.pypi.org)
     runs-on: ubuntu-latest
-    needs: run-tests
+    needs: ci
     environment:
       name: test.pypi.org
       url: https://test.pypi.org/project/signalbot/${{ steps.get-version.outputs.package_version }}/
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
-      - name: Set up Python
-        uses: actions/setup-python@v5
+      - name: Install the latest version of uv
+        uses: astral-sh/setup-uv@v3
         with:
-          python-version: 3.13.1
-      - name: Install Poetry
-        uses: abatilo/actions-poetry@v4
-        with:
-          poetry-version: 1.8.4
+          version: latest
       - name: Install dependencies
-        run: poetry install --no-dev
+        run: uv sync --no-dev
       - name: Get Package Version
         id: get-version
-        run: echo "{package_version}=$(poetry version -s)" >> $GITHUB_OUTPUT
+        run: echo "{package_version}=$(uv version --short)" >> $GITHUB_OUTPUT
       - name: Build package
-        run: poetry build
-      - name: Add test.pypi.org to Poetry
-        run: |
-          poetry config repositories.testpypi https://test.pypi.org/legacy/
-          poetry config pypi-token.testpypi ${{ secrets.API_TOKEN }}
+        run: uv build
       - name: Publish package
-        run: poetry publish -r testpypi
+        run: uv publish --index testpypi --token ${{ secrets.API_TOKEN }}
 
   publish-pypi:
     name: Publish (pypi.org)
@@ -51,23 +43,16 @@ jobs:
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
-      - name: Set up Python
-        uses: actions/setup-python@v5
+      - name: Install the latest version of uv
+        uses: astral-sh/setup-uv@v3
         with:
-          python-version: 3.13.1
-      - name: Install Poetry
-        uses: abatilo/actions-poetry@v4
-        with:
-          poetry-version: 1.8.4
+          version: latest
       - name: Install dependencies
-        run: poetry install --no-dev
+        run: uv sync --no-dev
       - name: Get Package Version
         id: get-version
-        run: echo "{package_version}=$(poetry version -s)" >> $GITHUB_OUTPUT
+        run: echo "{package_version}=$(uv version --short)" >> $GITHUB_OUTPUT
       - name: Build package
-        run: poetry build
-      - name: Add pypi.org to Poetry
-        run: |
-          poetry config pypi-token.pypi ${{ secrets.API_TOKEN }}
+        run: uv build
       - name: Publish package
-        run: poetry publish
+        run: uv publish --token ${{ secrets.API_TOKEN }}

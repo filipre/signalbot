@@ -7,7 +7,7 @@ on:
 jobs:
   ci:
     name: CI
-    uses: filipre/signalbot/.github/workflows/ci.yaml@master
+    uses: signalbot-org/signalbot/.github/workflows/ci.yaml@master
 
   publish-test-pypi:
     name: Publish (test.pypi.org)

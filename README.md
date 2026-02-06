@@ -3,7 +3,7 @@
 [![PyPI Downloads](https://img.shields.io/pypi/dm/signalbot?logo=python)](https://pepy.tech/projects/signalbot)
 [![image](https://img.shields.io/pypi/v/signalbot.svg)](https://pypi.python.org/pypi/signalbot)
 [![image](https://img.shields.io/pypi/l/signalbot.svg)](https://pypi.python.org/pypi/signalbot)
-[![CI](https://github.com/filipre/signalbot/actions/workflows/ci.yaml/badge.svg)](https://github.com/filipre/signalbot/actions/workflows/ci.yaml)
+[![CI](https://github.com/signalbot-org/signalbot/actions/workflows/ci.yaml/badge.svg)](https://github.com/signalbot-org/signalbot/actions/workflows/ci.yaml)
 
 Python package to build your own Signal bots.
 
@@ -13,7 +13,7 @@ Install it with `pip install signalbot`.
 
 Below you can find a minimal example on how to use the package.
 Save it as `bot.py`.
-There is also a bigger example in the [example folder](https://github.com/filipre/signalbot/tree/master/example).
+There is also a bigger example in the [example folder](https://github.com/signalbot-org/signalbot/tree/master/example).
 
 ```python
 import os
@@ -175,7 +175,7 @@ You can find an example implementation in `tests/test_chat.py`.
 ## Real world bot examples
 
 There are many real world examples of bot implementations using this library.
-Check the whole list at https://github.com/filipre/signalbot/network/dependents
+Check the whole list at https://github.com/signalbot-org/signalbot/network/dependents
 
 ## Other Projects
 

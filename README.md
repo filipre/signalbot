@@ -13,7 +13,7 @@ Install it with `pip install signalbot`.
 
 Below you can find a minimal example on how to use the package.
 Save it as `bot.py`.
-There is also a bigger example in the [example folder](https://github.com/signalbot-org/signalbot/tree/master/example).
+There is also a bigger example in the [example folder](https://github.com/signalbot-org/signalbot/tree/main/example).
 
 ```python
 import os

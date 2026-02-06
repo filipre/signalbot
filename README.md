@@ -4,6 +4,7 @@
 [![image](https://img.shields.io/pypi/v/signalbot.svg)](https://pypi.python.org/pypi/signalbot)
 [![image](https://img.shields.io/pypi/l/signalbot.svg)](https://pypi.python.org/pypi/signalbot)
 [![CI](https://github.com/signalbot-org/signalbot/actions/workflows/ci.yaml/badge.svg)](https://github.com/signalbot-org/signalbot/actions/workflows/ci.yaml)
+[![codecov](https://codecov.io/gh/signalbot-org/signalbot/graph/badge.svg?token=N3ZA5MTU2P)](https://codecov.io/gh/signalbot-org/signalbot)
 
 Python package to build your own Signal bots.
 

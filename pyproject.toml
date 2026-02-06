@@ -40,7 +40,7 @@ dev = [
 ]
 
 [project.urls]
-repository = "https://github.com/filipre/signalbot"
+repository = "https://github.com/signalbot-org/signalbot"
 
 [build-system]
 requires = ["uv_build>=0.9.26,<0.10.0"]

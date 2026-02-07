@@ -159,16 +159,13 @@ class SignalBot:
             if isinstance(groups, list):
                 group_ids = []
                 for group in groups:
-                    if self._is_group_id(group):  # group is a group id, higher prio
-                        group_ids.append(group)
-                    else:  # group is a group name
-                        matched_group = self._get_group_by_name(group)
-                        if matched_group is not None:
-                            group_ids.append(matched_group["id"])
-                        else:
-                            self._logger.warning(
-                                f"[Bot] [{command.__class__.__name__}] '{group}' is not a valid group name or id",  # noqa: E501, G004
-                            )
+                    group_id = self._resolve_group_receiver(group)
+                    if group_id is not None:
+                        group_ids.append(group_id)
+                    else:
+                        error_msg = f"[Bot] [{command.__class__.__name__}] '{group}' "
+                        error_msg += "is not a valid group name or id"
+                        self._logger.warning(error_msg)
 
             self.commands.append((command, contacts, group_ids, f))
 
@@ -399,18 +396,32 @@ class SignalBot:
         if self._is_username(receiver):
             return receiver
 
-        if self._is_group_id(receiver):
-            return receiver
-
-        group = self._groups_by_internal_id.get(receiver)
-        if group is not None:
-            return group["id"]
-
-        group = self._get_group_by_name(receiver)
-        if group is not None:
-            return group["id"]
+        group_id = self._resolve_group_receiver(receiver)
+        if group_id is not None:
+            return group_id
 
         raise SignalBotError("Cannot resolve receiver.")  # noqa: EM101, TRY003
+
+    def _resolve_group_receiver(self, group_id_or_name: str) -> str | None:
+        group = self._groups_by_id.get(group_id_or_name)
+        if group is not None:
+            return group["id"]
+
+        if self._is_group_id(group_id_or_name):
+            error_msg = f"[Bot] Group with id '{group_id_or_name}' not found. There "
+            error_msg += "is a typo in id or the bot is not a member of the group."
+            self._logger.warning(error_msg)
+            return group_id_or_name
+
+        group = self._groups_by_internal_id.get(group_id_or_name)
+        if group is not None:
+            return group["id"]
+
+        group = self._get_group_by_name(group_id_or_name)
+        if group is not None:
+            return group["id"]
+
+        return None
 
     def _is_phone_number(self, phone_number: str) -> bool:
         try:

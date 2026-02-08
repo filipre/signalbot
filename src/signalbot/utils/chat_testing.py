@@ -11,7 +11,7 @@ from pytest_mock import MockerFixture
 from signalbot.bot import Command, Context, SignalBot
 
 
-def mock_chat(*messages):  # noqa: ANN002, ANN201
+def mock_chat(*messages: str):  # noqa: ANN201
     def decorator_chat(func):  # noqa: ANN001, ANN202
         signalbot_package = ".".join(__package__.split(".")[:-1])
 
@@ -23,7 +23,7 @@ def mock_chat(*messages):  # noqa: ANN002, ANN201
             mocker.patch(
                 f"{signalbot_package}.SignalAPI.send", new_callable=SendMessagesMock
             )
-            mocker.patch(
+            receive_mock = mocker.patch(
                 f"{signalbot_package}.SignalAPI.receive",
                 new_callable=ReceiveMessagesMock,
             )
@@ -32,8 +32,8 @@ def mock_chat(*messages):  # noqa: ANN002, ANN201
                 new_callable=GetGroupsMock,
             )
 
-            receive_mock = self.signal_bot._signal.receive  # noqa: SLF001
             receive_mock.define(messages)
+            await self.signal_bot._detect_groups()  # noqa: SLF001
             await self.signal_bot._resolve_commands()  # noqa: SLF001
             await self.run_bot()
 

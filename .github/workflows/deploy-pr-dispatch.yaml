@@ -4,6 +4,8 @@ on:
   issue_comment:
     types: [created]
 
+permissions: write-all
+
 jobs:
   deploy-check:
     runs-on: ubuntu-latest

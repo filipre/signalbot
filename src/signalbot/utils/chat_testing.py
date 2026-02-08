@@ -10,7 +10,7 @@ from pytest_mock import MockerFixture
 from signalbot.bot import Command, Context, SignalBot
 
 
-def chat(*messages):  # noqa: ANN002, ANN201
+def mock_chat(*messages):  # noqa: ANN002, ANN201
     def decorator_chat(func):  # noqa: ANN001, ANN202
         signalbot_package = ".".join(__package__.split(".")[:-1])
 

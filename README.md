@@ -148,7 +148,7 @@ uv run pytest
 
 In many cases, we can mock receiving and sending messages to speed up development time.
 To do so, you can use `signalbot.utils.ChatTestCase` which sets up a "skeleton" bot.
-Then, you can send messages using the `@chat` decorator in `signalbot.utils`.
+Then, you can send messages using the `@mock_chat` decorator in `signalbot.utils`.
 You can find an example implementation in `tests/test_chat.py`.
 
 ## Troubleshooting

@@ -9,6 +9,8 @@ permissions:
   checks: write
   deployments: write
   pull-requests: write
+  statuses: write
+  issues: write
 
 jobs:
   deploy-check:

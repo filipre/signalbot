@@ -28,14 +28,7 @@ def chat(*messages):  # noqa: ANN002, ANN201
             )
             mocker.patch(
                 f"{signalbot_package}.SignalAPI.get_groups",
-                new_callable=AsyncMock,
-                return_value=[
-                    {
-                        "id": ChatTestCase.group_id,
-                        "internal_id": ChatTestCase.group_internal_id,
-                        "name": ChatTestCase.group_name,
-                    }
-                ],
+                new_callable=GetGroupsMock,
             )
 
             receive_mock = self.signal_bot._signal.receive  # noqa: SLF001
@@ -109,7 +102,7 @@ class ChatTestCase:
 
 
 class ReceiveMessagesMock(MagicMock):
-    def define(self, messages: list):  # noqa: ANN201
+    def define(self, messages: list) -> None:
         json_messages = [ChatTestCase.new_message(m) for m in messages]
         mock_iterator = AsyncMock()
         mock_iterator.__aiter__.return_value = json_messages
@@ -117,7 +110,7 @@ class ReceiveMessagesMock(MagicMock):
 
 
 class SendMessagesMock(AsyncMock):
-    def __init__(self, *args, **kwargs):  # noqa: ANN002, ANN003, ANN204
+    def __init__(self, *args, **kwargs) -> None:  # noqa: ANN002, ANN003
         super().__init__(*args, **kwargs)
         mock = AsyncMock()
         mock.return_value = {"timestamp": "1638715559464"}
@@ -130,22 +123,28 @@ class SendMessagesMock(AsyncMock):
     def results(self) -> list:
         return self._extract_responses()
 
-    def _extract_responses(self):  # noqa: ANN202
-        results = []
-        for args in self.call_args_list:
-            results.append(args[0])  # noqa: PERF401
-        return results
+    def _extract_responses(self) -> list:
+        return [args[0] for args in self.call_args_list]
 
 
 class ReactMessageMock(AsyncMock):
     def results(self) -> list:
         return self._extract_responses()
 
-    def _extract_responses(self):  # noqa: ANN202
-        results = []
-        for args in self.call_args_list:
-            results.append(args[0])  # noqa: PERF401
-        return results
+    def _extract_responses(self) -> list:
+        return [args[0] for args in self.call_args_list]
+
+
+class GetGroupsMock(AsyncMock):
+    def __init__(self, *args, **kwargs):  # noqa: ANN002, ANN003, ANN204
+        super().__init__(*args, **kwargs)
+        self.return_value = [
+            {
+                "id": ChatTestCase.group_id,
+                "internal_id": ChatTestCase.group_internal_id,
+                "name": ChatTestCase.group_name,
+            }
+        ]
 
 
 class DummyCommand(Command):

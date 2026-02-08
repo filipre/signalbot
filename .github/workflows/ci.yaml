@@ -26,6 +26,9 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Print workflows
+        run: ls -R ./.github/
+
       - name: Install uv
         uses: ./.github/workflows/install-uv.yaml
 

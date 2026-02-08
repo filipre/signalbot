@@ -40,10 +40,8 @@ jobs:
         with:
           ref: ${{ github.event.client_payload.pull_request.head.ref }}
 
-      - name: Install the latest version of uv
-        uses: astral-sh/setup-uv@v3
-        with:
-          version: latest
+      - name: Install uv
+        uses: ./.github/workflows/install-uv
 
       - name: Install dependencies
         run: uv sync --no-dev

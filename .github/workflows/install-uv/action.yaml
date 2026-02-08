@@ -1,0 +1,16 @@
+# .github/actions/setup-uv/action.yml
+
+name: 'Install UV'
+description: 'Installs UV with a specific version'
+inputs:
+  version:
+    description: 'Version of UV to install'
+    default: '0.10.0'
+
+runs:
+  using: 'composite'
+  steps:
+    - name: 'Install UV'
+      uses: astral-sh/setup-uv@v3
+      with:
+        version: ${{ inputs.version }}

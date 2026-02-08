@@ -7,7 +7,7 @@ on:
 jobs:
   ci:
     name: CI
-    uses: signalbot-org/signalbot/.github/workflows/ci.yaml@main
+    uses: ./.github/workflows/ci.yaml
 
   publish-test-pypi:
     name: Publish (test.pypi.org)
@@ -19,10 +19,8 @@ jobs:
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
-      - name: Install the latest version of uv
-        uses: astral-sh/setup-uv@v3
-        with:
-          version: latest
+      - name: Install uv
+        uses: ./.github/workflows/install-uv
       - name: Install dependencies
         run: uv sync --no-dev
       - name: Get Package Version
@@ -43,10 +41,8 @@ jobs:
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
-      - name: Install the latest version of uv
-        uses: astral-sh/setup-uv@v3
-        with:
-          version: latest
+      - name: Install uv
+        uses: ./.github/workflows/install-uv
       - name: Install dependencies
         run: uv sync --no-dev
       - name: Get Package Version

@@ -25,14 +25,19 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Install the latest version of uv
-        uses: astral-sh/setup-uv@v3
-        with:
-          version: latest
+
+      - name: Print workflows
+        run: ls -R ./.github/workflows/
+
+      - name: Install uv
+        uses: ./.github/workflows/install-uv
+
       - name: Install dependencies
-        run: uv sync --no-dev
+        run: uv sync --locked
+
       - name: Run unit tests
         run: uv run pytest --cov=src/signalbot --cov-branch --cov-report=xml
+
       - name: Upload coverage reports to Codecov
         uses: codecov/codecov-action@v5
         with:

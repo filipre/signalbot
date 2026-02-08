@@ -5,8 +5,7 @@ description: 'Installs UV with a specific version'
 inputs:
   version:
     description: 'Version of UV to install'
-    required: true
-    default: '0.10.0'  # Default version if not passed
+    default: '0.10.0'
 
 runs:
   using: 'composite'

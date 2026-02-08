@@ -3,6 +3,12 @@ on:
   repository_dispatch:
     types: [deploy-command]
 
+permissions:
+  contents: write
+  checks: write
+  deployments: write
+  pull-requests: write
+
 jobs:
   publish-package:
     name: Publish Package

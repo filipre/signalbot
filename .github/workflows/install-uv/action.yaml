@@ -1,10 +1,17 @@
-on:
-  workflow_call:
+# .github/actions/setup-uv/action.yml
 
-jobs:
-  install:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: astral-sh/setup-uv@v3
-        with:
-          version: 0.10.0
+name: 'Install UV'
+description: 'Installs UV with a specific version'
+inputs:
+  version:
+    description: 'Version of UV to install'
+    required: true
+    default: '0.10.0'  # Default version if not passed
+
+runs:
+  using: 'composite'
+  steps:
+    - name: 'Install UV'
+      uses: astral-sh/setup-uv@v3
+      with:
+        version: ${{ inputs.version }}

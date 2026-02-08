@@ -2,6 +2,7 @@ import functools
 import json
 import time
 import uuid
+from types import MappingProxyType
 from unittest.mock import AsyncMock, MagicMock
 
 import aiohttp
@@ -50,21 +51,23 @@ class ChatTestCase:
     group_internal_id = "Mg8LQTdaZJs8+LJCrtQgblqHx+xI2dX9JJ8hVA2kqt8="
     group_name = "Test"
     group_id = "group.OyZzqio1xDmYiLsQ1VsqRcUFOU4tK2TcECmYt2KeozHJwglMBHAPS7jlkrm="
-    config = {  # noqa: RUF012
-        "signal_service": signal_service,
-        "phone_number": phone_number,
-        "storage": {"type": "in-memory"},
-    }
+    config = MappingProxyType(
+        {
+            "signal_service": signal_service,
+            "phone_number": phone_number,
+            "storage": {"type": "in-memory"},
+        }
+    )
 
-    def setup(self):  # noqa: ANN201
+    def setup(self) -> None:
         self.signal_bot = SignalBot(ChatTestCase.config)
 
     async def run_bot(self):  # noqa: ANN201
-        PRODUCER_ID = 1337  # noqa: N806
-        HANDLER_ID = 4444  # noqa: N806
-        await self.signal_bot._produce(PRODUCER_ID)  # noqa: SLF001
+        producer_id = 1337
+        handler_ir = 4444
+        await self.signal_bot._produce(producer_id)  # noqa: SLF001
         while self.signal_bot._q.qsize() > 0:  # noqa: SLF001
-            await self.signal_bot._consume_new_item(HANDLER_ID)  # noqa: SLF001
+            await self.signal_bot._consume_new_item(handler_ir)  # noqa: SLF001
 
     @classmethod
     def new_message(cls, text) -> str:  # noqa: ANN001
@@ -110,8 +113,8 @@ class ReceiveMessagesMock(MagicMock):
 
 
 class SendMessagesMock(AsyncMock):
-    def __init__(self, *args, **kwargs) -> None:  # noqa: ANN002, ANN003
-        super().__init__(*args, **kwargs)
+    def __init__(self, **kwargs: str) -> None:
+        super().__init__(**kwargs)
         mock = AsyncMock()
         mock.return_value = {"timestamp": "1638715559464"}
         self.return_value = AsyncMock(
@@ -136,8 +139,8 @@ class ReactMessageMock(AsyncMock):
 
 
 class GetGroupsMock(AsyncMock):
-    def __init__(self, *args, **kwargs) -> None:  # noqa: ANN002, ANN003
-        super().__init__(*args, **kwargs)
+    def __init__(self, **kwargs: str) -> None:
+        super().__init__(**kwargs)
         self.return_value = [
             {
                 "id": ChatTestCase.group_id,

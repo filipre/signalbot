@@ -31,7 +31,7 @@ def chat(*messages):  # noqa: ANN002, ANN201
                 new_callable=AsyncMock,
                 return_value=[
                     {
-                        "id": ChatTestCase.group_secret,
+                        "id": ChatTestCase.group_id,
                         "internal_id": ChatTestCase.group_internal_id,
                         "name": ChatTestCase.group_name,
                     }
@@ -54,10 +54,9 @@ class ChatTestCase:
     signal_service = "127.0.0.1:8080"
     phone_number = "+49123456789"
 
-    group_internal_id = "group_id1="
-    group_id = "asdf"
+    group_internal_id = "Mg8LQTdaZJs8+LJCrtQgblqHx+xI2dX9JJ8hVA2kqt8="
     group_name = "Test"
-    group_secret = "group.group_secret1="  # noqa: S105
+    group_id = "group.OyZzqio1xDmYiLsQ1VsqRcUFOU4tK2TcECmYt2KeozHJwglMBHAPS7jlkrm="
     config = {  # noqa: RUF012
         "signal_service": signal_service,
         "phone_number": phone_number,

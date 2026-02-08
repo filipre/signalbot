@@ -35,7 +35,7 @@ class TestSchnickSchnackSchnuckCommand(ChatTestCase):
         assert replies.call_count == 1
         assert len(replies.results()) == 1
         for recipient, message in replies.results():
-            assert recipient == ChatTestCase.group_secret
+            assert recipient == ChatTestCase.group_id
             assert message == "schnack"
 
     @chat("schnack")
@@ -49,5 +49,5 @@ class TestSchnickSchnackSchnuckCommand(ChatTestCase):
         assert replies.call_count == 1
         assert len(replies.results()) == 1
         for recipient, message in replies.results():
-            assert recipient == ChatTestCase.group_secret
+            assert recipient == ChatTestCase.group_id
             assert message == "schnuck"

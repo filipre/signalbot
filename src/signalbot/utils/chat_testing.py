@@ -13,22 +13,16 @@ from signalbot.bot import Command, Context, SignalBot
 
 def mock_chat(*messages: str):  # noqa: ANN201
     def decorator_chat(func):  # noqa: ANN001, ANN202
-        signalbot_package = ".".join(__package__.split(".")[:-1])
-
         @functools.wraps(func)
         async def wrapper_chat(self, mocker: MockerFixture, *args, **kwargs):  # noqa: ANN001, ANN002, ANN003, ANN202
-            mocker.patch(
-                f"{signalbot_package}.SignalAPI.react", new_callable=ReactMessageMock
-            )
-            mocker.patch(
-                f"{signalbot_package}.SignalAPI.send", new_callable=SendMessagesMock
-            )
+            mocker.patch("signalbot.SignalAPI.react", new_callable=ReactMessageMock)
+            mocker.patch("signalbot.SignalAPI.send", new_callable=SendMessagesMock)
             receive_mock = mocker.patch(
-                f"{signalbot_package}.SignalAPI.receive",
+                "signalbot.SignalAPI.receive",
                 new_callable=ReceiveMessagesMock,
             )
             mocker.patch(
-                f"{signalbot_package}.SignalAPI.get_groups",
+                "signalbot.SignalAPI.get_groups",
                 new_callable=GetGroupsMock,
             )
 

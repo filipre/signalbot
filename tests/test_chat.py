@@ -2,7 +2,7 @@ import pytest
 from pytest_mock import MockerFixture
 
 from signalbot import Command, Context, triggered
-from signalbot.utils import ChatTestCase, chat
+from signalbot.utils import ChatTestCase, mock_chat
 
 
 class SchnickSchnackSchnuckCommand(Command):
@@ -24,7 +24,7 @@ class TestSchnickSchnackSchnuckCommand(ChatTestCase):
         super().setup()
         self.signal_bot.register(SchnickSchnackSchnuckCommand())
 
-    @chat("schnick")
+    @mock_chat("schnick")
     async def test_schnick(
         self,
         mocker: MockerFixture,  # noqa: ARG002
@@ -35,10 +35,10 @@ class TestSchnickSchnackSchnuckCommand(ChatTestCase):
         assert replies.call_count == 1
         assert len(replies.results()) == 1
         for recipient, message in replies.results():
-            assert recipient == ChatTestCase.group_secret
+            assert recipient == ChatTestCase.group_id
             assert message == "schnack"
 
-    @chat("schnack")
+    @mock_chat("schnack")
     async def test_schnack(
         self,
         mocker: MockerFixture,  # noqa: ARG002
@@ -49,5 +49,5 @@ class TestSchnickSchnackSchnuckCommand(ChatTestCase):
         assert replies.call_count == 1
         assert len(replies.results()) == 1
         for recipient, message in replies.results():
-            assert recipient == ChatTestCase.group_secret
+            assert recipient == ChatTestCase.group_id
             assert message == "schnuck"

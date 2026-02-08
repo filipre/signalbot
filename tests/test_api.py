@@ -9,9 +9,7 @@ class TestAPI:
     signal_service = "127.0.0.1:8080"
     phone_number = "+49123456789"
 
-    group_id = "group_id1"
-    group_secret = "group.group_secret1"  # noqa: S105
-    groups = {group_id: group_secret}  # noqa: RUF012
+    group_id = "group.OyZzqio1xDmYiLsQ1VsqRcUFOU4tK2TcECmYt2KeozHJwglMBHAPS7jlkrm="
 
     @pytest.fixture(autouse=True)
     def setup(self):

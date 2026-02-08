@@ -29,10 +29,6 @@ class TestMessage:
     signal_service = "127.0.0.1:8080"
     phone_number = "+49123456789"
 
-    group_id = "group_id1"
-    group_secret = "group.group_secret1"  # noqa: S105
-    groups = {group_id: group_secret}  # noqa: RUF012
-
     @pytest.fixture(autouse=True)
     def setup(self):
         self.signal_api = SignalAPI(

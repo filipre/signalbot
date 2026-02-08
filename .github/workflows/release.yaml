@@ -20,7 +20,7 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
       - name: Install uv
-        uses: ./.github/workflows/install-uv.yaml
+        uses: ./.github/workflows/install-uv
       - name: Install dependencies
         run: uv sync --no-dev
       - name: Get Package Version
@@ -42,7 +42,7 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
       - name: Install uv
-        uses: ./.github/workflows/install-uv.yaml
+        uses: ./.github/workflows/install-uv
       - name: Install dependencies
         run: uv sync --no-dev
       - name: Get Package Version

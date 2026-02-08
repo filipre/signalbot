@@ -136,7 +136,7 @@ class ReactMessageMock(AsyncMock):
 
 
 class GetGroupsMock(AsyncMock):
-    def __init__(self, *args, **kwargs):  # noqa: ANN002, ANN003, ANN204
+    def __init__(self, *args, **kwargs) -> None:  # noqa: ANN002, ANN003
         super().__init__(*args, **kwargs)
         self.return_value = [
             {
@@ -148,5 +148,5 @@ class GetGroupsMock(AsyncMock):
 
 
 class DummyCommand(Command):
-    async def handle(self, context: Context):  # noqa: ANN201
+    async def handle(self, context: Context) -> None:
         pass

@@ -1,0 +1,10 @@
+on:
+  workflow_call:
+
+jobs:
+  install:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: astral-sh/setup-uv@v3
+        with:
+          version: 0.10.0

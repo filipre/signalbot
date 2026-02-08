@@ -3,16 +3,12 @@ on:
   repository_dispatch:
     types: [deploy-command]
 
-permissions:
-  contents: write
-  checks: write
-  deployments: write
-  pull-requests: write
-  statuses: write
-  issues: write
+permissions: {}
 
 jobs:
   publish-package:
+    permissions:
+      pull-requests: write # for peter-evans/create-or-update-comment to create PR reaction
     name: Publish Package
     runs-on: ubuntu-latest
     environment:

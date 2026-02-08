@@ -4,16 +4,13 @@ on:
   issue_comment:
     types: [created]
 
-permissions:
-  contents: write
-  checks: write
-  deployments: write
-  pull-requests: write
-  statuses: write
-  issues: write
+permissions: {}
 
 jobs:
   deploy-check:
+    permissions:
+      contents: write # for executing the repository_dispatch event
+      pull-requests: write # for peter-evans/slash-command-dispatch to create PR reaction
     runs-on: ubuntu-latest
     steps:
       - name: Check if user has write access

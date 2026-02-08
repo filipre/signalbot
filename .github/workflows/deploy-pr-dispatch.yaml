@@ -13,6 +13,7 @@ jobs:
         id: checkUser
         with:
           require: "write"
+
       - name: Trigger the deploy-pr-command workflow and add a reaction to the comment
         if: steps.checkUser.outputs.require-result == 'true'
         id: checkCommand

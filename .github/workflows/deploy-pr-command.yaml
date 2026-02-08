@@ -44,7 +44,7 @@ jobs:
         uses: ./.github/workflows/install-uv
 
       - name: Install dependencies
-        run: uv sync --no-dev
+        run: uv sync --locked --no-dev
 
       - name: Create custom version
         id: create-custom-version

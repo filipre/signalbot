@@ -19,15 +19,20 @@ jobs:
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
+
       - name: Install uv
         uses: ./.github/workflows/install-uv
+
       - name: Install dependencies
-        run: uv sync --no-dev
+        run: uv sync --locked --no-dev
+
       - name: Get Package Version
         id: get-version
         run: echo "{package_version}=$(uv version --short)" >> $GITHUB_OUTPUT
+
       - name: Build package
         run: uv build
+
       - name: Publish package
         run: uv publish --index testpypi --token ${{ secrets.API_TOKEN }}
 
@@ -41,14 +46,19 @@ jobs:
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
+
       - name: Install uv
         uses: ./.github/workflows/install-uv
+
       - name: Install dependencies
-        run: uv sync --no-dev
+        run: uv sync --locked --no-dev
+
       - name: Get Package Version
         id: get-version
         run: echo "{package_version}=$(uv version --short)" >> $GITHUB_OUTPUT
+
       - name: Build package
         run: uv build
+
       - name: Publish package
         run: uv publish --token ${{ secrets.API_TOKEN }}

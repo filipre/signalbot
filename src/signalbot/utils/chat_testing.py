@@ -25,10 +25,17 @@ def mock_chat(*messages: str):  # noqa: ANN201
                 "signalbot.SignalAPI.get_groups",
                 new_callable=GetGroupsMock,
             )
+            mocker.patch(
+                "signalbot.SignalAPI.get_signal_cli_about",
+                new_callable=GetSignalCliAboutMock,
+            )
+            mocker.patch(
+                "signalbot.SignalAPI.check_signal_service",
+                new_callable=CheckSignalServiceMock,
+            )
 
             receive_mock.define(messages)
-            await self.signal_bot._detect_groups()  # noqa: SLF001
-            await self.signal_bot._resolve_commands()  # noqa: SLF001
+            await self.signal_bot._async_post_init()  # noqa: SLF001
             await self.run_bot()
 
             return await func(self, mocker, *args, **kwargs)
@@ -142,6 +149,21 @@ class GetGroupsMock(AsyncMock):
                 "name": ChatTestCase.group_name,
             }
         ]
+
+
+class GetSignalCliAboutMock(AsyncMock):
+    def __init__(self, **kwargs: str) -> None:
+        super().__init__(**kwargs)
+        self.return_value = {
+            "version": "0.97",
+            "mode": "json-rpc",
+        }
+
+
+class CheckSignalServiceMock(AsyncMock):
+    def __init__(self, **kwargs: str) -> None:
+        super().__init__(**kwargs)
+        self.return_value = True
 
 
 class DummyCommand(Command):

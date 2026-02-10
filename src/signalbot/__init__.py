@@ -1,3 +1,5 @@
+import importlib.metadata
+
 from signalbot.api import ReceiveMessagesError, SendMessageError, SignalAPI
 from signalbot.bot import SignalBot, enable_console_logging
 from signalbot.command import Command, CommandError, regex_triggered, triggered
@@ -20,3 +22,8 @@ __all__ = [
     "regex_triggered",
     "triggered",
 ]
+
+try:
+    __version__ = importlib.metadata.version(__name__)
+except importlib.metadata.PackageNotFoundError:
+    __version__ = "0.0.0"

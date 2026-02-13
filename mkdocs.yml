@@ -7,6 +7,7 @@ nav:
     - SignalBot: api_signalbot.md
     - Message: api_message.md
     - Context: api_context.md
+    - LinkPreview: api_linkpreview.md
 
 theme:
   name: material

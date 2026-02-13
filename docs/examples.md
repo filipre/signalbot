@@ -1,4 +1,4 @@
-# Examplea
+# Examples
 
 <details><summary> Send attachment </summary>
 ``` python3

@@ -41,6 +41,7 @@ plugins:
         python:
           options:
             show_submodules: true
+            show_docstring_attributes: true
 
 markdown_extensions:
   - pymdownx.highlight:

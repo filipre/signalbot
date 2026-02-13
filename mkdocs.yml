@@ -7,12 +7,16 @@ repo_name: signalbot-org/signalbot
 
 nav:
   - Home: index.md
+  - Getting started: getting_started.md
   - Examples: examples.md
+  - Additional information: additional_information.md
   - API:
     - SignalBot: api_signalbot.md
     - Message: api_message.md
     - Context: api_context.md
     - LinkPreview: api_linkpreview.md
+  - Troubleshooting: troubleshooting.md
+  - Contributing: local_development.md
 
 theme:
   name: material

@@ -38,6 +38,10 @@ dev = [
   "pytest-mock>=3.15.1",
   "pytest-cov>=7.0.0",
 ]
+docs = [
+  "mkdocstrings[python]>=0.30.1",
+  "mkdocs-material>=9.7.1",
+]
 
 [project.urls]
 repository = "https://github.com/signalbot-org/signalbot"

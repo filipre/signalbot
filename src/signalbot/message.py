@@ -55,18 +55,18 @@ class Message:
             the message.
         group: The UUID of the group chat the message was sent in, or `None` if the
             message was sent in a user chat.
-        reaction: The reaction emoji if the message is a reaction, or `None` otherwise.
+        reaction: The reaction emoji if the message is a reaction.
         mentions: A list of UUIDs of users mentioned in the message.
-        quote: A `Quote` object representing the quoted message if the message is a
-            quote, or `None` otherwise.
+        quote: An object representing the quoted message if the message is a
+            quote.
         read_messages: A list of dictionaries representing the messages that have been
-            read if the message is a read message, or `None` otherwise.
+            read if the message is a `MessageType.READ_MESSAGE`
         target_sent_timestamp: The timestamp of the original message that was edited, if
-            the message is a `MessageType.EDIT_MESSAGE`, or `None` otherwise.
+            the message is a `MessageType.EDIT_MESSAGE`.
         remote_delete_timestamp: The timestamp of the original message that was deleted,
-            the message is a `MessageType.DELETE_MESSAGE`, or `None` otherwise.
+            the message is a `MessageType.DELETE_MESSAGE`.
         updated_group_id: The UUID of the group that was updated, if the message is a
-            `MessageType.GROUP_UPDATE_MESSAGE`, or `None` otherwise.
+            `MessageType.GROUP_UPDATE_MESSAGE`.
         raw_message: The raw JSON string of the message as received from the Signal API.
     """
 

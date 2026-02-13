@@ -55,6 +55,11 @@ def enable_console_logging(level: int = logging.WARNING) -> None:
 
 
 class SignalBot:
+    """
+    SignalBot is the main class for the bot. It provides methods to register commands,
+    start the bot, and interact with messages.
+    """
+
     def __init__(self, config: dict) -> None:
         """Initilization for the SignalBot.
 

@@ -1,0 +1,15 @@
+site_name: Documentation
+
+nav:
+  - Home: index.md
+
+theme: material
+
+plugins:
+  - autorefs:
+      resolve_closest: true
+  - mkdocstrings:
+      handlers:
+        python:
+          options:
+            show_submodules: true

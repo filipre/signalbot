@@ -39,9 +39,9 @@ class Message:
     """Class representing a Signal message.
 
     Attributes:
-        source: The ID of the sender of the message.
+        source: The phone number or UUID of the sender of the message.
         source_number: The phone number of the sender of the message.
-            This is only available for user chats, and is `None` for group chats.
+            This is `None` for signal contacts where the phone number was not exchanged.
         source_uuid: The UUID of the sender of the message.
         timestamp: The timestamp of when the message was sent.
         type: The type of the message.

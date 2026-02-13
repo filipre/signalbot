@@ -172,6 +172,17 @@ You can find an example implementation in `tests/test_chat.py`.
     uv run prek install
     ```
 
+### Serving the documentation locally
+
+1. Install the docs dependencies
+    ```bash
+    uv sync --group docs
+    ```
+2. Run the mkdocs serve command
+    ```bash
+    uv run mkdocs serve --livereload --watch ./
+    ```
+
 ## Real world bot examples
 
 There are many real world examples of bot implementations using this library.

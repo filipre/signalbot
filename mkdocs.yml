@@ -1,4 +1,9 @@
-site_name: Documentation
+site_name: Signalbot
+site_description: Documentation for Signalbot, a Python library for building Signal bots using the signal-cli-rest-api.
+site_author: Era Dorta
+
+repo_url: https://github.com/signalbot-org/signalbot
+repo_name: signalbot-org/signalbot
 
 nav:
   - Home: index.md
@@ -11,8 +16,10 @@ nav:
 
 theme:
   name: material
+  icon:
+    logo: fontawesome/solid/book
+    repo: fontawesome/brands/github
   palette:
-
     # Palette toggle for automatic mode
     - media: "(prefers-color-scheme)"
       toggle:
@@ -32,22 +39,58 @@ theme:
       toggle:
         icon: material/brightness-4
         name: Switch to system preference
+  features:
+    - navigation.top
+    - navigation.indexes
+    - content.code.annotate
+    - content.code.copy
+
+
+markdown_extensions:
+  - abbr
+  - admonition
+  - attr_list
+  - def_list
+  - footnotes
+  - toc:
+      permalink: true
+  - pymdownx.arithmatex:
+      generic: true
+  - pymdownx.betterem:
+      smart_enable: all
+  - pymdownx.caret
+  - pymdownx.details
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
+  - pymdownx.highlight:
+      guess_lang: false
+  - pymdownx.inlinehilite
+  - pymdownx.keys:
+      key_map:
+        click: "Click"
+        left-click: "Left Click"
+        right-click: "Right Click"
+  - pymdownx.magiclink
+  - pymdownx.mark
+  - pymdownx.saneheaders
+  - pymdownx.smartsymbols
+  - pymdownx.superfences
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.tasklist:
+      custom_checkbox: true
+  - pymdownx.tilde
+  - pymdownx.snippets
 
 plugins:
-  - autorefs:
-      resolve_closest: true
+  - search
+  - git-revision-date-localized:
+      enable_creation_date: true
+      fallback_to_build_date: true
   - mkdocstrings:
       handlers:
         python:
           options:
             show_submodules: true
             show_docstring_attributes: true
-
-markdown_extensions:
-  - pymdownx.highlight:
-      anchor_linenums: true
-      line_spans: __span
-      pygments_lang_class: true
-  - pymdownx.inlinehilite
-  - pymdownx.snippets
-  - pymdownx.superfences

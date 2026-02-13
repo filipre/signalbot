@@ -1,1 +1,1 @@
-::: signalbot.link_previews.LinkPreview
+::: signalbot.LinkPreview

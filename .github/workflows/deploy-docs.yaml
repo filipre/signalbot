@@ -1,0 +1,24 @@
+name: Deploy docs to GitHub pages
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: ./.github/workflows/install-uv
+
+      - name: Install dependencies
+        run: uv sync --locked --group docs
+
+      - name: Build and deploy with mkdocs
+        run: uv run mkdocs gh-deploy --force

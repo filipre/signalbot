@@ -282,17 +282,17 @@ class SignalBot:
             base64_attachments: List of attachments encoded in base64.
             link_preview: Link previews to be sent with the message.
             quote_author: The author of the quoted message, required if quote_message is
-              set.
+                set.
             quote_mentions: List of mentioned users in the quoted message, required if
-              quote_message is set.
+                quote_message is set.
             quote_message: The content of the quoted message, required if quote_message
-              is set.
+                is set.
             quote_timestamp: The timestamp of the quoted message, required if
-              quote_message is set.
+                quote_message is set.
             mentions: List of dictionary of mentions, it has the format
-              `[{ "author": "uuid" , "start": 0, "length": 1 }]`.
+                `[{ "author": "uuid" , "start": 0, "length": 1 }]`.
             edit_timestamp: The timestamp of the message to edit, if not set a new
-              message will be sent.
+                message will be sent.
             text_mode: The text mode of the message, can be "normal" or "styled".
             view_once: Whether the message should be view once or not.
 

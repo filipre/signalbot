@@ -19,5 +19,10 @@ jobs:
       - name: Install dependencies
         run: uv sync --locked --group docs
 
-      - name: Build and deploy with mkdocs
-        run: uv run mkdocs gh-deploy --force
+      - name: Build and deploy a new version with mike
+        run: uv run mike deploy --push --update-aliases $(uv version --short) latest
+
+      # The --push option in the previous step should have already pushed the changes
+      # but it seems to fail sometimes, unclear why. This is a workaround to ensure the changes are pushed.
+      - name: Push the changes
+        run: git push origin gh-pages

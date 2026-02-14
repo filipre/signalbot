@@ -7,3 +7,4 @@ dist
 example-local
 .coverage
 coverage.xml
+site/

@@ -16,13 +16,14 @@ class SignalAPI:
         signal_service: str,
         phone_number: str,
         download_attachments: bool = True,  # noqa: FBT001, FBT002
-        use_https: bool = True,  # noqa: FBT001, FBT002
+        use_https: bool | None = None,  # noqa: FBT001
     ):
         self.phone_number = phone_number
+        self._use_https_configured = use_https is not None
         self._signal_api_uris = SignalAPIURIs(
             signal_service=signal_service,
             phone_number=phone_number,
-            use_https=use_https,
+            use_https=True if use_https is None else use_https,
         )
         self.download_attachments = download_attachments
 
@@ -307,10 +308,11 @@ class SignalAPI:
 
     async def check_signal_service(self) -> bool:
         preferred_use_https = self._signal_api_uris.use_https
-        self._signal_api_uris.use_https = preferred_use_https
         try:
             return (await self.health_check()).status == 204  # noqa: PLR2004
         except HealthCheckError:
+            if self._use_https_configured:
+                return False
             self._signal_api_uris.use_https = not preferred_use_https
             try:
                 return (await self.health_check()).status == 204  # noqa: PLR2004

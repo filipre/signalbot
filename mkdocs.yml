@@ -1,6 +1,7 @@
 site_name: Signalbot
 site_description: Documentation for Signalbot, a Python library for building Signal bots using the signal-cli-rest-api.
 site_author: Era Dorta
+site_url: https://signalbot-org.github.io/signalbot/
 
 repo_url: https://github.com/signalbot-org/signalbot
 repo_name: signalbot-org/signalbot

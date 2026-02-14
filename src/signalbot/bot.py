@@ -15,7 +15,7 @@ import phonenumbers
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from packaging.version import Version
 
-from signalbot.api import ReceiveMessagesError, SignalAPI
+from signalbot.api import ConnectionMode, ReceiveMessagesError, SignalAPI
 from signalbot.command import Command
 from signalbot.context import Context
 from signalbot.message import Message, MessageType, UnknownMessageFormatError
@@ -89,6 +89,7 @@ class SignalBot:
             redis_port: 6379
         retry_interval: 1
         download_attachments: True
+        connection_mode: ConnectionMode.AUTO
         ```
         """
         self._logger = logging.getLogger(LOGGER_NAME)
@@ -109,10 +110,12 @@ class SignalBot:
             self._phone_number = self.config["phone_number"]
             self._signal_service = self.config["signal_service"]
             download_attachments = self.config.get("download_attachments", True)
+            connection_mode = self.config.get("connection_mode", ConnectionMode.AUTO)
             self._signal = SignalAPI(
                 self._signal_service,
                 self._phone_number,
                 download_attachments,
+                connection_mode,
             )
         except KeyError:
             raise SignalBotError("Could not initialize SignalAPI with given config")  # noqa: B904, EM101, TRY003

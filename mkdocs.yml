@@ -15,6 +15,8 @@ nav:
     - Message: api_message.md
     - Context: api_context.md
     - LinkPreview: api_linkpreview.md
+    - Command: api_command.md
+    - Quote: api_quote.md
   - Troubleshooting: troubleshooting.md
   - Contributing: local_development.md
 

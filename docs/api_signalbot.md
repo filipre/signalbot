@@ -1,1 +1,1 @@
-::: signalbot.SignalBot
+::: signalbot.bot

@@ -16,6 +16,14 @@ if TYPE_CHECKING:
 def regex_triggered(
     *by: str | re.Pattern[str],
 ) -> Callable[[Callable[P, T]], Callable[P, T]]:
+    """Decorator to trigger a command if the message text matches any of the provided
+    regex patterns.
+
+    Args:
+        *by: A variable number of strings or compiled regex patterns to match the
+        message text against.
+    """
+
     def decorator_regex_triggered(func: Callable[P, T]) -> Callable[P, T]:
         @functools.wraps(func)
         async def wrapper_regex_triggered(
@@ -38,6 +46,14 @@ def regex_triggered(
 def triggered(
     *by: str, case_sensitive: bool = False
 ) -> Callable[[Callable[P, T]], Callable[P, T]]:
+    """Decorator to trigger a command if the message text matches any of the provided
+    strings.
+
+    Args:
+        *by: A variable number of strings to match the message text against.
+        case_sensitive: Whether the matching should be case sensitive.
+    """
+
     def decorator_triggered(func: Callable[P, T]) -> Callable[P, T]:
         @functools.wraps(func)
         async def wrapper_triggered(*args: P.args, **kwargs: P.kwargs) -> T | None:
@@ -61,16 +77,31 @@ def triggered(
 
 
 class Command(ABC):
+    """Abstract base class for commands.
+
+    To create a command, subclass this class and implement the `handle` method.
+    Then, register the command with the bot using `bot.register(CommandSubclass)`.
+    """
+
     def __init__(self) -> None:
         # The bot attribute is assigned after calling bot.register(Command())
         self.bot: SignalBot | None = None
 
     def setup(self) -> None:
+        """Optional setup method that can be overridden by subclasses.
+        This method is called after the command is registered with the bot but
+        before any data is retrieved, so it cannot access the group ids.
+        """
         return
 
     @abstractmethod
     async def handle(self, context: Context) -> None:
-        pass
+        """Abstract method to handle a command.
+        This method must be implemented by subclasses to define the behavior of the
+            command.
+        Args:
+            context: Chat context containing the received message and other information.
+        """
 
 
 class CommandError(Exception):

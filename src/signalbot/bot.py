@@ -58,6 +58,13 @@ class SignalBot:
     """
     SignalBot is the main class for the bot. It provides methods to register commands,
     start the bot, and interact with messages.
+
+    Attributes:
+        config (dict): The configuration dictionary for the bot.
+        commands: A list of registered commands with their filters.
+        groups (list): A list of groups the bot is a member of.
+        storage (SQLiteStorage | RedisStorage): The storage backend used by the bot.
+        scheduler (AsyncIOScheduler): The scheduler for running scheduled tasks.
     """
 
     def __init__(self, config: dict) -> None:

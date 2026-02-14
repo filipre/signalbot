@@ -21,7 +21,7 @@ def regex_triggered(
 
     Args:
         *by: A variable number of strings or compiled regex patterns to match the
-        message text against.
+            message text against.
     """
 
     def decorator_regex_triggered(func: Callable[P, T]) -> Callable[P, T]:

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import base64
+from enum import Enum, auto
 from typing import TYPE_CHECKING, Any, Literal
 
 import aiohttp
@@ -10,20 +11,35 @@ if TYPE_CHECKING:
     from collections.abc import AsyncIterator
 
 
+class ConnectionMode(Enum):
+    """Protocol strategy for connecting to signal-cli-rest-api.
+
+    Attributes:
+        HTTPS_ONLY: Always use HTTPS/WSS.
+        HTTP_ONLY: Always use HTTP/WS.
+        AUTO: Start with HTTPS/WSS and fallback to HTTP/WS if unavailable.
+    """
+
+    HTTPS_ONLY = auto()
+    HTTP_ONLY = auto()
+    AUTO = auto()
+
+
 class SignalAPI:
     def __init__(  # noqa: ANN204
         self,
         signal_service: str,
         phone_number: str,
         download_attachments: bool = True,  # noqa: FBT001, FBT002
-        use_https: bool | None = None,  # noqa: FBT001
+        connection_mode: ConnectionMode = ConnectionMode.AUTO,
     ):
         self.phone_number = phone_number
-        self._use_https_configured = use_https is not None
+        self.connection_mode = connection_mode
+        use_https = connection_mode in (ConnectionMode.HTTPS_ONLY, ConnectionMode.AUTO)
         self._signal_api_uris = SignalAPIURIs(
             signal_service=signal_service,
             phone_number=phone_number,
-            use_https=True if use_https is None else use_https,
+            use_https=use_https,
         )
         self.download_attachments = download_attachments
 
@@ -306,18 +322,27 @@ class SignalAPI:
         ) as exc:
             raise HealthCheckError from exc
 
-    async def check_signal_service(self) -> bool:
-        preferred_use_https = self._signal_api_uris.use_https
+    async def _is_signal_service_available(self) -> bool:
         try:
             return (await self.health_check()).status == 204  # noqa: PLR2004
         except HealthCheckError:
-            if self._use_https_configured:
-                return False
-            self._signal_api_uris.use_https = not preferred_use_https
-            try:
-                return (await self.health_check()).status == 204  # noqa: PLR2004
-            except HealthCheckError:
-                return False
+            return False
+
+    async def check_signal_service(self) -> bool:
+        if self.connection_mode in (
+            ConnectionMode.HTTPS_ONLY,
+            ConnectionMode.HTTP_ONLY,
+        ):
+            # use_https is already set according to the connection mode
+            return await self._is_signal_service_available()
+
+        # try HTTPS/WSS first in ConnectionMode.AUTO mode
+        if await self._is_signal_service_available():
+            return True
+
+        # if secure protocol is unavailable, fallback to HTTP/WS
+        self._signal_api_uris.use_https = False
+        return await self._is_signal_service_available()
 
     async def get_signal_cli_about(self) -> dict[str, Any]:
         uri = self._signal_api_uris.about_rest_uri()

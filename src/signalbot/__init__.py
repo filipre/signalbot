@@ -1,6 +1,11 @@
 import importlib.metadata
 
-from signalbot.api import ReceiveMessagesError, SendMessageError, SignalAPI
+from signalbot.api import (
+    ConnectionMode,
+    ReceiveMessagesError,
+    SendMessageError,
+    SignalAPI,
+)
 from signalbot.bot import SignalBot, enable_console_logging
 from signalbot.command import Command, CommandError, regex_triggered, triggered
 from signalbot.context import Context
@@ -10,6 +15,7 @@ from signalbot.message import Message, MessageType, Quote, UnknownMessageFormatE
 __all__ = [
     "Command",
     "CommandError",
+    "ConnectionMode",
     "Context",
     "LinkPreview",
     "Message",

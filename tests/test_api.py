@@ -3,6 +3,7 @@ import pytest
 from pytest_mock import MockerFixture
 
 from signalbot import SignalAPI
+from signalbot.api import HealthCheckError
 
 
 class TestAPI:
@@ -64,3 +65,35 @@ class TestAPI:
         expected_uri = f"https://{self.signal_service}/v1/attachments"
         actual_uri = self.signal_api._signal_api_uris.attachment_rest_uri()  # noqa: SLF001
         assert actual_uri == expected_uri
+
+    @pytest.mark.asyncio
+    async def test_check_signal_service_prefers_configured_protocol(
+        self, mocker: MockerFixture
+    ):
+        signal_api = SignalAPI(self.signal_service, self.phone_number, use_https=False)
+
+        health_check_mock = mocker.patch.object(
+            signal_api, "health_check", new_callable=mocker.AsyncMock
+        )
+        health_check_mock.return_value = mocker.Mock(status=204)
+
+        is_healthy = await signal_api.check_signal_service()
+
+        assert is_healthy is True
+        assert signal_api._signal_api_uris.use_https is False  # noqa: SLF001
+
+    @pytest.mark.asyncio
+    async def test_check_signal_service_falls_back_to_other_protocol(
+        self, mocker: MockerFixture
+    ):
+        signal_api = SignalAPI(self.signal_service, self.phone_number, use_https=False)
+
+        health_check_mock = mocker.patch.object(
+            signal_api, "health_check", new_callable=mocker.AsyncMock
+        )
+        health_check_mock.side_effect = [HealthCheckError(), mocker.Mock(status=204)]
+
+        is_healthy = await signal_api.check_signal_service()
+
+        assert is_healthy is True
+        assert signal_api._signal_api_uris.use_https is True  # noqa: SLF001

@@ -70,6 +70,34 @@ class TestProducer(TestCommon):
         assert self.signal_bot._q.qsize() == 4  # noqa: PLR2004, SLF001
 
 
+class TestSignalApiProtocolConfig:
+    signal_service = "127.0.0.1:8080"
+    phone_number = "+49123456789"
+
+    def test_use_https_defaults_to_true(self):
+        signal_bot = SignalBot(
+            {
+                "signal_service": self.signal_service,
+                "phone_number": self.phone_number,
+                "storage": {"type": "in-memory"},
+            }
+        )
+
+        assert signal_bot._signal._signal_api_uris.use_https is True  # noqa: SLF001
+
+    def test_use_https_can_be_set_to_false(self):
+        signal_bot = SignalBot(
+            {
+                "signal_service": self.signal_service,
+                "phone_number": self.phone_number,
+                "storage": {"type": "in-memory"},
+                "use_https": False,
+            }
+        )
+
+        assert signal_bot._signal._signal_api_uris.use_https is False  # noqa: SLF001
+
+
 class TestUsernameValidation(TestCommon):
     def test_valid_username(self):
         valid_usernames = [

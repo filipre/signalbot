@@ -85,6 +85,7 @@ class SignalBot:
             redis_port: 6379
         retry_interval: 1
         download_attachments: True
+        use_https: True
         ```
         """
         self._logger = logging.getLogger(LOGGER_NAME)
@@ -103,10 +104,12 @@ class SignalBot:
             self._phone_number = self.config["phone_number"]
             self._signal_service = self.config["signal_service"]
             download_attachments = self.config.get("download_attachments", True)
+            use_https = self.config.get("use_https", True)
             self._signal = SignalAPI(
                 self._signal_service,
                 self._phone_number,
                 download_attachments,
+                use_https,
             )
         except KeyError:
             raise SignalBotError("Could not initialize SignalAPI with given config")  # noqa: B904, EM101, TRY003

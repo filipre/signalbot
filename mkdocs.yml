@@ -6,11 +6,11 @@ repo_url: https://github.com/signalbot-org/signalbot
 repo_name: signalbot-org/signalbot
 
 nav:
-  - Home: index.md
+  - Overview: index.md
   - Getting started: getting_started.md
   - Examples: examples.md
   - Additional information: additional_information.md
-  - API:
+  - Reference:
     - SignalBot: api_bot.md
     - Message: api_message.md
     - Context: api_context.md

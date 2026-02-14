@@ -62,9 +62,13 @@ class SignalBot:
     Attributes:
         config (dict): The configuration dictionary for the bot.
         commands: A list of registered commands with their filters.
+            Only available after `.start()` is called and `init_task` is done.
         groups (list): A list of groups the bot is a member of.
+            Only available after `.start()` is called and `init_task` is done.
         storage (SQLiteStorage | RedisStorage): The storage backend used by the bot.
         scheduler (AsyncIOScheduler): The scheduler for running scheduled tasks.
+        init_task (asyncio.Task | None): The initialization async task for the bot.
+            Only available after `.start()` is called.
     """
 
     def __init__(self, config: dict) -> None:
@@ -99,6 +103,8 @@ class SignalBot:
         self._groups_by_internal_id = {}
         self._groups_by_name = defaultdict(list)
 
+        self.init_task: None | asyncio.Task = None
+
         try:
             self._phone_number = self.config["phone_number"]
             self._signal_service = self.config["signal_service"]
@@ -118,7 +124,6 @@ class SignalBot:
             asyncio.set_event_loop(self._event_loop)
 
         self._q = asyncio.Queue()
-        self._running_tasks: set[asyncio.Task] = set()
 
         self._produce_tasks: set[asyncio.Task] = set()
         self._consume_tasks: set[asyncio.Task] = set()
@@ -205,7 +210,7 @@ class SignalBot:
         await self._check_signal_cli_rest_api_mode()
         await self._detect_groups()
         await self._resolve_commands()
-        await self._produce_consume_messages()
+        await self._create_produce_consume_messages_tasks()
 
     async def _check_signal_service(self) -> None:
         while (await self._signal.check_signal_service()) is False:
@@ -245,10 +250,9 @@ class SignalBot:
         Args:
             run_forever: Whether to start the event loop or only add the task to it.
         """
-        task = self._event_loop.create_task(
+        self.init_task = self._event_loop.create_task(
             self._rerun_on_exception(self._async_post_init),
         )
-        self._store_reference_to_task(task, self._running_tasks)
 
         if run_forever:
             self.scheduler.start()
@@ -641,7 +645,7 @@ class SignalBot:
             self._logger.warning(f"Restarting coroutine in {sleep_t} seconds")  # noqa: G004
             await asyncio.sleep(sleep_t)
 
-    async def _produce_consume_messages(
+    async def _create_produce_consume_messages_tasks(
         self,
         producers: int = 1,
         consumers: int = 3,

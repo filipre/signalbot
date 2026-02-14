@@ -32,7 +32,7 @@ def main(
 
     bot.scheduler.add_job(send, args=[bot, receiver, text])
     bot.scheduler.add_job(
-        send, args=[bot, receiver, "Ping"], trigger="interval", seconds=2
+        send, args=[bot, receiver, "Ping"], trigger="interval", seconds=5
     )
     bot.start()
 

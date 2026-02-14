@@ -83,7 +83,7 @@ class TestSignalApiProtocolConfig:
             }
         )
 
-        assert signal_bot._signal.connection_mode is ConnectionMode.AUTO  # noqa: SLF001
+        assert signal_bot._signal.connection_mode == ConnectionMode.AUTO  # noqa: SLF001
         assert signal_bot._signal._signal_api_uris.use_https is True  # noqa: SLF001
 
     def test_connection_mode_can_be_set_to_http_only(self):
@@ -96,7 +96,7 @@ class TestSignalApiProtocolConfig:
             }
         )
 
-        assert signal_bot._signal.connection_mode is ConnectionMode.HTTP_ONLY  # noqa: SLF001
+        assert signal_bot._signal.connection_mode == ConnectionMode.HTTP_ONLY  # noqa: SLF001
         assert signal_bot._signal._signal_api_uris.use_https is False  # noqa: SLF001
 
     def test_connection_mode_can_be_set_to_https_only(self):
@@ -109,7 +109,7 @@ class TestSignalApiProtocolConfig:
             }
         )
 
-        assert signal_bot._signal.connection_mode is ConnectionMode.HTTPS_ONLY  # noqa: SLF001
+        assert signal_bot._signal.connection_mode == ConnectionMode.HTTPS_ONLY  # noqa: SLF001
         assert signal_bot._signal._signal_api_uris.use_https is True  # noqa: SLF001
 
 

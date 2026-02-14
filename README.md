@@ -10,7 +10,7 @@ Python package to build your own Signal bots.
 
 ## Installation
 
-See the [getting started]() section in the documentation.
+See the [getting started](https://signalbot-org.github.io/signalbot/getting_started) section in the documentation.
 
 ## Minimal bot
 
@@ -41,7 +41,7 @@ if __name__ == "__main__":
 
 ## Help
 
-See the [documentation]() for more details.
+See the [documentation](https://signalbot-org.github.io/signalbot/) for more details.
 
 ## Other Projects
 

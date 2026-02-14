@@ -19,7 +19,8 @@ async def send(bot: SignalBot, receiver: str, text: str) -> None:
 
 
 def main(
-    receiver: str = os.environ["PHONE_NUMBER"], text: str = "Hello from SignalBot!"
+    receiver: str = os.environ["PHONE_NUMBER"],
+    text: str = "Hello from SignalBot!",
 ) -> None:
     enable_console_logging(logging.INFO)
 

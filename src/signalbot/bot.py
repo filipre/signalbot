@@ -552,9 +552,10 @@ class SignalBot:
     def _is_valid_uuid(self, receiver_uuid: str) -> bool:
         try:
             uuid.UUID(str(receiver_uuid))
-            return True  # noqa: TRY300
         except ValueError:
             return False
+        else:
+            return True
 
     def _is_username(self, receiver_username: str) -> bool:  # noqa: PLR0911
         """
@@ -574,11 +575,10 @@ class SignalBot:
                 return False
             try:
                 digits = int(digits)
-                if digits == 0:  # noqa: SIM103
-                    return False
-                return True  # noqa: TRY300
             except ValueError:
                 return False
+            else:
+                return digits != 0
         else:
             return False
 

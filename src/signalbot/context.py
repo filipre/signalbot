@@ -10,6 +10,12 @@ if TYPE_CHECKING:
 
 
 class Context:
+    """
+    Context is a helper class that provides methods to reply, edit, react, etc. to a
+    message. This is useful to avoid having to pass the recipient and other arguments to
+    the bot's methods manually.
+    """
+
     def __init__(self, bot: SignalBot, message: Message) -> None:
         self.bot = bot
         self.message = message
@@ -24,6 +30,9 @@ class Context:
         text_mode: str | None = None,
         view_once: bool = False,
     ) -> int:
+        """Same as
+         [signalbot.SignalBot.send()](api_bot.md#signalbot.SignalBot.send)
+        but with the recipient set to the message's recipient."""
         return await self.bot.send(
             self.message.recipient(),
             text,
@@ -45,6 +54,9 @@ class Context:
         text_mode: str | None = None,
         view_once: bool = False,
     ) -> int:
+        """Same as
+         [signalbot.SignalBot.send()](api_bot.md#signalbot.SignalBot.send)
+        but with the recipient and timestamp set to the message's."""
         return await self.bot.send(
             self.message.recipient(),
             text,
@@ -68,6 +80,9 @@ class Context:
         text_mode: str | None = None,
         view_once: bool = False,
     ) -> int:
+        """Same as
+         [signalbot.SignalBot.send()](api_bot.md#signalbot.SignalBot.send)
+        but with the quote arguments set to the message's."""
         send_mentions = self._convert_receive_mentions_into_send_mentions(
             self.message.mentions,
         )
@@ -86,18 +101,33 @@ class Context:
         )
 
     async def react(self, emoji: str) -> None:
+        """Same as
+         [signalbot.SignalBot.react()](api_bot.md#signalbot.SignalBot.react)
+        but with the recipient set to the message's recipient."""
         await self.bot.react(self.message, emoji)
 
     async def receipt(self, receipt_type: Literal["read", "viewed"]) -> None:
+        """Same as
+         [signalbot.SignalBot.receipt()](api_bot.md#signalbot.SignalBot.receipt)
+        but with the recipient set to the message's recipient."""
         await self.bot.receipt(self.message, receipt_type)
 
     async def start_typing(self) -> None:
+        """Same as
+        [signalbot.SignalBot.start_typing()](api_bot.md#signalbot.SignalBot.start_typing)
+         but with the recipient set to the message's recipient."""
         await self.bot.start_typing(self.message.recipient())
 
     async def stop_typing(self) -> None:
+        """Same as
+        [signalbot.SignalBot.stop_typing()](api_bot.md#signalbot.SignalBot.stop_typing)
+         but with the recipient set to the message's recipient."""
         await self.bot.stop_typing(self.message.recipient())
 
     async def remote_delete(self, timestamp: int) -> int:
+        """Same as
+        [signalbot.SignalBot.remote_delete()](api_bot.md#signalbot.SignalBot.remote_delete)
+        but with the recipient and timestamp set to the message's."""
         return await self.bot.remote_delete(
             self.message.recipient(), timestamp=timestamp
         )

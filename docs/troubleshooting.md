@@ -1,0 +1,6 @@
+- Check that you linked your account successfully
+- Can you receive messages using `wscat` (websockets) and send messages using `curl` (http)?
+- Do you see incoming messages in the API logs?
+- Do you see the "raw" messages in the bot's logs?
+- Do you see "consumers" picking up jobs and handling incoming messages?
+- Do you see the response in the bot's logs?

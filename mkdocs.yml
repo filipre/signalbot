@@ -1,0 +1,102 @@
+site_name: Signalbot
+site_description: Documentation for Signalbot, a Python library for building Signal bots using the signal-cli-rest-api.
+site_author: Era Dorta
+
+repo_url: https://github.com/signalbot-org/signalbot
+repo_name: signalbot-org/signalbot
+
+nav:
+  - Home: index.md
+  - Getting started: getting_started.md
+  - Examples: examples.md
+  - Additional information: additional_information.md
+  - API:
+    - SignalBot: api_bot.md
+    - Message: api_message.md
+    - Context: api_context.md
+    - LinkPreview: api_linkpreview.md
+    - Command: api_command.md
+    - Quote: api_quote.md
+  - Troubleshooting: troubleshooting.md
+  - Contributing: local_development.md
+
+theme:
+  name: material
+  icon:
+    logo: fontawesome/solid/book
+    repo: fontawesome/brands/github
+  palette:
+    # Palette toggle for automatic mode
+    - media: "(prefers-color-scheme)"
+      toggle:
+        icon: material/brightness-auto
+        name: Switch to light mode
+
+    # Palette toggle for light mode
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+
+    # Palette toggle for dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      toggle:
+        icon: material/brightness-4
+        name: Switch to system preference
+  features:
+    - navigation.top
+    - navigation.indexes
+    - content.code.annotate
+    - content.code.copy
+
+
+markdown_extensions:
+  - abbr
+  - admonition
+  - attr_list
+  - def_list
+  - footnotes
+  - toc:
+      permalink: true
+  - pymdownx.arithmatex:
+      generic: true
+  - pymdownx.betterem:
+      smart_enable: all
+  - pymdownx.caret
+  - pymdownx.details
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
+  - pymdownx.highlight:
+      guess_lang: false
+  - pymdownx.inlinehilite
+  - pymdownx.keys:
+      key_map:
+        click: "Click"
+        left-click: "Left Click"
+        right-click: "Right Click"
+  - pymdownx.magiclink
+  - pymdownx.mark
+  - pymdownx.saneheaders
+  - pymdownx.smartsymbols
+  - pymdownx.superfences
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.tasklist:
+      custom_checkbox: true
+  - pymdownx.tilde
+  - pymdownx.snippets
+
+plugins:
+  - search
+  - git-revision-date-localized:
+      enable_creation_date: true
+      fallback_to_build_date: true
+  - mkdocstrings:
+      handlers:
+        python:
+          options:
+            show_docstring_attributes: true
+            show_root_toc_entry: false

@@ -51,7 +51,10 @@ python bot.py
 ```
 
 By default, `SignalBot` starts with `HTTPS/WSS` and can fallback to `HTTP/WS` if needed.
-If you want to lock the protocol, set `"use_https": True` (only `HTTPS/WSS`) or `"use_https": False` (only `HTTP/WS`) in the `SignalBot` config.
+Set `connection_mode` in the config to control behavior:
+- `ConnectionMode.HTTPS_ONLY`: only `HTTPS/WSS`
+- `ConnectionMode.HTTP_ONLY`: only `HTTP/WS`
+- `ConnectionMode.AUTO`: start with `HTTPS/WSS`, fallback to `HTTP/WS` (default)
 
 7. The logs should indicate that one "producer" and three "consumers" have started. The producer checks for new messages sent to the linked account using a web socket connection. It creates a task for every registered command and the consumers work off the tasks. In case you are working with many blocking function calls, you may need to adjust the number of consumers such that the bot stays reactive.
 ```

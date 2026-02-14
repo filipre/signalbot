@@ -83,10 +83,27 @@ class TestAPI:
         assert signal_api._signal_api_uris.use_https is False  # noqa: SLF001
 
     @pytest.mark.asyncio
-    async def test_check_signal_service_falls_back_to_other_protocol(
+    async def test_check_signal_service_does_not_fallback_if_protocol_configured(
         self, mocker: MockerFixture
     ):
         signal_api = SignalAPI(self.signal_service, self.phone_number, use_https=False)
+
+        health_check_mock = mocker.patch.object(
+            signal_api, "health_check", new_callable=mocker.AsyncMock
+        )
+        health_check_mock.side_effect = HealthCheckError()
+
+        is_healthy = await signal_api.check_signal_service()
+
+        assert is_healthy is False
+        assert health_check_mock.call_count == 1
+        assert signal_api._signal_api_uris.use_https is False  # noqa: SLF001
+
+    @pytest.mark.asyncio
+    async def test_check_signal_service_falls_back_to_other_protocol_in_auto_mode(
+        self, mocker: MockerFixture
+    ):
+        signal_api = SignalAPI(self.signal_service, self.phone_number)
 
         health_check_mock = mocker.patch.object(
             signal_api, "health_check", new_callable=mocker.AsyncMock
@@ -96,4 +113,4 @@ class TestAPI:
         is_healthy = await signal_api.check_signal_service()
 
         assert is_healthy is True
-        assert signal_api._signal_api_uris.use_https is True  # noqa: SLF001
+        assert signal_api._signal_api_uris.use_https is False  # noqa: SLF001

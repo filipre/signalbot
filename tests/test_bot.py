@@ -84,6 +84,7 @@ class TestSignalApiProtocolConfig:
         )
 
         assert signal_bot._signal._signal_api_uris.use_https is True  # noqa: SLF001
+        assert signal_bot._signal._use_https_configured is False  # noqa: SLF001
 
     def test_use_https_can_be_set_to_false(self):
         signal_bot = SignalBot(
@@ -96,6 +97,7 @@ class TestSignalApiProtocolConfig:
         )
 
         assert signal_bot._signal._signal_api_uris.use_https is False  # noqa: SLF001
+        assert signal_bot._signal._use_https_configured is True  # noqa: SLF001
 
 
 class TestUsernameValidation(TestCommon):

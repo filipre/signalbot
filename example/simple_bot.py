@@ -1,4 +1,4 @@
-import logging
+import logging  # noqa: INP001
 import os
 
 from signalbot import Command, Context, SignalBot, enable_console_logging, triggered

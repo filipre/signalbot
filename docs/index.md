@@ -3,7 +3,7 @@
 Python package to build your own Signal bots.
 
 The package provides methods to easily listen for incoming messages and responding or reacting on them.
-It also provides a class to develop new commands which then can be registered within the bot.
+It also provides a class to develop new commands, which then can be registered within the bot.
 
 Here is minimal example of what that looks like:
 ```python
@@ -12,7 +12,7 @@ Here is minimal example of what that looks like:
 
 To set it up follow the steps in the [getting started page](getting_started.md).
 
-### Common methods
+### Methods overview
 
 The bot can do a lot more, here is a quick overview of the most common methods:
 
@@ -30,3 +30,8 @@ The bot can do a lot more, here is a quick overview of the most common methods:
 - `bot.update_group(group_id, avatar, description, expiration, name)`: Change group settings
 - `bot.delete_attachment(attachment_filename)`: Delete the local copy of an attachment
 - `bot.scheduler`: APScheduler > AsyncIOScheduler, see [here](https://apscheduler.readthedocs.io/en/3.x/modules/schedulers/asyncio.html?highlight=AsyncIOScheduler#apscheduler.schedulers.asyncio.AsyncIOScheduler)
+
+## Real world bot examples
+
+There are many real world examples of bot implementations using this library.
+Check the whole list at https://github.com/signalbot-org/signalbot/network/dependents

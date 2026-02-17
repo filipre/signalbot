@@ -50,6 +50,12 @@ pip install signalbot
 python bot.py
 ```
 
+By default, `SignalBot` starts with `HTTPS/WSS` and can fallback to `HTTP/WS` if needed.
+Set `connection_mode` in the config to control behavior:
+- `ConnectionMode.HTTPS_ONLY`: only `HTTPS/WSS`
+- `ConnectionMode.HTTP_ONLY`: only `HTTP/WS`
+- `ConnectionMode.AUTO`: start with `HTTPS/WSS`, fallback to `HTTP/WS` (default)
+
 7. The logs should indicate that one "producer" and three "consumers" have started. The producer checks for new messages sent to the linked account using a web socket connection. It creates a task for every registered command and the consumers work off the tasks. In case you are working with many blocking function calls, you may need to adjust the number of consumers such that the bot stays reactive.
 ```
 <date> signalbot [WARNING] - __init__ - [Bot] Could not initialize Redis and no SQLite DB name was given. In-memory storage will be used. Restarting will delete the storage! Add storage: {'type': 'in-memory'} to the config to silence this error.

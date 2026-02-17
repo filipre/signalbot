@@ -4,7 +4,7 @@ import aiohttp
 import pytest
 from pytest_mock import MockerFixture
 
-from signalbot import Command, SignalAPI, SignalBot
+from signalbot import Command, ConnectionMode, SignalAPI, SignalBot
 from signalbot.context import Context
 from signalbot.utils import DummyCommand
 
@@ -68,6 +68,49 @@ class TestProducer(TestCommon):
         await self.signal_bot._produce(1337)  # noqa: SLF001
 
         assert self.signal_bot._q.qsize() == 4  # noqa: PLR2004, SLF001
+
+
+class TestSignalApiProtocolConfig:
+    signal_service = "127.0.0.1:8080"
+    phone_number = "+49123456789"
+
+    def test_connection_mode_defaults_to_auto(self):
+        signal_bot = SignalBot(
+            {
+                "signal_service": self.signal_service,
+                "phone_number": self.phone_number,
+                "storage": {"type": "in-memory"},
+            }
+        )
+
+        assert signal_bot._signal.connection_mode == ConnectionMode.AUTO  # noqa: SLF001
+        assert signal_bot._signal._signal_api_uris.use_https is True  # noqa: SLF001
+
+    def test_connection_mode_can_be_set_to_http_only(self):
+        signal_bot = SignalBot(
+            {
+                "signal_service": self.signal_service,
+                "phone_number": self.phone_number,
+                "storage": {"type": "in-memory"},
+                "connection_mode": ConnectionMode.HTTP_ONLY,
+            }
+        )
+
+        assert signal_bot._signal.connection_mode == ConnectionMode.HTTP_ONLY  # noqa: SLF001
+        assert signal_bot._signal._signal_api_uris.use_https is False  # noqa: SLF001
+
+    def test_connection_mode_can_be_set_to_https_only(self):
+        signal_bot = SignalBot(
+            {
+                "signal_service": self.signal_service,
+                "phone_number": self.phone_number,
+                "storage": {"type": "in-memory"},
+                "connection_mode": ConnectionMode.HTTPS_ONLY,
+            }
+        )
+
+        assert signal_bot._signal.connection_mode == ConnectionMode.HTTPS_ONLY  # noqa: SLF001
+        assert signal_bot._signal._signal_api_uris.use_https is True  # noqa: SLF001
 
 
 class TestUsernameValidation(TestCommon):

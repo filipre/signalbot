@@ -25,6 +25,9 @@ class ConnectionMode(Enum):
     AUTO = auto()
 
 
+HEALTH_CHECK_GOOD_STATUS = 204
+
+
 class SignalAPI:
     def __init__(  # noqa: ANN204
         self,
@@ -324,23 +327,19 @@ class SignalAPI:
 
     async def _is_signal_service_available(self) -> bool:
         try:
-            return (await self.health_check()).status == 204  # noqa: PLR2004
+            return (await self.health_check()).status == HEALTH_CHECK_GOOD_STATUS
         except HealthCheckError:
             return False
 
     async def check_signal_service(self) -> bool:
-        if self.connection_mode in (
-            ConnectionMode.HTTPS_ONLY,
-            ConnectionMode.HTTP_ONLY,
-        ):
+        if self.connection_mode != ConnectionMode.AUTO:
             # use_https is already set according to the connection mode
             return await self._is_signal_service_available()
 
-        # try HTTPS/WSS first in ConnectionMode.AUTO mode
+        self._signal_api_uris.use_https = True
         if await self._is_signal_service_available():
             return True
 
-        # if secure protocol is unavailable, fallback to HTTP/WS
         self._signal_api_uris.use_https = False
         return await self._is_signal_service_available()
 

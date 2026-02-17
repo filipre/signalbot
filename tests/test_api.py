@@ -3,7 +3,7 @@ import pytest
 from pytest_mock import MockerFixture
 
 from signalbot import ConnectionMode, SignalAPI
-from signalbot.api import HealthCheckError
+from signalbot.api import HEALTH_CHECK_GOOD_STATUS, HealthCheckError
 
 
 class TestAPI:
@@ -79,7 +79,7 @@ class TestAPI:
         health_check_mock = mocker.patch.object(
             signal_api, "health_check", new_callable=mocker.AsyncMock
         )
-        health_check_mock.return_value = mocker.Mock(status=204)
+        health_check_mock.return_value = mocker.Mock(status=HEALTH_CHECK_GOOD_STATUS)
 
         is_healthy = await signal_api.check_signal_service()
 
@@ -99,7 +99,7 @@ class TestAPI:
         health_check_mock = mocker.patch.object(
             signal_api, "health_check", new_callable=mocker.AsyncMock
         )
-        health_check_mock.return_value = mocker.Mock(status=204)
+        health_check_mock.return_value = mocker.Mock(status=HEALTH_CHECK_GOOD_STATUS)
 
         is_healthy = await signal_api.check_signal_service()
 
@@ -137,7 +137,10 @@ class TestAPI:
         health_check_mock = mocker.patch.object(
             signal_api, "health_check", new_callable=mocker.AsyncMock
         )
-        health_check_mock.side_effect = [HealthCheckError(), mocker.Mock(status=204)]
+        health_check_mock.side_effect = [
+            HealthCheckError(),
+            mocker.Mock(status=HEALTH_CHECK_GOOD_STATUS),
+        ]
 
         is_healthy = await signal_api.check_signal_service()
 
@@ -157,7 +160,7 @@ class TestAPI:
         health_check_mock = mocker.patch.object(
             signal_api, "health_check", new_callable=mocker.AsyncMock
         )
-        health_check_mock.return_value = mocker.Mock(status=204)
+        health_check_mock.return_value = mocker.Mock(status=HEALTH_CHECK_GOOD_STATUS)
 
         is_healthy = await signal_api.check_signal_service()
 

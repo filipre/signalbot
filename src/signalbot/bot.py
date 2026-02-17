@@ -69,14 +69,14 @@ class SignalBot:
     start the bot, and interact with messages.
 
     Attributes:
-        config: The configuration for the bot.
+        config (BotConfig): The configuration for the bot.
         commands: A list of registered commands with their filters.
             Only available after `.start()` is called and `init_task` is done.
         groups (list): A list of groups the bot is a member of.
             Only available after `.start()` is called and `init_task` is done.
         storage (SQLiteStorage | RedisStorage): The storage backend used by the bot.
         scheduler (AsyncIOScheduler): The scheduler for running scheduled tasks.
-        init_task (asyncio.Task | None): The initialization async task for the bot.
+        init_task: The initialization async task for the bot.
             Only available after `.start()` is called.
     """
 
@@ -87,18 +87,11 @@ class SignalBot:
             config: the configuration for the bot.
 
         Example config:
-        ```yaml
-        # ======= Mandatory fields ========
-        signal_service: "127.0.0.1:8080"
-        phone_number: "+49123456789"
-
-        # ======= Optional fields ========
-        storage:
-            redis_host: "redis"
-            redis_port: 6379
-        retry_interval: 1
-        download_attachments: True
-        connection_mode: ConnectionMode.AUTO
+        ```python
+        {
+            signal_service: "127.0.0.1:8080",
+            phone_number: "+49123456789"
+        }
         ```
         """
         self._logger = logging.getLogger(LOGGER_NAME)

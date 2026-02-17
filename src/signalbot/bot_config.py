@@ -11,22 +11,62 @@ from signalbot.api import ConnectionMode
 
 
 class RedisConfig(BaseModel):
+    """
+    The configuration for the Redis storage backend.
+
+    Attributes:
+        type: The type of storage.
+        redis_host: The hostname of the Redis server.
+        redis_port: The port number of the Redis server.
+    """
+
     type: Literal["redis"] = "redis"
     redis_host: str
     redis_port: int
 
 
 class SQLiteConfig(BaseModel):
+    """
+    The configuration for the SQLite storage backend.
+
+    Attributes:
+        type: The type of storage.
+        sqlite_db: The path to the SQLite database file.
+        check_same_thread: Whether to check the same thread when accessing the database.
+    """
+
     type: Literal["sqlite"] = "sqlite"
     sqlite_db: str | Path
     check_same_thread: bool = True
 
 
 class InMemoryConfig(BaseModel):
+    """
+    The configuration for the in-memory storage backend.
+
+    Attributes:
+        type: The type of storage.
+    """
+
     type: Literal["in-memory"] = "in-memory"
 
 
 class BotConfig(BaseModel):
+    """
+    The configuration for SignalBot.
+
+    Attributes:
+        signal_service: The URL of the signal-cli-rest-api service to connect to.
+        phone_number: The phone number of the bot.
+        storage: The configuration for the storage backend to use. Defaults to `None`.
+        retry_interval: The interval in seconds to wait before retrying a failed
+            connection to the signal service.
+        download_attachments: Whether to download attachments from messages. Defaults to
+            `True`.
+        connection_mode: The connection mode to use when connecting to the Signal
+            service. Defaults to `ConnectionMode.AUTO`.
+    """
+
     signal_service: str
     phone_number: str
 

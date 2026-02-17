@@ -9,7 +9,10 @@ repo_name: signalbot-org/signalbot
 nav:
   - Overview: index.md
   - Getting started: getting_started.md
-  - Examples: examples.md
+  - Examples:
+    - API overview: examples/api_overview.md
+    - Bot config: examples/bot_config_options.md
+    - Scheduler: examples/bot_with_scheduler.md
   - Additional information: additional_information.md
   - Reference:
     - SignalBot: api_bot.md

@@ -1,9 +1,3 @@
-# Examples
-
-The code shown here can be found the [example folder](https://github.com/signalbot-org/signalbot/tree/main/example).
-
-## Bot with several commands
-
 This bot showcases how to use most of the features in the library.
 Check the [commands section](#commands) to see the implementation of each command.
 
@@ -82,10 +76,4 @@ Check the [commands section](#commands) to see the implementation of each comman
 ```
 </details>
 
-
-## Bot with scheduler
-
-This bot showcases how to use the scheduler and also how to use the library without using the `Command` class.
-``` python
---8<-- "example/bot_with_scheduler.py"
-```
+The code shown here can be found the [example folder](https://github.com/signalbot-org/signalbot/tree/main/example).

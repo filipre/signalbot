@@ -4,14 +4,14 @@
 
 The configuration of the bot can be specified in several ways.
 
-### BotConfig
+### Config
 
-Create a [BotConfig][signalbot.BotConfig] instance:
+Create a [Config][signalbot.Config] instance:
 
 ```python
-from signalbot import SignalBot, BotConfig, ConnectionMode
+from signalbot import SignalBot, Config, ConnectionMode
 
-config = BotConfig(
+config = Config(
     signal_service="http://localhost:8080",
     phone_number="+1234567890",
 )
@@ -25,7 +25,7 @@ bot.start()
 Create a python dictionary:
 
 ```python
-from signalbot import SignalBot, BotConfig
+from signalbot import SignalBot, Config
 
 config = {
     "signal_service": "http://localhost:8080",

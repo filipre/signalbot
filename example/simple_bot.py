@@ -1,7 +1,14 @@
 import logging  # noqa: INP001
 import os
 
-from signalbot import Command, Context, SignalBot, enable_console_logging, triggered
+from signalbot import (
+    Command,
+    Config,
+    Context,
+    SignalBot,
+    enable_console_logging,
+    triggered,
+)
 
 
 class PingCommand(Command):
@@ -14,10 +21,10 @@ if __name__ == "__main__":
     enable_console_logging(logging.INFO)
 
     bot = SignalBot(
-        {
-            "signal_service": os.environ["SIGNAL_SERVICE"],
-            "phone_number": os.environ["PHONE_NUMBER"],
-        }
+        Config(
+            signal_service=os.environ["SIGNAL_SERVICE"],
+            phone_number=os.environ["PHONE_NUMBER"],
+        )
     )
     bot.register(PingCommand())  # Run the command for all contacts and groups
     bot.start()

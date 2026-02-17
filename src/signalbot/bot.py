@@ -17,7 +17,7 @@ from packaging.version import Version
 
 from signalbot.api import ReceiveMessagesError, SignalAPI
 from signalbot.bot_config import (
-    BotConfig,
+    Config,
     InMemoryConfig,
     RedisConfig,
     SQLiteConfig,
@@ -69,7 +69,7 @@ class SignalBot:
     start the bot, and interact with messages.
 
     Attributes:
-        config (BotConfig): The configuration for the bot.
+        config (Config): The configuration for the bot.
         commands: A list of registered commands with their filters.
             Only available after `.start()` is called and `init_task` is done.
         groups (list): A list of groups the bot is a member of.
@@ -80,7 +80,7 @@ class SignalBot:
             Only available after `.start()` is called.
     """
 
-    def __init__(self, config: BotConfig | Mapping | Path | str) -> None:
+    def __init__(self, config: Config | Mapping | Path | str) -> None:
         """Initilization for the SignalBot.
 
         Args:

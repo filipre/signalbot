@@ -8,20 +8,29 @@ import time
 import traceback
 import uuid
 from collections import defaultdict
-from collections.abc import Callable
+from collections.abc import Callable, Mapping
 from typing import TYPE_CHECKING, Any, Literal, TypeAlias
 
 import phonenumbers
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from packaging.version import Version
 
-from signalbot.api import ConnectionMode, ReceiveMessagesError, SignalAPI
+from signalbot.api import ReceiveMessagesError, SignalAPI
+from signalbot.bot_config import (
+    BotConfig,
+    InMemoryConfig,
+    RedisConfig,
+    SQLiteConfig,
+    load_config,
+)
 from signalbot.command import Command
 from signalbot.context import Context
 from signalbot.message import Message, MessageType, UnknownMessageFormatError
 from signalbot.storage import RedisStorage, SQLiteStorage
 
 if TYPE_CHECKING:
+    from pathlib import Path
+
     from signalbot.link_previews import LinkPreview
 
 CommandList: TypeAlias = list[
@@ -60,7 +69,7 @@ class SignalBot:
     start the bot, and interact with messages.
 
     Attributes:
-        config (dict): The configuration dictionary for the bot.
+        config: The configuration for the bot.
         commands: A list of registered commands with their filters.
             Only available after `.start()` is called and `init_task` is done.
         groups (list): A list of groups the bot is a member of.
@@ -71,11 +80,11 @@ class SignalBot:
             Only available after `.start()` is called.
     """
 
-    def __init__(self, config: dict) -> None:
+    def __init__(self, config: BotConfig | Mapping | Path | str) -> None:
         """Initilization for the SignalBot.
 
         Args:
-            config: Dictionary with the bot configuration.
+            config: the configuration for the bot.
 
         Example config:
         ```yaml
@@ -94,7 +103,7 @@ class SignalBot:
         """
         self._logger = logging.getLogger(LOGGER_NAME)
 
-        self.config = config
+        self.config = load_config(config)
 
         self._commands_to_be_registered: CommandList = []  # populated by .register()
         self.commands: CommandList = []  # populated by .start()
@@ -107,15 +116,11 @@ class SignalBot:
         self.init_task: None | asyncio.Task = None
 
         try:
-            self._phone_number = self.config["phone_number"]
-            self._signal_service = self.config["signal_service"]
-            download_attachments = self.config.get("download_attachments", True)
-            connection_mode = self.config.get("connection_mode", ConnectionMode.AUTO)
             self._signal = SignalAPI(
-                self._signal_service,
-                self._phone_number,
-                download_attachments,
-                connection_mode,
+                self.config.signal_service,
+                self.config.phone_number,
+                self.config.download_attachments,
+                self.config.connection_mode,
             )
         except KeyError:
             raise SignalBotError("Could not initialize SignalAPI with given config")  # noqa: B904, EM101, TRY003
@@ -136,36 +141,28 @@ class SignalBot:
         except Exception as e:  # noqa: BLE001
             raise SignalBotError(f"Could not initialize scheduler: {e}")  # noqa: B904, EM102, TRY003
 
-        config_storage = {}
-        try:
-            config_storage = self.config["storage"]
-            if config_storage.get("type") == "sqlite":
-                self._sqlite_db = config_storage["sqlite_db"]
-                check_same_thread = config_storage.get("check_same_thread", True)
-                self.storage = SQLiteStorage(
-                    self._sqlite_db,
-                    check_same_thread=check_same_thread,
-                )
-                self._logger.info("sqlite storage initilized")
-            else:
-                self._redis_host = config_storage["redis_host"]
-                self._redis_port = config_storage["redis_port"]
-                self.storage = RedisStorage(self._redis_host, self._redis_port)
-                self._logger.info("redis storage initilized")
-        except Exception:  # noqa: BLE001
+        if isinstance(self.config.storage, SQLiteConfig):
+            self.storage = SQLiteStorage(
+                self.config.storage.sqlite_db,
+                check_same_thread=self.config.storage.check_same_thread,
+            )
+            self._logger.info("sqlite storage initilized")
+        elif isinstance(self.config.storage, RedisConfig):
+            self.storage = RedisStorage(
+                self.config.storage.redis_host, self.config.storage.redis_port
+            )
+            self._logger.info("redis storage initilized")
+        elif isinstance(self.config.storage, InMemoryConfig):
             self.storage = SQLiteStorage()
-            if config_storage.get("type") != "in-memory":
-                self._logger.warning(
-                    "[Bot] Could not initialize Redis and no SQLite DB name was given."
-                    " In-memory storage will be used."
-                    " Restarting will delete the storage!"
-                    " Add storage: {'type': 'in-memory'}"
-                    " to the config to silence this error.",
-                )
-            if "redis_host" in config_storage:
-                self._logger.warning(
-                    f"[Bot] Redis initialization error: {traceback.format_exc()}",  # noqa: G004
-                )
+            self._logger.info("in-memory storage initilized")
+        else:
+            self.storage = SQLiteStorage()
+            self._logger.warning(
+                " Using in-memory storage."
+                " Restarting will delete the storage!"
+                " Add storage: {'type': 'in-memory'}"
+                " to the config to silence this error.",
+            )
 
     def register(
         self,
@@ -220,7 +217,7 @@ class SignalBot:
             self._logger.error(
                 "Cannot connect to the signal-cli-rest-api service, retrying"
             )
-            await asyncio.sleep(self.config.get("retry_interval", 1))
+            await asyncio.sleep(self.config.retry_interval)
 
     async def _check_signal_cli_rest_api_version(self) -> None:
         min_version = Version("0.95.0")

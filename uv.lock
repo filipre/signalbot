@@ -2145,7 +2145,7 @@ wheels = [
 
 [[package]]
 name = "signalbot"
-version = "0.23.1"
+version = "0.24.0"
 source = { editable = "." }
 dependencies = [
     { name = "aiohttp" },

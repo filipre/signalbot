@@ -12,12 +12,19 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Install uv
         uses: ./.github/workflows/install-uv
 
       - name: Install dependencies
         run: uv sync --locked --group docs
+
+      - name: Setup git for deploy
+        run: |
+          git config --global user.name "Mike Deploy Bot"
+          git config --global user.email "mike.deploy@email.com"
 
       - name: Build and deploy a new version with mike
         run: uv run mike deploy --push --update-aliases $(uv version --short) latest

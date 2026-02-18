@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import base64
-from enum import Enum, auto
+from enum import Enum
 from typing import TYPE_CHECKING, Any, Literal
 
 import aiohttp
@@ -11,7 +11,7 @@ if TYPE_CHECKING:
     from collections.abc import AsyncIterator
 
 
-class ConnectionMode(Enum):
+class ConnectionMode(str, Enum):
     """Protocol strategy for connecting to signal-cli-rest-api.
 
     Attributes:
@@ -20,9 +20,9 @@ class ConnectionMode(Enum):
         AUTO: Start with HTTPS/WSS and fallback to HTTP/WS if unavailable.
     """
 
-    HTTPS_ONLY = auto()
-    HTTP_ONLY = auto()
-    AUTO = auto()
+    HTTPS_ONLY = "https_only"
+    HTTP_ONLY = "http_only"
+    AUTO = "auto"
 
 
 HEALTH_CHECK_GOOD_STATUS = 204

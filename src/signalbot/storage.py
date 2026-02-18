@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 try:  # noqa: SIM105
     import redis
 except ModuleNotFoundError:
@@ -6,7 +8,10 @@ except ModuleNotFoundError:
 import json
 import sqlite3
 from abc import ABC, abstractmethod
-from typing import Any
+from typing import TYPE_CHECKING, Any
+
+if TYPE_CHECKING:
+    from pathlib import Path
 
 
 class Storage(ABC):
@@ -32,7 +37,7 @@ class StorageError(Exception):
 
 
 class SQLiteStorage(Storage):
-    def __init__(self, database: str = ":memory:", **kwargs):  # noqa: ANN003, ANN204
+    def __init__(self, database: str | Path = ":memory:", **kwargs):  # noqa: ANN003, ANN204
         self._sqlite = sqlite3.connect(database, **kwargs)
         self._sqlite.execute(
             "CREATE TABLE IF NOT EXISTS signalbot (key text unique, value text)",

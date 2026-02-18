@@ -19,7 +19,7 @@ This is what a minimal bot using signalbot looks like:
 ```python
 import os
 import logging
-from signalbot import SignalBot, Command, Context, triggered, enable_console_logging
+from signalbot import SignalBot, Config, Command, Context, triggered, enable_console_logging
 
 
 class PingCommand(Command):
@@ -31,10 +31,12 @@ class PingCommand(Command):
 if __name__ == "__main__":
     enable_console_logging(logging.INFO)
 
-    bot = SignalBot({
-        "signal_service": os.environ["SIGNAL_SERVICE"],
-        "phone_number": os.environ["PHONE_NUMBER"]
-    })
+    bot = SignalBot(
+        Config(
+            signal_service=os.environ["SIGNAL_SERVICE"],
+            phone_number=os.environ["PHONE_NUMBER"],
+        )
+    )
     bot.register(PingCommand()) # Run the command for all contacts and groups
     bot.start()
 ```

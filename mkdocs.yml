@@ -9,10 +9,14 @@ repo_name: signalbot-org/signalbot
 nav:
   - Overview: index.md
   - Getting started: getting_started.md
-  - Examples: examples.md
+  - Examples:
+    - API overview: examples/api_overview.md
+    - Bot config: examples/bot_config_options.md
+    - Scheduler: examples/bot_with_scheduler.md
   - Additional information: additional_information.md
   - Reference:
     - SignalBot: api_bot.md
+    - Config: api_bot_config.md
     - Message: api_message.md
     - Context: api_context.md
     - LinkPreview: api_linkpreview.md
@@ -98,10 +102,19 @@ plugins:
   - mkdocstrings:
       handlers:
         python:
+          inventories:
+            - https://docs.python.org/3/objects.inv
+            - https://mkdocstrings.github.io/griffe/objects.inv
+            - https://docs.pydantic.dev/latest/objects.inv
+            - https://apscheduler.readthedocs.io/en/3.x/objects.inv
           options:
-            show_docstring_attributes: true
             show_root_toc_entry: false
-
+            separate_signature: true
+            docstring_options:
+              ignore_init_summary: true
+            merge_init_into_class: true
+            show_signature_annotations: true
+            signature_crossrefs: true
 extra:
   version:
     provider: mike

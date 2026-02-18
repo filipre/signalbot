@@ -5,7 +5,7 @@ pip install signalbot
 
 Below you can find a minimal example on how to use the package.
 Save it as `bot.py`.
-There is also a bigger example in the [examples page](examples.md).
+There is also a bigger example in the [examples section](examples/api_overview.md).
 
 ```python
 --8<-- "example/simple_bot.py"

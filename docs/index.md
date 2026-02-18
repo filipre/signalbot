@@ -29,7 +29,7 @@ The bot can do a lot more, here is a quick overview of the most common methods:
 - `bot.receipt(message, receipt_type)`: Mark a message as read
 - `bot.update_group(group_id, avatar, description, expiration, name)`: Change group settings
 - `bot.delete_attachment(attachment_filename)`: Delete the local copy of an attachment
-- `bot.scheduler`: APScheduler > AsyncIOScheduler, see [here](https://apscheduler.readthedocs.io/en/3.x/modules/schedulers/asyncio.html?highlight=AsyncIOScheduler#apscheduler.schedulers.asyncio.AsyncIOScheduler)
+- `bot.scheduler`: Schedule tasks, see the [scheduler examples](examples/bot_with_scheduler.md).
 
 ## Real world bot examples
 

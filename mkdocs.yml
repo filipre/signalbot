@@ -102,10 +102,18 @@ plugins:
   - mkdocstrings:
       handlers:
         python:
+          inventories:
+            - https://docs.python.org/3/objects.inv
+            - https://mkdocstrings.github.io/griffe/objects.inv
+            - https://docs.pydantic.dev/latest/objects.inv
           options:
-            show_docstring_attributes: true
             show_root_toc_entry: false
-
+            separate_signature: true
+            docstring_options:
+              ignore_init_summary: true
+            merge_init_into_class: true
+            show_signature_annotations: true
+            signature_crossrefs: true
 extra:
   version:
     provider: mike

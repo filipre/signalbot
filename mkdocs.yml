@@ -106,6 +106,7 @@ plugins:
             - https://docs.python.org/3/objects.inv
             - https://mkdocstrings.github.io/griffe/objects.inv
             - https://docs.pydantic.dev/latest/objects.inv
+            - https://apscheduler.readthedocs.io/en/3.x/objects.inv
           options:
             show_root_toc_entry: false
             separate_signature: true

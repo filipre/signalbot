@@ -1,7 +1,7 @@
 # Signal Bot Framework
 
 [![PyPI Downloads](https://img.shields.io/pypi/dm/signalbot?label=Downloads
-)](https://pypistats.org/packages/zensical)
+)](https://pypistats.org/packages/signalbot)
 [![Version](https://img.shields.io/pypi/v/signalbot?logo=python&logoColor=white&label=PyPI)](https://pypi.python.org/pypi/signalbot)
 [![License](https://img.shields.io/pypi/l/signalbot.svg?label=License)](https://pypi.python.org/pypi/signalbot)
 [![CI](https://github.com/signalbot-org/signalbot/actions/workflows/ci.yaml/badge.svg)](https://github.com/signalbot-org/signalbot/actions/workflows/ci.yaml)

@@ -1,7 +1,7 @@
-import logging  # noqa: INP001
+import logging
 import os
 
-from commands import (
+from example.commands import (
     AttachmentCommand,
     DeleteCommand,
     DeleteLocalAttachmentCommand,
@@ -15,7 +15,6 @@ from commands import (
     TriggeredCommand,
     TypingCommand,
 )
-
 from signalbot import SignalBot, enable_console_logging
 
 

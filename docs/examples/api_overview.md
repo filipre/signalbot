@@ -1,6 +1,8 @@
 This bot showcases how to use most of the features in the library.
 Check the [commands section](#commands) to see the implementation of each command.
 
+Docs changed.
+
 ``` python
 --8<-- "examples/bot.py"
 ```

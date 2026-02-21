@@ -1,7 +1,7 @@
 import logging
 import os
 
-from example.commands import (
+from examples.commands import (
     AttachmentCommand,
     DeleteCommand,
     DeleteLocalAttachmentCommand,

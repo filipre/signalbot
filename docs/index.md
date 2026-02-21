@@ -7,7 +7,7 @@ It also provides a class to develop new commands, which then can be registered w
 
 Here is minimal example of what that looks like:
 ```python
---8<-- "example/simple_bot.py"
+--8<-- "examples/simple_bot.py"
 ```
 
 To set it up follow the steps in the [getting started page](getting_started.md).

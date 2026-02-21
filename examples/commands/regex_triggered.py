@@ -1,4 +1,4 @@
-from example.commands.help import CommandWithHelpMessage
+from examples.commands.help import CommandWithHelpMessage
 from signalbot import Context, regex_triggered
 
 

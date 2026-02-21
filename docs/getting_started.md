@@ -8,7 +8,7 @@ Save it as `bot.py`.
 There is also a bigger example in the [examples section](examples/api_overview.md).
 
 ```python
---8<-- "example/simple_bot.py"
+--8<-- "examples/simple_bot.py"
 ```
 
 Please check out https://github.com/bbernhard/signal-cli-rest-api#getting-started to learn about [signal-cli-rest-api](https://github.com/bbernhard/signal-cli-rest-api) and [signal-cli](https://github.com/AsamK/signal-cli). A good first step is to make the example above work.

@@ -4,11 +4,10 @@ on:
   push:
     branches: [main]
     paths:
-      - 'docs/**' # If the documentation files changed
+      - 'docs/**'    # If the documentation files changed
       - 'mkdocs.yml' # If the MkDocs configuration changed
-      - 'uv.lock' # If the dependencies changed (in case docs dependencies are updated)
+      - 'uv.lock'    # If the dependencies changed (in case docs dependencies were updated)
 
-  # always run tests for every PR
   pull_request:
     branches: [main]
     paths:

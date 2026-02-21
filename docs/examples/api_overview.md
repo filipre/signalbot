@@ -2,78 +2,78 @@ This bot showcases how to use most of the features in the library.
 Check the [commands section](#commands) to see the implementation of each command.
 
 ``` python
---8<-- "example/bot.py"
+--8<-- "examples/bot.py"
 ```
 
 ### Commands
 
 <details><summary>AttachmentCommand</summary>
 ``` python
---8<-- "example/commands/attachments.py"
+--8<-- "examples/commands/attachments.py"
 ```
 </details>
 
 
 <details><summary>DeleteCommand & DeleteLocalAttachmentCommand & ReceiveDeleteCommand</summary>
 ``` python
---8<-- "example/commands/delete.py"
+--8<-- "examples/commands/delete.py"
 ```
 </details>
 
 
 <details><summary>EditCommand</summary>
 ``` python
---8<-- "example/commands/edit.py"
+--8<-- "examples/commands/edit.py"
 ```
 </details>
 
 
 <details><summary>HelpCommand</summary>
 ``` python
---8<-- "example/commands/help.py"
+--8<-- "examples/commands/help.py"
 ```
 </details>
 
 
 <details><summary>TriggeredCommand</summary>
 ``` python
---8<-- "example/commands/multiple_triggered.py"
+--8<-- "examples/commands/multiple_triggered.py"
 ```
 </details>
 
 
 <details><summary>PingCommand</summary>
 ``` python
---8<-- "example/commands/ping.py"
+--8<-- "examples/commands/ping.py"
 ```
 </details>
 
 
 <details><summary>RegexTriggeredCommand</summary>
 ``` python
---8<-- "example/commands/regex_triggered.py"
+--8<-- "examples/commands/regex_triggered.py"
 ```
 </details>
 
 
 <details><summary>ReplyCommand</summary>
 ``` python
---8<-- "example/commands/reply.py"
+--8<-- "examples/commands/reply.py"
 ```
 </details>
 
 
 <details><summary>StylesCommand</summary>
 ``` python
---8<-- "example/commands/styles.py"
+--8<-- "examples/commands/styles.py"
 ```
 </details>
 
 
 <details><summary>TypingCommand</summary>
 ``` python
---8<-- "example/commands/typing.py"
+--8<-- "examples/commands/typing.py"
 ```
 </details>
 
-The code shown here can be found the [example folder](https://github.com/signalbot-org/signalbot/tree/main/example).
+The code shown here can be found the [examples folder](https://github.com/signalbot-org/signalbot/tree/main/examples).

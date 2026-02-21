@@ -1,7 +1,7 @@
 import base64
 from pathlib import Path
 
-from commands.help import CommandWithHelpMessage
+from examples.commands.help import CommandWithHelpMessage
 from signalbot import Context, triggered
 
 

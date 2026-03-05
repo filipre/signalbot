@@ -13,7 +13,7 @@ from typing import TYPE_CHECKING, Any, Literal, TypeAlias
 
 import phonenumbers
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
-from packaging.version import InvalidVersion, Version
+from packaging.version import Version
 
 from signalbot.api import ReceiveMessagesError, SignalAPI
 from signalbot.bot_config import (
@@ -223,13 +223,7 @@ class SignalBot:
             )
             return
 
-        try:
-            parsed_version = Version(version)
-        except InvalidVersion as exc:
-            error_msg = f"Invalid signal-cli-rest-api version: {version!r}"
-            raise RuntimeError(error_msg) from exc
-
-        if parsed_version < min_version:
+        if Version(version) < min_version:
             error_msg = f"Incompatible signal-cli-rest-api version, found {version}"
             error_msg += f", minimum required is {min_version}"
             raise RuntimeError(error_msg)

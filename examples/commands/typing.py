@@ -9,9 +9,9 @@ class TypingCommand(CommandWithHelpMessage):
         return "typing: ⌨️ Demonstrates typing indicator for a few seconds."
 
     @triggered("typing")
-    async def handle(self, c: Context) -> None:
-        await c.start_typing()
+    async def handle(self, context: Context) -> None:
+        await context.start_typing()
         seconds = 5
         await asyncio.sleep(seconds)
-        await c.stop_typing()
-        await c.send(f"Typed for {seconds}s")
+        await context.stop_typing()
+        await context.send(f"Typed for {seconds}s")

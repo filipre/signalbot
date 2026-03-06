@@ -14,9 +14,9 @@ class HelpCommand(CommandWithHelpMessage):
         return "help: 🆘 Shows information about available commands."
 
     @triggered("help")
-    async def handle(self, c: Context) -> None:
+    async def handle(self, context: Context) -> None:
         help_message = "Available commands:\n"
         command: CommandWithHelpMessage
         for command, _, _, _ in self.bot.commands:
             help_message += f"\t - {command.help_message()}\n"
-        await c.send(help_message)
+        await context.send(help_message)

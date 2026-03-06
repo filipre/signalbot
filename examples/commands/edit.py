@@ -9,7 +9,7 @@ class EditCommand(CommandWithHelpMessage):
         return "edit: ✏️ Edit a message."
 
     @triggered("edit")
-    async def handle(self, c: Context) -> None:
-        timestamp = await c.send("This message will be edited in two seconds.")
+    async def handle(self, context: Context) -> None:
+        timestamp = await context.send("This message will be edited in two seconds.")
         await asyncio.sleep(2)
-        await c.edit("This message has been edited.", timestamp)
+        await context.edit("This message has been edited.", timestamp)

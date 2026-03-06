@@ -61,8 +61,8 @@ class TestProducer(TestCommon):
             json=group_mock,
         )
 
-        self.signal_bot._q = asyncio.Queue()  # noqa: SLF001
-        self.signal_bot._signal = SignalAPI(  # noqa: SLF001
+        self.signal_bot._q = asyncio.Queue()
+        self.signal_bot._signal = SignalAPI(
             self.signal_service,
             self.phone_number,
         )
@@ -70,11 +70,11 @@ class TestProducer(TestCommon):
         # Any two commands
         self.signal_bot.register(DummyCommand())
         self.signal_bot.register(DummyCommand())
-        await self.signal_bot._resolve_commands()  # noqa: SLF001
+        await self.signal_bot._resolve_commands()
 
-        await self.signal_bot._produce(1337)  # noqa: SLF001
+        await self.signal_bot._produce(1337)
 
-        assert self.signal_bot._q.qsize() == 4  # noqa: PLR2004, SLF001
+        assert self.signal_bot._q.qsize() == 4  # noqa: PLR2004
 
 
 class TestSignalApiProtocolConfig:
@@ -90,8 +90,8 @@ class TestSignalApiProtocolConfig:
             }
         )
 
-        assert signal_bot._signal.connection_mode == ConnectionMode.AUTO  # noqa: SLF001
-        assert signal_bot._signal._signal_api_uris.use_https is True  # noqa: SLF001
+        assert signal_bot._signal.connection_mode == ConnectionMode.AUTO
+        assert signal_bot._signal._signal_api_uris.use_https is True
 
     def test_connection_mode_can_be_set_to_http_only(self):
         signal_bot = SignalBot(
@@ -103,8 +103,8 @@ class TestSignalApiProtocolConfig:
             }
         )
 
-        assert signal_bot._signal.connection_mode == ConnectionMode.HTTP_ONLY  # noqa: SLF001
-        assert signal_bot._signal._signal_api_uris.use_https is False  # noqa: SLF001
+        assert signal_bot._signal.connection_mode == ConnectionMode.HTTP_ONLY
+        assert signal_bot._signal._signal_api_uris.use_https is False
 
     def test_connection_mode_can_be_set_to_https_only(self):
         signal_bot = SignalBot(
@@ -116,8 +116,8 @@ class TestSignalApiProtocolConfig:
             }
         )
 
-        assert signal_bot._signal.connection_mode == ConnectionMode.HTTPS_ONLY  # noqa: SLF001
-        assert signal_bot._signal._signal_api_uris.use_https is True  # noqa: SLF001
+        assert signal_bot._signal.connection_mode == ConnectionMode.HTTPS_ONLY
+        assert signal_bot._signal._signal_api_uris.use_https is True
 
 
 @pytest.mark.asyncio
@@ -130,10 +130,10 @@ class TestSignalApiVersionCheck(TestCommon):
         )
         version_mock.return_value = str(MIN_SIGNAL_CLI_REST_API_VERSION)
 
-        await self.signal_bot._check_signal_cli_rest_api_version()  # noqa: SLF001
+        await self.signal_bot._check_signal_cli_rest_api_version()
 
         version_mock.return_value = f"{MIN_SIGNAL_CLI_REST_API_VERSION.major + 1}.0.0"
-        await self.signal_bot._check_signal_cli_rest_api_version()  # noqa: SLF001
+        await self.signal_bot._check_signal_cli_rest_api_version()
 
     async def test_unset_version(self, mocker: MockerFixture):
         version_mock = mocker.patch.object(
@@ -143,7 +143,7 @@ class TestSignalApiVersionCheck(TestCommon):
         )
         version_mock.return_value = "unset"
 
-        await self.signal_bot._check_signal_cli_rest_api_version()  # noqa: SLF001
+        await self.signal_bot._check_signal_cli_rest_api_version()
 
     async def test_old_version_raises_runtime_error(self, mocker: MockerFixture):
         version_mock = mocker.patch.object(
@@ -158,7 +158,7 @@ class TestSignalApiVersionCheck(TestCommon):
         with pytest.raises(
             RuntimeError, match="Incompatible signal-cli-rest-api version"
         ):
-            await self.signal_bot._check_signal_cli_rest_api_version()  # noqa: SLF001
+            await self.signal_bot._check_signal_cli_rest_api_version()
 
     async def test_invalid_version(self, mocker: MockerFixture):
         version_mock = mocker.patch.object(
@@ -169,7 +169,7 @@ class TestSignalApiVersionCheck(TestCommon):
         version_mock.return_value = "abc"
 
         with pytest.raises(InvalidVersion, match="Invalid version: 'abc'"):
-            await self.signal_bot._check_signal_cli_rest_api_version()  # noqa: SLF001
+            await self.signal_bot._check_signal_cli_rest_api_version()
 
 
 class TestUsernameValidation(TestCommon):
@@ -183,7 +183,7 @@ class TestUsernameValidation(TestCommon):
             "usernameeeeeeeeeeeeeeeeeeeeeeeee.999999999",
         ]
         for valid_username in valid_usernames:
-            assert self.signal_bot._is_username(valid_username)  # noqa: SLF001
+            assert self.signal_bot._is_username(valid_username)
 
     def test_invalid_username(self):
         invalid_usernames = [
@@ -201,19 +201,19 @@ class TestUsernameValidation(TestCommon):
             ".usernameeeeeeeeeeeeeeeeeeeeeeeeee.99",
         ]
         for invalid_username in invalid_usernames:
-            assert not self.signal_bot._is_username(invalid_username)  # noqa: SLF001
+            assert not self.signal_bot._is_username(invalid_username)
 
 
 class TestRegisterCommand(TestCommon):
     def test_register_one_command(self):
         self.signal_bot.register(DummyCommand())
-        assert len(self.signal_bot._commands_to_be_registered) == 1  # noqa: SLF001
+        assert len(self.signal_bot._commands_to_be_registered) == 1
 
     def test_register_three_commands(self):
         self.signal_bot.register(DummyCommand())
         self.signal_bot.register(DummyCommand())
         self.signal_bot.register(DummyCommand())
-        assert len(self.signal_bot._commands_to_be_registered) == 3  # noqa: PLR2004, SLF001
+        assert len(self.signal_bot._commands_to_be_registered) == 3  # noqa: PLR2004
 
     def test_register_calls_setup_of_command(self):
         class SomeTestCommand(Command):
@@ -236,7 +236,7 @@ class TestRegisterCommand(TestCommon):
     async def test_register_single_contact(self):
         user_number = "+49987654321"
         self.signal_bot.register(DummyCommand(), contacts=[user_number])
-        await self.signal_bot._resolve_commands()  # noqa: SLF001
+        await self.signal_bot._resolve_commands()
         assert self.signal_bot.commands[0][1] == [user_number]
 
     @pytest.mark.asyncio
@@ -248,7 +248,7 @@ class TestRegisterCommand(TestCommon):
             DummyCommand(),
             contacts=[user_number1, user_number2, user_number3],
         )
-        await self.signal_bot._resolve_commands()  # noqa: SLF001
+        await self.signal_bot._resolve_commands()
         expected_user_chats = [user_number1, user_number2, user_number3]
         assert self.signal_bot.commands[0][1] == expected_user_chats
 
@@ -259,7 +259,7 @@ class TestRegisterCommand(TestCommon):
         user_number3 = "+49987654323"
         self.signal_bot.register(DummyCommand(), contacts=[user_number1, user_number2])
         self.signal_bot.register(DummyCommand(), contacts=[user_number3])
-        await self.signal_bot._resolve_commands()  # noqa: SLF001
+        await self.signal_bot._resolve_commands()
         expected_user_chats_cmd0 = [user_number1, user_number2]
         expected_user_chats_cmd1 = [user_number3]
         assert self.signal_bot.commands[0][1] == expected_user_chats_cmd0

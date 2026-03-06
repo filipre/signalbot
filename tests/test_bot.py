@@ -5,7 +5,13 @@ import pytest
 from packaging.version import InvalidVersion
 from pytest_mock import MockerFixture
 
-from signalbot import Command, ConnectionMode, SignalAPI, SignalBot
+from signalbot import (
+    MIN_SIGNAL_CLI_REST_API_VERSION,
+    Command,
+    ConnectionMode,
+    SignalAPI,
+    SignalBot,
+)
 from signalbot.context import Context
 from signalbot.utils import DummyCommand
 
@@ -122,8 +128,11 @@ class TestSignalApiVersionCheck(TestCommon):
             "signal_cli_rest_api_version",
             new_callable=mocker.AsyncMock,
         )
-        version_mock.return_value = "999.0"
+        version_mock.return_value = str(MIN_SIGNAL_CLI_REST_API_VERSION)
 
+        await self.signal_bot._check_signal_cli_rest_api_version()  # noqa: SLF001
+
+        version_mock.return_value = f"{MIN_SIGNAL_CLI_REST_API_VERSION.major + 1}.0.0"
         await self.signal_bot._check_signal_cli_rest_api_version()  # noqa: SLF001
 
     async def test_unset_version(self, mocker: MockerFixture):
@@ -142,7 +151,9 @@ class TestSignalApiVersionCheck(TestCommon):
             "signal_cli_rest_api_version",
             new_callable=mocker.AsyncMock,
         )
-        version_mock.return_value = "0.94.0"
+        prev_version = f"{MIN_SIGNAL_CLI_REST_API_VERSION.major}."
+        prev_version += f"{MIN_SIGNAL_CLI_REST_API_VERSION.minor - 1}.0"
+        version_mock.return_value = prev_version
 
         with pytest.raises(
             RuntimeError, match="Incompatible signal-cli-rest-api version"

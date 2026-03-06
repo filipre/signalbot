@@ -6,7 +6,11 @@ from signalbot.api import (
     SendMessageError,
     SignalAPI,
 )
-from signalbot.bot import SignalBot, enable_console_logging
+from signalbot.bot import (
+    MIN_SIGNAL_CLI_REST_API_VERSION,
+    SignalBot,
+    enable_console_logging,
+)
 from signalbot.bot_config import Config, InMemoryConfig, RedisConfig, SQLiteConfig
 from signalbot.command import Command, CommandError, regex_triggered, triggered
 from signalbot.context import Context
@@ -14,6 +18,7 @@ from signalbot.link_previews import LinkPreview
 from signalbot.message import Message, MessageType, Quote, UnknownMessageFormatError
 
 __all__ = [
+    "MIN_SIGNAL_CLI_REST_API_VERSION",
     "Command",
     "CommandError",
     "Config",

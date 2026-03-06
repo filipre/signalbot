@@ -7,13 +7,13 @@ from signalbot.utils import ChatTestCase, mock_chat
 
 class SchnickSchnackSchnuckCommand(Command):
     @triggered("schnick", "schnack")
-    async def handle(self, c: Context) -> bool:
-        text = c.message.text
+    async def handle(self, context: Context) -> None:
+        text = context.message.text
         if text == "schnick":
-            await c.send("schnack")
+            await context.send("schnack")
 
         if text == "schnack":
-            await c.send("schnuck")
+            await context.send("schnuck")
 
 
 @pytest.mark.asyncio

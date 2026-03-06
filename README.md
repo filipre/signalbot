@@ -25,8 +25,8 @@ from signalbot import SignalBot, Config, Command, Context, triggered, enable_con
 
 class PingCommand(Command):
     @triggered("Ping")
-    async def handle(self, c: Context) -> None:
-        await c.send("Pong")
+    async def handle(self, context: Context) -> None:
+        await context.send("Pong")
 
 
 if __name__ == "__main__":

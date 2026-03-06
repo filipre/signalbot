@@ -114,12 +114,19 @@ class TestSignalApiProtocolConfig:
         assert signal_bot._signal._signal_api_uris.use_https is True  # noqa: SLF001
 
 
+@pytest.mark.asyncio
 class TestSignalApiVersionCheck(TestCommon):
-    @pytest.mark.asyncio
-    async def test_unset_version(
-        self,
-        mocker: MockerFixture,
-    ):
+    async def test_new_version_is_okay(self, mocker: MockerFixture):
+        version_mock = mocker.patch.object(
+            self.signal_bot,
+            "signal_cli_rest_api_version",
+            new_callable=mocker.AsyncMock,
+        )
+        version_mock.return_value = "999.0"
+
+        await self.signal_bot._check_signal_cli_rest_api_version()  # noqa: SLF001
+
+    async def test_unset_version(self, mocker: MockerFixture):
         version_mock = mocker.patch.object(
             self.signal_bot,
             "signal_cli_rest_api_version",
@@ -129,11 +136,7 @@ class TestSignalApiVersionCheck(TestCommon):
 
         await self.signal_bot._check_signal_cli_rest_api_version()  # noqa: SLF001
 
-    @pytest.mark.asyncio
-    async def test_old_version_raises_runtime_error(
-        self,
-        mocker: MockerFixture,
-    ):
+    async def test_old_version_raises_runtime_error(self, mocker: MockerFixture):
         version_mock = mocker.patch.object(
             self.signal_bot,
             "signal_cli_rest_api_version",
@@ -146,25 +149,7 @@ class TestSignalApiVersionCheck(TestCommon):
         ):
             await self.signal_bot._check_signal_cli_rest_api_version()  # noqa: SLF001
 
-    @pytest.mark.asyncio
-    async def test_new_version_raises_runtime_error(
-        self,
-        mocker: MockerFixture,
-    ):
-        version_mock = mocker.patch.object(
-            self.signal_bot,
-            "signal_cli_rest_api_version",
-            new_callable=mocker.AsyncMock,
-        )
-        version_mock.return_value = "999.0"
-
-        await self.signal_bot._check_signal_cli_rest_api_version()  # noqa: SLF001
-
-    @pytest.mark.asyncio
-    async def test_other_invalid_version_raises_runtime_error(
-        self,
-        mocker: MockerFixture,
-    ):
+    async def test_invalid_version(self, mocker: MockerFixture):
         version_mock = mocker.patch.object(
             self.signal_bot,
             "signal_cli_rest_api_version",

@@ -43,7 +43,11 @@ CommandList: TypeAlias = list[
 ]
 
 LOGGER_NAME = "signalbot"
+
 MIN_SIGNAL_CLI_REST_API_VERSION = Version("0.95.0")
+"""
+The minimum required version of `signal-cli-rest-api` for this version of `signalbot`.
+"""
 
 
 def enable_console_logging(level: int = logging.WARNING) -> None:

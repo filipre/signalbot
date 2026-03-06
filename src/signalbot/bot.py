@@ -215,6 +215,14 @@ class SignalBot:
     async def _check_signal_cli_rest_api_version(self) -> None:
         min_version = Version("0.95.0")
         version = await self.signal_cli_rest_api_version()
+
+        # `unset` version is for preview versions of signal-cli-rest-api
+        if version == "unset":
+            self._logger.warning(
+                "signal-cli-rest-api version is unset; skipping compatibility check",
+            )
+            return
+
         if Version(version) < min_version:
             error_msg = f"Incompatible signal-cli-rest-api version, found {version}"
             error_msg += f", minimum required is {min_version}"

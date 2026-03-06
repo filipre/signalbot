@@ -2,6 +2,7 @@ import asyncio
 
 import aiohttp
 import pytest
+from packaging.version import InvalidVersion
 from pytest_mock import MockerFixture
 
 from signalbot import Command, ConnectionMode, SignalAPI, SignalBot
@@ -111,6 +112,68 @@ class TestSignalApiProtocolConfig:
 
         assert signal_bot._signal.connection_mode == ConnectionMode.HTTPS_ONLY  # noqa: SLF001
         assert signal_bot._signal._signal_api_uris.use_https is True  # noqa: SLF001
+
+
+class TestSignalApiVersionCheck(TestCommon):
+    @pytest.mark.asyncio
+    async def test_unset_version(
+        self,
+        mocker: MockerFixture,
+    ):
+        version_mock = mocker.patch.object(
+            self.signal_bot,
+            "signal_cli_rest_api_version",
+            new_callable=mocker.AsyncMock,
+        )
+        version_mock.return_value = "unset"
+
+        await self.signal_bot._check_signal_cli_rest_api_version()  # noqa: SLF001
+
+    @pytest.mark.asyncio
+    async def test_old_version_raises_runtime_error(
+        self,
+        mocker: MockerFixture,
+    ):
+        version_mock = mocker.patch.object(
+            self.signal_bot,
+            "signal_cli_rest_api_version",
+            new_callable=mocker.AsyncMock,
+        )
+        version_mock.return_value = "0.94.0"
+
+        with pytest.raises(
+            RuntimeError, match="Incompatible signal-cli-rest-api version"
+        ):
+            await self.signal_bot._check_signal_cli_rest_api_version()  # noqa: SLF001
+
+    @pytest.mark.asyncio
+    async def test_new_version_raises_runtime_error(
+        self,
+        mocker: MockerFixture,
+    ):
+        version_mock = mocker.patch.object(
+            self.signal_bot,
+            "signal_cli_rest_api_version",
+            new_callable=mocker.AsyncMock,
+        )
+        version_mock.return_value = "999.0"
+
+        await self.signal_bot._check_signal_cli_rest_api_version()  # noqa: SLF001
+
+    @pytest.mark.asyncio
+    async def test_other_invalid_version_raises_runtime_error(
+        self,
+        mocker: MockerFixture,
+    ):
+        version_mock = mocker.patch.object(
+            self.signal_bot,
+            "signal_cli_rest_api_version",
+            new_callable=mocker.AsyncMock,
+        )
+        version_mock.return_value = "abc"
+
+        with pytest.raises(InvalidVersion, match="Invalid version: 'abc'"):
+            await self.signal_bot._check_signal_cli_rest_api_version()  # noqa: SLF001
 
 
 class TestUsernameValidation(TestCommon):

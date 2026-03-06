@@ -43,6 +43,9 @@ CommandList: TypeAlias = list[
 ]
 
 LOGGER_NAME = "signalbot"
+"""
+The logger name used by signalbot.
+"""
 
 MIN_SIGNAL_CLI_REST_API_VERSION = Version("0.95.0")
 """

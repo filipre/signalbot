@@ -7,6 +7,7 @@ from signalbot.api import (
     SignalAPI,
 )
 from signalbot.bot import (
+    LOGGER_NAME,
     MIN_SIGNAL_CLI_REST_API_VERSION,
     SignalBot,
     enable_console_logging,
@@ -18,6 +19,7 @@ from signalbot.link_previews import LinkPreview
 from signalbot.message import Message, MessageType, Quote, UnknownMessageFormatError
 
 __all__ = [
+    "LOGGER_NAME",
     "MIN_SIGNAL_CLI_REST_API_VERSION",
     "Command",
     "CommandError",

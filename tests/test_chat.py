@@ -7,13 +7,13 @@ from signalbot.utils import ChatTestCase, mock_chat
 
 class SchnickSchnackSchnuckCommand(Command):
     @triggered("schnick", "schnack")
-    async def handle(self, c: Context) -> bool:
-        text = c.message.text
+    async def handle(self, context: Context) -> None:
+        text = context.message.text
         if text == "schnick":
-            await c.send("schnack")
+            await context.send("schnack")
 
         if text == "schnack":
-            await c.send("schnuck")
+            await context.send("schnuck")
 
 
 @pytest.mark.asyncio
@@ -31,7 +31,7 @@ class TestSchnickSchnackSchnuckCommand(ChatTestCase):
         *args: object,  # noqa: ARG002
         **kwargs: object,  # noqa: ARG002
     ):
-        replies = self.signal_bot._signal.send  # noqa: SLF001
+        replies = self.signal_bot._signal.send
         assert replies.call_count == 1
         assert len(replies.results()) == 1
         for recipient, message in replies.results():
@@ -45,7 +45,7 @@ class TestSchnickSchnackSchnuckCommand(ChatTestCase):
         *args: object,  # noqa: ARG002
         **kwargs: object,  # noqa: ARG002
     ):
-        replies = self.signal_bot._signal.send  # noqa: SLF001
+        replies = self.signal_bot._signal.send
         assert replies.call_count == 1
         assert len(replies.results()) == 1
         for recipient, message in replies.results():

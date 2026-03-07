@@ -43,6 +43,14 @@ CommandList: TypeAlias = list[
 ]
 
 LOGGER_NAME = "signalbot"
+"""
+The logger name used by signalbot.
+"""
+
+MIN_SIGNAL_CLI_REST_API_VERSION = Version("0.95.0")
+"""
+The minimum required version of `signal-cli-rest-api` for this version of `signalbot`.
+"""
 
 
 def enable_console_logging(level: int = logging.WARNING) -> None:
@@ -213,11 +221,18 @@ class SignalBot:
             await asyncio.sleep(self.config.retry_interval)
 
     async def _check_signal_cli_rest_api_version(self) -> None:
-        min_version = Version("0.95.0")
         version = await self.signal_cli_rest_api_version()
-        if Version(version) < min_version:
+
+        # `unset` version is for preview versions of signal-cli-rest-api
+        if version == "unset":
+            self._logger.warning(
+                "signal-cli-rest-api version is unset; skipping compatibility check",
+            )
+            return
+
+        if Version(version) < MIN_SIGNAL_CLI_REST_API_VERSION:
             error_msg = f"Incompatible signal-cli-rest-api version, found {version}"
-            error_msg += f", minimum required is {min_version}"
+            error_msg += f", minimum required is {MIN_SIGNAL_CLI_REST_API_VERSION}"
             raise RuntimeError(error_msg)
 
     async def _check_signal_cli_rest_api_mode(self) -> None:

@@ -53,17 +53,17 @@ class TestAPI:
 
     def test_receive_uri(self):
         expected_uri = f"wss://{self.signal_service}/v1/receive/{self.phone_number}"
-        actual_uri = self.signal_api._signal_api_uris.receive_ws_uri()  # noqa: SLF001
+        actual_uri = self.signal_api._signal_api_uris.receive_ws_uri()
         assert actual_uri == expected_uri
 
     def test_send_uri(self):
         expected_uri = f"https://{self.signal_service}/v2/send"
-        actual_uri = self.signal_api._signal_api_uris.send_rest_uri()  # noqa: SLF001
+        actual_uri = self.signal_api._signal_api_uris.send_rest_uri()
         assert actual_uri == expected_uri
 
     def test_attachment_rest_uri(self):
         expected_uri = f"https://{self.signal_service}/v1/attachments"
-        actual_uri = self.signal_api._signal_api_uris.attachment_rest_uri()  # noqa: SLF001
+        actual_uri = self.signal_api._signal_api_uris.attachment_rest_uri()
         assert actual_uri == expected_uri
 
     @pytest.mark.asyncio
@@ -84,7 +84,7 @@ class TestAPI:
         is_healthy = await signal_api.check_signal_service()
 
         assert is_healthy is True
-        assert signal_api._signal_api_uris.use_https is False  # noqa: SLF001
+        assert signal_api._signal_api_uris.use_https is False
 
     @pytest.mark.asyncio
     async def test_check_signal_service_https_only_uses_secure_protocol(
@@ -105,7 +105,7 @@ class TestAPI:
 
         assert is_healthy is True
         assert health_check_mock.call_count == 1
-        assert signal_api._signal_api_uris.use_https is True  # noqa: SLF001
+        assert signal_api._signal_api_uris.use_https is True
 
     @pytest.mark.asyncio
     async def test_check_signal_service_does_not_fallback_if_protocol_configured(
@@ -126,7 +126,7 @@ class TestAPI:
 
         assert is_healthy is False
         assert health_check_mock.call_count == 1
-        assert signal_api._signal_api_uris.use_https is False  # noqa: SLF001
+        assert signal_api._signal_api_uris.use_https is False
 
     @pytest.mark.asyncio
     async def test_check_signal_service_falls_back_to_other_protocol_in_auto_mode(
@@ -145,7 +145,7 @@ class TestAPI:
         is_healthy = await signal_api.check_signal_service()
 
         assert is_healthy is True
-        assert signal_api._signal_api_uris.use_https is False  # noqa: SLF001
+        assert signal_api._signal_api_uris.use_https is False
 
     @pytest.mark.asyncio
     async def test_check_signal_service_auto_succeeds_without_fallback(
@@ -166,4 +166,4 @@ class TestAPI:
 
         assert is_healthy is True
         assert health_check_mock.call_count == 1
-        assert signal_api._signal_api_uris.use_https is True  # noqa: SLF001
+        assert signal_api._signal_api_uris.use_https is True

@@ -10,11 +10,11 @@ class AttachmentCommand(CommandWithHelpMessage):
         return "friday: 🦀 Send and delete an image."
 
     @triggered("friday")
-    async def handle(self, c: Context) -> None:
+    async def handle(self, context: Context) -> None:
         with open(Path(__file__).parent / "image.jpeg", "rb") as f:  # noqa: ASYNC230, PTH123
             image = str(base64.b64encode(f.read()), encoding="utf-8")
 
-        await c.send(
+        await context.send(
             "https://www.youtube.com/watch?v=pU2SdH1HBuk",
             base64_attachments=[image],
         )

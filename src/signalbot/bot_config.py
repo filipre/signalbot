@@ -56,7 +56,7 @@ class Config(BaseModel):
     The configuration for SignalBot.
 
     Attributes:
-        signal_service: The URL of the signal-cli-rest-api service to connect to.
+        signal_service: The URL of the `signal-cli-rest-api` service to connect to.
         phone_number: The phone number of the bot.
         storage: The configuration for the storage backend to use. Defaults to `None`.
         retry_interval: The interval in seconds to wait before retrying a failed

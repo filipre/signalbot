@@ -66,7 +66,7 @@ Set `connection_mode` in the config to control behavior:
 <date> signalbot [INFO] - _consume - [Bot] Consumer #3 started
 ```
 
-8. Send the message `Ping` (case sensitive) to the number that the bot is listening to. The bot (i.e. the linked account) should respond with a `Pong`. Confirm that the bot received a raw message, that the consumer worked on the message and that a new message has been sent.
+8. Send the message `Ping` to the number that the bot is listening to. The bot (i.e. the linked account) should respond with a `Pong`. Confirm that the bot received a raw message, that the consumer worked on the message and that a new message has been sent.
 ```
 <date> signalbot [INFO] - _produce - [Raw Message] {"envelope": <raw message dictionary>}
 <date> signalbot [INFO] - _consume_new_item - [Bot] Consumer #2 got new job in 0.00046 seconds

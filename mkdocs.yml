@@ -15,13 +15,13 @@ nav:
     - Scheduler: examples/bot_with_scheduler.md
   - Additional information: additional_information.md
   - Reference:
-    - SignalBot: api_bot.md
-    - Config: api_bot_config.md
-    - Message: api_message.md
-    - Context: api_context.md
-    - LinkPreview: api_linkpreview.md
-    - Command: api_command.md
-    - Quote: api_quote.md
+    - SignalBot: reference/bot.md
+    - Config: reference/bot_config.md
+    - Message: reference/message.md
+    - Context: reference/context.md
+    - LinkPreview: reference/linkpreview.md
+    - Command: reference/command.md
+    - Quote: reference/quote.md
   - Troubleshooting: troubleshooting.md
   - Contributing: local_development.md
 

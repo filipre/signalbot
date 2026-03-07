@@ -12,7 +12,7 @@ if TYPE_CHECKING:
 
 
 class ConnectionMode(str, Enum):
-    """Protocol strategy for connecting to signal-cli-rest-api.
+    """Protocol strategy for connecting to `signal-cli-rest-api`.
 
     Attributes:
         HTTPS_ONLY: Always use HTTPS/WSS.

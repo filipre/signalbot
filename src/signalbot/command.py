@@ -29,8 +29,8 @@ def regex_triggered(
         async def wrapper_regex_triggered(
             *args: P.args, **kwargs: P.kwargs
         ) -> T | None:
-            c: Context = args[1]
-            text = c.message.text
+            context: Context = args[1]
+            text = context.message.text
             if not isinstance(text, str):
                 return None
             matches = [bool(re.search(pattern, text)) for pattern in by]
@@ -57,8 +57,8 @@ def triggered(
     def decorator_triggered(func: Callable[P, T]) -> Callable[P, T]:
         @functools.wraps(func)
         async def wrapper_triggered(*args: P.args, **kwargs: P.kwargs) -> T | None:
-            c: Context = args[1]
-            text = c.message.text
+            context: Context = args[1]
+            text = context.message.text
             if not isinstance(text, str):
                 return None
 

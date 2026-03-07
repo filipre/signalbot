@@ -1,0 +1,17 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "sticker.schema.json",
+    "title": "Sticker",
+    "type": "object",
+    "properties": {
+        "packId": {
+            "type": "string"
+        },
+        "stickerId": {
+            "type": "integer"
+        }
+    },
+    "required": [
+        "stickerId"
+    ]
+}

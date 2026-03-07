@@ -1,0 +1,14 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "error.schema.json",
+    "title": "Error",
+    "type": "object",
+    "properties": {
+        "message": {
+            "type": "string"
+        },
+        "type": {
+            "type": "string"
+        }
+    }
+}

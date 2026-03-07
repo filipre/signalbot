@@ -1,0 +1,23 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "group-info.schema.json",
+    "title": "GroupInfo",
+    "type": "object",
+    "properties": {
+        "groupId": {
+            "type": "string"
+        },
+        "groupName": {
+            "type": "string"
+        },
+        "revision": {
+            "type": "integer"
+        },
+        "type": {
+            "type": "string"
+        }
+    },
+    "required": [
+        "revision"
+    ]
+}

@@ -1,0 +1,44 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "quote.schema.json",
+    "title": "Quote",
+    "type": "object",
+    "properties": {
+        "attachments": {
+            "type": "array",
+            "items": {
+                "$ref": "quoted-attachment.schema.json"
+            }
+        },
+        "author": {
+            "type": "string"
+        },
+        "authorNumber": {
+            "type": "string"
+        },
+        "authorUuid": {
+            "type": "string"
+        },
+        "id": {
+            "type": "integer"
+        },
+        "mentions": {
+            "type": "array",
+            "items": {
+                "$ref": "mention.schema.json"
+            }
+        },
+        "text": {
+            "type": "string"
+        },
+        "textStyles": {
+            "type": "array",
+            "items": {
+                "$ref": "text-style.schema.json"
+            }
+        }
+    },
+    "required": [
+        "id"
+    ]
+}

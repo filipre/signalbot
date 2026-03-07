@@ -18,5 +18,7 @@ uv run datamodel-codegen \
 --reuse-model \
 --reuse-scope tree \
 --shared-module-name common \
+--disable-timestamp \
+--use-exact-imports \
 --output ./src/signalbot/api/py_schema
 ```

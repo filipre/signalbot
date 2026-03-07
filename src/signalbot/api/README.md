@@ -15,5 +15,8 @@ uv run datamodel-codegen \
 --output-model-type pydantic_v2.BaseModel \
 --formatters ruff-check ruff-format \
 --snake-case-field \
+--reuse-model \
+--reuse-scope tree \
+--shared-module-name common \
 --output ./src/signalbot/api/py_schema
 ```

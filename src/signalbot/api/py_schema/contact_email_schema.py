@@ -3,7 +3,7 @@
 
 from __future__ import annotations
 
-from .common import ContactPhone
+from .shared import ContactPhone
 
 
 class ContactEmail(ContactPhone):

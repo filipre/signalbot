@@ -9,7 +9,7 @@ from pydantic import BaseModel, Field
 
 if TYPE_CHECKING:
     from .attachment_schema import Attachment
-    from .common import TextAttachment
+    from .shared import TextAttachment
 
 
 class SyncStoryMessage(BaseModel):

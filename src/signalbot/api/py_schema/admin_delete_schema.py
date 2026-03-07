@@ -3,7 +3,7 @@
 
 from __future__ import annotations
 
-from .common import UnpinMessage
+from .shared import UnpinMessage
 
 
 class AdminDelete(UnpinMessage):

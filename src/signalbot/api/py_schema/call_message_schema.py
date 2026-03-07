@@ -5,7 +5,7 @@ from __future__ import annotations
 
 from pydantic import BaseModel, Field
 
-from .common import AnswerMessage
+from .shared import AnswerMessage
 
 
 class BusyMessage(BaseModel):

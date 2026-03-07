@@ -7,8 +7,8 @@ from typing import TYPE_CHECKING
 
 from pydantic import BaseModel, Field
 
-from .common import BackgroundGradient as BackgroundGradient_1
-from .common import TextAttachment as TextAttachment_1
+from .shared import BackgroundGradient as BackgroundGradient_1
+from .shared import TextAttachment as TextAttachment_1
 
 if TYPE_CHECKING:
     from .attachment_schema import Attachment

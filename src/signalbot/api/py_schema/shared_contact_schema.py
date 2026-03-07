@@ -8,11 +8,11 @@ from typing import TYPE_CHECKING
 from pydantic import BaseModel
 
 if TYPE_CHECKING:
-    from .common import ContactPhone
     from .contact_address_schema import ContactAddress
     from .contact_avatar_schema import ContactAvatar
     from .contact_email_schema import ContactEmail
     from .contact_name_schema import ContactName
+    from .shared import ContactPhone
 
 
 class SharedContact(BaseModel):

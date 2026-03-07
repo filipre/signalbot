@@ -10,7 +10,6 @@ from pydantic import BaseModel, Field
 if TYPE_CHECKING:
     from .admin_delete_schema import AdminDelete
     from .attachment_schema import Attachment
-    from .common import UnpinMessage
     from .edit_message_schema import EditMessage
     from .group_info_schema import GroupInfo
     from .mention_schema import Mention
@@ -23,6 +22,7 @@ if TYPE_CHECKING:
     from .quote_schema import Quote
     from .reaction_schema import Reaction
     from .remote_delete_schema import RemoteDelete
+    from .shared import UnpinMessage
     from .shared_contact_schema import SharedContact
     from .sticker_schema import Sticker
     from .story_context_schema import StoryContext

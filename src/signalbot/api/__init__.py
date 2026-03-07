@@ -2,7 +2,6 @@ from signalbot.api.py_schema.admin_delete_schema import AdminDelete
 from signalbot.api.py_schema.attachment_data_schema import AttachmentData
 from signalbot.api.py_schema.attachment_schema import Attachment
 from signalbot.api.py_schema.call_message_schema import (
-    AnswerMessage,
     BusyMessage,
     CallMessage,
     HangupMessage,
@@ -13,7 +12,6 @@ from signalbot.api.py_schema.contact_address_schema import ContactAddress
 from signalbot.api.py_schema.contact_avatar_schema import ContactAvatar
 from signalbot.api.py_schema.contact_email_schema import ContactEmail
 from signalbot.api.py_schema.contact_name_schema import ContactName
-from signalbot.api.py_schema.contact_phone_schema import ContactPhone
 from signalbot.api.py_schema.contact_schema import Contact
 from signalbot.api.py_schema.data_message_schema import DataMessage
 from signalbot.api.py_schema.edit_message_schema import EditMessage
@@ -39,6 +37,13 @@ from signalbot.api.py_schema.send_message_result_schema import SendMessageResult
 from signalbot.api.py_schema.send_message_result_schema import (
     Type as SendMessageResultType,
 )
+from signalbot.api.py_schema.shared import (
+    AnswerMessage,
+    BackgroundGradient,
+    ContactPhone,
+    TextAttachment,
+    UnpinMessage,
+)
 from signalbot.api.py_schema.shared_contact_schema import SharedContact
 from signalbot.api.py_schema.sticker_schema import Sticker
 from signalbot.api.py_schema.story_context_schema import StoryContext
@@ -53,16 +58,12 @@ from signalbot.api.py_schema.sync_data_message_schema import SyncDataMessage
 from signalbot.api.py_schema.sync_message_schema import SyncMessage
 from signalbot.api.py_schema.sync_message_schema import Type as SyncMessageType
 from signalbot.api.py_schema.sync_read_message_schema import SyncReadMessage
-from signalbot.api.py_schema.sync_story_message_schema import (
-    BackgroundGradient as SyncStoryBackgroundGradient,
-)
 from signalbot.api.py_schema.sync_story_message_schema import SyncStoryMessage
 from signalbot.api.py_schema.sync_story_message_schema import (
     TextAttachment as SyncStoryTextAttachment,
 )
 from signalbot.api.py_schema.text_style_schema import TextStyle
 from signalbot.api.py_schema.typing_message_schema import TypingMessage
-from signalbot.api.py_schema.unpin_message_schema import UnpinMessage
 from signalbot.api.signal_api import (
     ConnectionMode,
     ReceiveMessagesError,
@@ -75,6 +76,7 @@ __all__ = [
     "AnswerMessage",
     "Attachment",
     "AttachmentData",
+    "BackgroundGradient",
     "BusyMessage",
     "CallMessage",
     "ConnectionMode",
@@ -122,9 +124,9 @@ __all__ = [
     "SyncMessage",
     "SyncMessageType",
     "SyncReadMessage",
-    "SyncStoryBackgroundGradient",
     "SyncStoryMessage",
     "SyncStoryTextAttachment",
+    "TextAttachment",
     "TextStyle",
     "TypingMessage",
     "UnpinMessage",

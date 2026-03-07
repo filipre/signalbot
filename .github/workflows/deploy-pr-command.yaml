@@ -43,7 +43,7 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
         with:
-          ref: ${{ github.event.client_payload.pull_request.head.ref }}
+          ref: ${{ github.event.client_payload.pull_request.head.sha }}
 
       - name: Install uv
         uses: ./.github/workflows/install-uv

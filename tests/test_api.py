@@ -3,7 +3,7 @@ import pytest
 from pytest_mock import MockerFixture
 
 from signalbot import ConnectionMode, SignalAPI
-from signalbot.api import HEALTH_CHECK_GOOD_STATUS, HealthCheckError
+from signalbot.api.api import HEALTH_CHECK_GOOD_STATUS, HealthCheckError
 
 
 class TestAPI:

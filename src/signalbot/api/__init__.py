@@ -1,4 +1,4 @@
-from signalbot.api.api import (
+from signalbot.api.signal_api import (
     ConnectionMode,
     ReceiveMessagesError,
     SendMessageError,

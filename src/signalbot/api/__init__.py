@@ -47,21 +47,12 @@ from signalbot.api.py_schema.shared import (
 from signalbot.api.py_schema.shared_contact_schema import SharedContact
 from signalbot.api.py_schema.sticker_schema import Sticker
 from signalbot.api.py_schema.story_context_schema import StoryContext
-from signalbot.api.py_schema.story_message_schema import (
-    BackgroundGradient as StoryBackgroundGradient,
-)
 from signalbot.api.py_schema.story_message_schema import StoryMessage
-from signalbot.api.py_schema.story_message_schema import (
-    TextAttachment as StoryTextAttachment,
-)
 from signalbot.api.py_schema.sync_data_message_schema import SyncDataMessage
 from signalbot.api.py_schema.sync_message_schema import SyncMessage
 from signalbot.api.py_schema.sync_message_schema import Type as SyncMessageType
 from signalbot.api.py_schema.sync_read_message_schema import SyncReadMessage
 from signalbot.api.py_schema.sync_story_message_schema import SyncStoryMessage
-from signalbot.api.py_schema.sync_story_message_schema import (
-    TextAttachment as SyncStoryTextAttachment,
-)
 from signalbot.api.py_schema.text_style_schema import TextStyle
 from signalbot.api.py_schema.typing_message_schema import TypingMessage
 from signalbot.api.signal_api import (
@@ -70,6 +61,8 @@ from signalbot.api.signal_api import (
     SendMessageError,
     SignalAPI,
 )
+
+MessageEnvelope.model_rebuild()
 
 __all__ = [
     "AdminDelete",
@@ -116,16 +109,13 @@ __all__ = [
     "SharedContact",
     "SignalAPI",
     "Sticker",
-    "StoryBackgroundGradient",
     "StoryContext",
     "StoryMessage",
-    "StoryTextAttachment",
     "SyncDataMessage",
     "SyncMessage",
     "SyncMessageType",
     "SyncReadMessage",
     "SyncStoryMessage",
-    "SyncStoryTextAttachment",
     "TextAttachment",
     "TextStyle",
     "TypingMessage",

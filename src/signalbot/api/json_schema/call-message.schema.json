@@ -1,0 +1,90 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "call-message.schema.json",
+    "title": "CallMessage",
+    "type": "object",
+    "properties": {
+        "answerMessage": {
+            "title": "JsonCallMessage.Answer",
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer"
+                },
+                "opaque": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "id"
+            ]
+        },
+        "busyMessage": {
+            "title": "JsonCallMessage.Busy",
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer"
+                }
+            },
+            "required": [
+                "id"
+            ]
+        },
+        "hangupMessage": {
+            "title": "JsonCallMessage.Hangup",
+            "type": "object",
+            "properties": {
+                "deviceId": {
+                    "type": "integer"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "type": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "id",
+                "deviceId"
+            ]
+        },
+        "iceUpdateMessages": {
+            "type": "array",
+            "items": {
+                "title": "JsonCallMessage.IceUpdate",
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "integer"
+                    },
+                    "opaque": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "id"
+                ]
+            }
+        },
+        "offerMessage": {
+            "title": "JsonCallMessage.Offer",
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer"
+                },
+                "opaque": {
+                    "type": "string"
+                },
+                "type": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "id"
+            ]
+        }
+    }
+}

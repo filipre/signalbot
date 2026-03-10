@@ -1,0 +1,23 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "sync-read-message.schema.json",
+    "title": "SyncReadMessage",
+    "type": "object",
+    "properties": {
+        "sender": {
+            "type": "string"
+        },
+        "senderNumber": {
+            "type": "string"
+        },
+        "senderUuid": {
+            "type": "string"
+        },
+        "timestamp": {
+            "type": "integer"
+        }
+    },
+    "required": [
+        "timestamp"
+    ]
+}

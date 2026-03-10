@@ -1,0 +1,23 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "unpin-message.schema.json",
+    "title": "UnpinMessage",
+    "type": "object",
+    "properties": {
+        "targetAuthor": {
+            "type": "string"
+        },
+        "targetAuthorNumber": {
+            "type": "string"
+        },
+        "targetAuthorUuid": {
+            "type": "string"
+        },
+        "targetSentTimestamp": {
+            "type": "integer"
+        }
+    },
+    "required": [
+        "targetSentTimestamp"
+    ]
+}

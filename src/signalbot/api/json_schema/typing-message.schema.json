@@ -1,0 +1,20 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "typing-message.schema.json",
+    "title": "TypingMessage",
+    "type": "object",
+    "properties": {
+        "action": {
+            "type": "string"
+        },
+        "groupId": {
+            "type": "string"
+        },
+        "timestamp": {
+            "type": "integer"
+        }
+    },
+    "required": [
+        "timestamp"
+    ]
+}

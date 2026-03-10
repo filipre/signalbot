@@ -1,0 +1,32 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "receipt-message.schema.json",
+    "title": "ReceiptMessage",
+    "type": "object",
+    "properties": {
+        "isDelivery": {
+            "type": "boolean"
+        },
+        "isRead": {
+            "type": "boolean"
+        },
+        "isViewed": {
+            "type": "boolean"
+        },
+        "timestamps": {
+            "type": "array",
+            "items": {
+                "type": "integer"
+            }
+        },
+        "when": {
+            "type": "integer"
+        }
+    },
+    "required": [
+        "when",
+        "isDelivery",
+        "isRead",
+        "isViewed"
+    ]
+}

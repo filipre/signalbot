@@ -31,7 +31,7 @@ from signalbot.storage import RedisStorage, SQLiteStorage
 if TYPE_CHECKING:
     from pathlib import Path
 
-    from signalbot.link_previews import LinkPreview
+    from signalbot.api.messages.link_previews import LinkPreview
 
 CommandList: TypeAlias = list[
     tuple[

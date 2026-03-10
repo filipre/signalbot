@@ -1,0 +1,30 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "reaction.schema.json",
+    "title": "Reaction",
+    "type": "object",
+    "properties": {
+        "emoji": {
+            "type": "string"
+        },
+        "isRemove": {
+            "type": "boolean"
+        },
+        "targetAuthor": {
+            "type": "string"
+        },
+        "targetAuthorNumber": {
+            "type": "string"
+        },
+        "targetAuthorUuid": {
+            "type": "string"
+        },
+        "targetSentTimestamp": {
+            "type": "integer"
+        }
+    },
+    "required": [
+        "targetSentTimestamp",
+        "isRemove"
+    ]
+}

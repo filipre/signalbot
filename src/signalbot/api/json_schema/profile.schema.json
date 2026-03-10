@@ -1,0 +1,33 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "profile.schema.json",
+    "title": "Profile",
+    "type": "object",
+    "properties": {
+        "about": {
+            "type": "string"
+        },
+        "aboutEmoji": {
+            "type": "string"
+        },
+        "familyName": {
+            "type": "string"
+        },
+        "givenName": {
+            "type": "string"
+        },
+        "hasAvatar": {
+            "type": "boolean"
+        },
+        "lastUpdateTimestamp": {
+            "type": "integer"
+        },
+        "mobileCoinAddress": {
+            "type": "string"
+        }
+    },
+    "required": [
+        "lastUpdateTimestamp",
+        "hasAvatar"
+    ]
+}

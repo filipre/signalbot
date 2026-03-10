@@ -1,0 +1,23 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "internal.schema.json",
+    "title": "Internal",
+    "type": "object",
+    "properties": {
+        "capabilities": {
+            "type": "array",
+            "items": {
+                "type": "string"
+            }
+        },
+        "discoverableByPhonenumber": {
+            "type": "boolean"
+        },
+        "sharesPhoneNumber": {
+            "type": "boolean"
+        },
+        "unidentifiedAccessMode": {
+            "type": "string"
+        }
+    }
+}

@@ -1,0 +1,17 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "quoted-attachment.schema.json",
+    "title": "QuotedAttachment",
+    "type": "object",
+    "properties": {
+        "contentType": {
+            "type": "string"
+        },
+        "filename": {
+            "type": "string"
+        },
+        "thumbnail": {
+            "$ref": "attachment.schema.json"
+        }
+    }
+}

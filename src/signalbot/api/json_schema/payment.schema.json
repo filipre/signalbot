@@ -1,0 +1,17 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "payment.schema.json",
+    "title": "Payment",
+    "type": "object",
+    "properties": {
+        "note": {
+            "type": "string"
+        },
+        "receipt": {
+            "type": "string"
+        }
+    },
+    "required": [
+        "receipt"
+    ]
+}

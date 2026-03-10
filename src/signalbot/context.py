@@ -4,8 +4,8 @@ from copy import deepcopy
 from typing import TYPE_CHECKING, Any, Literal
 
 if TYPE_CHECKING:
+    from signalbot.api.messages.link_previews import LinkPreview
     from signalbot.bot import SignalBot
-    from signalbot.link_previews import LinkPreview
     from signalbot.message import Message
 
 

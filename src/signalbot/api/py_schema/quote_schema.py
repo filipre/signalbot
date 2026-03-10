@@ -3,14 +3,11 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
-
 from pydantic import BaseModel, Field
 
-if TYPE_CHECKING:
-    from .mention_schema import Mention
-    from .quoted_attachment_schema import QuotedAttachment
-    from .text_style_schema import TextStyle
+from .mention_schema import Mention
+from .quoted_attachment_schema import QuotedAttachment
+from .text_style_schema import TextStyle
 
 
 class Quote(BaseModel):

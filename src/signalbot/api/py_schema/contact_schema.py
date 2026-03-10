@@ -3,13 +3,10 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
-
 from pydantic import BaseModel, Field
 
-if TYPE_CHECKING:
-    from .internal_schema import Internal
-    from .profile_schema import Profile
+from .internal_schema import Internal
+from .profile_schema import Profile
 
 
 class Contact(BaseModel):

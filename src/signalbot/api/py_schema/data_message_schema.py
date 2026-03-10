@@ -3,29 +3,26 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
-
 from pydantic import BaseModel, Field
 
-if TYPE_CHECKING:
-    from .admin_delete_schema import AdminDelete
-    from .attachment_schema import Attachment
-    from .group_info_schema import GroupInfo
-    from .mention_schema import Mention
-    from .payment_schema import Payment
-    from .pin_message_schema import PinMessage
-    from .poll_create_schema import PollCreate
-    from .poll_terminate_schema import PollTerminate
-    from .poll_vote_schema import PollVote
-    from .preview_schema import Preview
-    from .quote_schema import Quote
-    from .reaction_schema import Reaction
-    from .remote_delete_schema import RemoteDelete
-    from .shared import UnpinMessage
-    from .shared_contact_schema import SharedContact
-    from .sticker_schema import Sticker
-    from .story_context_schema import StoryContext
-    from .text_style_schema import TextStyle
+from .admin_delete_schema import AdminDelete
+from .attachment_schema import Attachment
+from .group_info_schema import GroupInfo
+from .mention_schema import Mention
+from .payment_schema import Payment
+from .pin_message_schema import PinMessage
+from .poll_create_schema import PollCreate
+from .poll_terminate_schema import PollTerminate
+from .poll_vote_schema import PollVote
+from .preview_schema import Preview
+from .quote_schema import Quote
+from .reaction_schema import Reaction
+from .remote_delete_schema import RemoteDelete
+from .shared import UnpinMessage
+from .shared_contact_schema import SharedContact
+from .sticker_schema import Sticker
+from .story_context_schema import StoryContext
+from .text_style_schema import TextStyle
 
 
 class DataMessage(BaseModel):

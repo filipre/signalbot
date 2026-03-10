@@ -3,15 +3,11 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
-
 from pydantic import BaseModel, Field
 
+from .attachment_schema import Attachment
 from .shared import BackgroundGradient as BackgroundGradient_1
 from .shared import TextAttachment as TextAttachment_1
-
-if TYPE_CHECKING:
-    from .attachment_schema import Attachment
 
 
 class BackgroundGradient(BackgroundGradient_1):

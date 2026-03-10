@@ -3,13 +3,10 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
-
 from pydantic import BaseModel, Field
 
-if TYPE_CHECKING:
-    from .attachment_schema import Attachment
-    from .shared import TextAttachment
+from .attachment_schema import Attachment
+from .shared import TextAttachment
 
 
 class SyncStoryMessage(BaseModel):

@@ -79,3 +79,9 @@ ignore = [
     "INP001", # Missing __init__.py file
     "SLF001", # Access private attributes
 ]
+
+# The pydantic models fail to load if the annotations are hidden behind the type
+# checking block. Ignore that rule for them.
+"**/py_schema/**.py" = [
+    "TC001",
+]

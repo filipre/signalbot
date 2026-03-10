@@ -4,12 +4,10 @@
 from __future__ import annotations
 
 from enum import Enum
-from typing import TYPE_CHECKING
 
 from pydantic import BaseModel, Field
 
-if TYPE_CHECKING:
-    from .recipient_address_schema import RecipientAddress
+from .recipient_address_schema import RecipientAddress
 
 
 class Type(Enum):

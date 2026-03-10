@@ -4,14 +4,12 @@
 from __future__ import annotations
 
 from enum import Enum
-from typing import TYPE_CHECKING
 
 from pydantic import BaseModel, Field
 
-if TYPE_CHECKING:
-    from .sync_data_message_schema import SyncDataMessage
-    from .sync_read_message_schema import SyncReadMessage
-    from .sync_story_message_schema import SyncStoryMessage
+from .sync_data_message_schema import SyncDataMessage
+from .sync_read_message_schema import SyncReadMessage
+from .sync_story_message_schema import SyncStoryMessage
 
 
 class Type(Enum):

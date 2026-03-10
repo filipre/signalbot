@@ -3,18 +3,15 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
-
 from pydantic import BaseModel, Field
 
-if TYPE_CHECKING:
-    from .call_message_schema import CallMessage
-    from .data_message_schema import DataMessage
-    from .edit_message_schema import EditMessage
-    from .receipt_message_schema import ReceiptMessage
-    from .story_message_schema import StoryMessage
-    from .sync_message_schema import SyncMessage
-    from .typing_message_schema import TypingMessage
+from .call_message_schema import CallMessage
+from .data_message_schema import DataMessage
+from .edit_message_schema import EditMessage
+from .receipt_message_schema import ReceiptMessage
+from .story_message_schema import StoryMessage
+from .sync_message_schema import SyncMessage
+from .typing_message_schema import TypingMessage
 
 
 class MessageEnvelope(BaseModel):

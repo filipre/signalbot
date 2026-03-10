@@ -20,5 +20,7 @@ uv run datamodel-codegen \
 --disable-timestamp \
 --use-exact-imports \
 --no-use-type-checking-imports \
+--all-exports-scope recursive \
+--all-exports-collision-strategy minimal-prefix \
 --output ./src/signalbot/api/py_schema
 ```

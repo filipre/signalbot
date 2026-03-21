@@ -1,8 +1,6 @@
 {
-    "$schema": "https://json-schema.org/draft/2020-12/schema",
     "$id": "quoted-attachment.schema.json",
-    "title": "QuotedAttachment",
-    "type": "object",
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
     "properties": {
         "contentType": {
             "type": "string"
@@ -13,5 +11,7 @@
         "thumbnail": {
             "$ref": "attachment.schema.json"
         }
-    }
+    },
+    "title": "QuotedAttachment",
+    "type": "object"
 }

@@ -1,8 +1,6 @@
 {
-    "$schema": "https://json-schema.org/draft/2020-12/schema",
     "$id": "contact-name.schema.json",
-    "title": "ContactName",
-    "type": "object",
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
     "properties": {
         "family": {
             "type": "string"
@@ -22,5 +20,7 @@
         "suffix": {
             "type": "string"
         }
-    }
+    },
+    "title": "ContactName",
+    "type": "object"
 }

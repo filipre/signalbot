@@ -1,8 +1,6 @@
 {
-    "$schema": "https://json-schema.org/draft/2020-12/schema",
     "$id": "pin-message.schema.json",
-    "title": "PinMessage",
-    "type": "object",
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
     "properties": {
         "pinDurationSeconds": {
             "type": "integer"
@@ -23,5 +21,7 @@
     "required": [
         "targetSentTimestamp",
         "pinDurationSeconds"
-    ]
+    ],
+    "title": "PinMessage",
+    "type": "object"
 }

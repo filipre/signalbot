@@ -1,8 +1,6 @@
 {
-    "$schema": "https://json-schema.org/draft/2020-12/schema",
     "$id": "remote-delete.schema.json",
-    "title": "RemoteDelete",
-    "type": "object",
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
     "properties": {
         "timestamp": {
             "type": "integer"
@@ -10,5 +8,7 @@
     },
     "required": [
         "timestamp"
-    ]
+    ],
+    "title": "RemoteDelete",
+    "type": "object"
 }

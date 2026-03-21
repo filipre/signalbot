@@ -1,8 +1,6 @@
 {
-    "$schema": "https://json-schema.org/draft/2020-12/schema",
     "$id": "poll-terminate.schema.json",
-    "title": "PollTerminate",
-    "type": "object",
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
     "properties": {
         "targetSentTimestamp": {
             "type": "integer"
@@ -10,5 +8,7 @@
     },
     "required": [
         "targetSentTimestamp"
-    ]
+    ],
+    "title": "PollTerminate",
+    "type": "object"
 }

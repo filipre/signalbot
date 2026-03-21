@@ -1,14 +1,12 @@
 {
-    "$schema": "https://json-schema.org/draft/2020-12/schema",
     "$id": "internal.schema.json",
-    "title": "Internal",
-    "type": "object",
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
     "properties": {
         "capabilities": {
-            "type": "array",
             "items": {
                 "type": "string"
-            }
+            },
+            "type": "array"
         },
         "discoverableByPhonenumber": {
             "type": "boolean"
@@ -19,5 +17,7 @@
         "unidentifiedAccessMode": {
             "type": "string"
         }
-    }
+    },
+    "title": "Internal",
+    "type": "object"
 }

@@ -1,11 +1,11 @@
 {
-    "$schema": "https://json-schema.org/draft/2020-12/schema",
     "$id": "attachment-data.schema.json",
-    "title": "AttachmentData",
-    "type": "object",
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
     "properties": {
         "data": {
             "type": "string"
         }
-    }
+    },
+    "title": "AttachmentData",
+    "type": "object"
 }

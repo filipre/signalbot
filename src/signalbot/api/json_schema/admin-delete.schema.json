@@ -1,8 +1,6 @@
 {
-    "$schema": "https://json-schema.org/draft/2020-12/schema",
     "$id": "admin-delete.schema.json",
-    "title": "AdminDelete",
-    "type": "object",
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
     "properties": {
         "targetAuthor": {
             "type": "string"
@@ -19,5 +17,7 @@
     },
     "required": [
         "targetSentTimestamp"
-    ]
+    ],
+    "title": "AdminDelete",
+    "type": "object"
 }

@@ -1,14 +1,12 @@
 {
-    "$schema": "https://json-schema.org/draft/2020-12/schema",
     "$id": "quote.schema.json",
-    "title": "Quote",
-    "type": "object",
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
     "properties": {
         "attachments": {
-            "type": "array",
             "items": {
                 "$ref": "quoted-attachment.schema.json"
-            }
+            },
+            "type": "array"
         },
         "author": {
             "type": "string"
@@ -23,22 +21,24 @@
             "type": "integer"
         },
         "mentions": {
-            "type": "array",
             "items": {
                 "$ref": "mention.schema.json"
-            }
+            },
+            "type": "array"
         },
         "text": {
             "type": "string"
         },
         "textStyles": {
-            "type": "array",
             "items": {
                 "$ref": "text-style.schema.json"
-            }
+            },
+            "type": "array"
         }
     },
     "required": [
         "id"
-    ]
+    ],
+    "title": "Quote",
+    "type": "object"
 }

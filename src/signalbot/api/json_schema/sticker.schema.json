@@ -1,8 +1,6 @@
 {
-    "$schema": "https://json-schema.org/draft/2020-12/schema",
     "$id": "sticker.schema.json",
-    "title": "Sticker",
-    "type": "object",
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
     "properties": {
         "packId": {
             "type": "string"
@@ -13,5 +11,7 @@
     },
     "required": [
         "stickerId"
-    ]
+    ],
+    "title": "Sticker",
+    "type": "object"
 }

@@ -1,8 +1,6 @@
 {
-    "$schema": "https://json-schema.org/draft/2020-12/schema",
     "$id": "poll-vote.schema.json",
-    "title": "PollVote",
-    "type": "object",
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
     "properties": {
         "author": {
             "type": "string"
@@ -14,10 +12,10 @@
             "type": "string"
         },
         "optionIndexes": {
-            "type": "array",
             "items": {
                 "type": "integer"
-            }
+            },
+            "type": "array"
         },
         "targetSentTimestamp": {
             "type": "integer"
@@ -29,5 +27,7 @@
     "required": [
         "targetSentTimestamp",
         "voteCount"
-    ]
+    ],
+    "title": "PollVote",
+    "type": "object"
 }

@@ -1,8 +1,6 @@
 {
-    "$schema": "https://json-schema.org/draft/2020-12/schema",
     "$id": "sync-read-message.schema.json",
-    "title": "SyncReadMessage",
-    "type": "object",
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
     "properties": {
         "sender": {
             "type": "string"
@@ -19,5 +17,7 @@
     },
     "required": [
         "timestamp"
-    ]
+    ],
+    "title": "SyncReadMessage",
+    "type": "object"
 }

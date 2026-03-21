@@ -1,8 +1,6 @@
 {
-    "$schema": "https://json-schema.org/draft/2020-12/schema",
     "$id": "payment.schema.json",
-    "title": "Payment",
-    "type": "object",
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
     "properties": {
         "note": {
             "type": "string"
@@ -13,5 +11,7 @@
     },
     "required": [
         "receipt"
-    ]
+    ],
+    "title": "Payment",
+    "type": "object"
 }

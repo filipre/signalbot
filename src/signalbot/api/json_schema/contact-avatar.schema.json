@@ -1,8 +1,6 @@
 {
-    "$schema": "https://json-schema.org/draft/2020-12/schema",
     "$id": "contact-avatar.schema.json",
-    "title": "ContactAvatar",
-    "type": "object",
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
     "properties": {
         "attachment": {
             "$ref": "attachment.schema.json"
@@ -13,5 +11,7 @@
     },
     "required": [
         "isProfile"
-    ]
+    ],
+    "title": "ContactAvatar",
+    "type": "object"
 }

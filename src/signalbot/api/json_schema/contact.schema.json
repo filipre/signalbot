@@ -1,8 +1,6 @@
 {
-    "$schema": "https://json-schema.org/draft/2020-12/schema",
     "$id": "contact.schema.json",
-    "title": "Contact",
-    "type": "object",
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
     "properties": {
         "color": {
             "type": "string"
@@ -69,5 +67,7 @@
         "messageExpirationTime",
         "profileSharing",
         "unregistered"
-    ]
+    ],
+    "title": "Contact",
+    "type": "object"
 }

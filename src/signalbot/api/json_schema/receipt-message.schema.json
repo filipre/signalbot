@@ -1,8 +1,6 @@
 {
-    "$schema": "https://json-schema.org/draft/2020-12/schema",
     "$id": "receipt-message.schema.json",
-    "title": "ReceiptMessage",
-    "type": "object",
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
     "properties": {
         "isDelivery": {
             "type": "boolean"
@@ -14,10 +12,10 @@
             "type": "boolean"
         },
         "timestamps": {
-            "type": "array",
             "items": {
                 "type": "integer"
-            }
+            },
+            "type": "array"
         },
         "when": {
             "type": "integer"
@@ -28,5 +26,7 @@
         "isDelivery",
         "isRead",
         "isViewed"
-    ]
+    ],
+    "title": "ReceiptMessage",
+    "type": "object"
 }

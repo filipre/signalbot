@@ -1,8 +1,6 @@
 {
-    "$schema": "https://json-schema.org/draft/2020-12/schema",
     "$id": "mention.schema.json",
-    "title": "Mention",
-    "type": "object",
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
     "properties": {
         "length": {
             "type": "integer"
@@ -23,5 +21,7 @@
     "required": [
         "start",
         "length"
-    ]
+    ],
+    "title": "Mention",
+    "type": "object"
 }

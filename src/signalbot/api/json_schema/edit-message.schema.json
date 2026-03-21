@@ -1,8 +1,6 @@
 {
-    "$schema": "https://json-schema.org/draft/2020-12/schema",
     "$id": "edit-message.schema.json",
-    "title": "EditMessage",
-    "type": "object",
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
     "properties": {
         "dataMessage": {
             "$ref": "data-message.schema.json"
@@ -13,5 +11,7 @@
     },
     "required": [
         "targetSentTimestamp"
-    ]
+    ],
+    "title": "EditMessage",
+    "type": "object"
 }

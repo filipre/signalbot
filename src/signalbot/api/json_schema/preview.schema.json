@@ -1,8 +1,6 @@
 {
-    "$schema": "https://json-schema.org/draft/2020-12/schema",
     "$id": "preview.schema.json",
-    "title": "Preview",
-    "type": "object",
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
     "properties": {
         "description": {
             "type": "string"
@@ -16,5 +14,7 @@
         "url": {
             "type": "string"
         }
-    }
+    },
+    "title": "Preview",
+    "type": "object"
 }

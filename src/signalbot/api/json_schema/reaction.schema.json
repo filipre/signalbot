@@ -1,8 +1,6 @@
 {
-    "$schema": "https://json-schema.org/draft/2020-12/schema",
     "$id": "reaction.schema.json",
-    "title": "Reaction",
-    "type": "object",
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
     "properties": {
         "emoji": {
             "type": "string"
@@ -26,5 +24,7 @@
     "required": [
         "targetSentTimestamp",
         "isRemove"
-    ]
+    ],
+    "title": "Reaction",
+    "type": "object"
 }

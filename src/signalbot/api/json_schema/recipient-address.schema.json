@@ -1,8 +1,6 @@
 {
-    "$schema": "https://json-schema.org/draft/2020-12/schema",
     "$id": "recipient-address.schema.json",
-    "title": "RecipientAddress",
-    "type": "object",
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
     "properties": {
         "number": {
             "type": "string"
@@ -13,5 +11,7 @@
         "uuid": {
             "type": "string"
         }
-    }
+    },
+    "title": "RecipientAddress",
+    "type": "object"
 }

@@ -1,8 +1,6 @@
 {
-    "$schema": "https://json-schema.org/draft/2020-12/schema",
     "$id": "text-style.schema.json",
-    "title": "TextStyle",
-    "type": "object",
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
     "properties": {
         "length": {
             "type": "integer"
@@ -17,5 +15,7 @@
     "required": [
         "start",
         "length"
-    ]
+    ],
+    "title": "TextStyle",
+    "type": "object"
 }

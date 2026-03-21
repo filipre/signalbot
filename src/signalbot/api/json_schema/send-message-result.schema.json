@@ -1,8 +1,6 @@
 {
-    "$schema": "https://json-schema.org/draft/2020-12/schema",
     "$id": "send-message-result.schema.json",
-    "title": "SendMessageResult",
-    "type": "object",
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
     "properties": {
         "groupId": {
             "type": "string"
@@ -17,7 +15,6 @@
             "type": "string"
         },
         "type": {
-            "type": "string",
             "enum": [
                 "SUCCESS",
                 "NETWORK_FAILURE",
@@ -25,7 +22,10 @@
                 "IDENTITY_FAILURE",
                 "RATE_LIMIT_FAILURE",
                 "INVALID_PRE_KEY_FAILURE"
-            ]
+            ],
+            "type": "string"
         }
-    }
+    },
+    "title": "SendMessageResult",
+    "type": "object"
 }

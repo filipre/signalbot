@@ -1,8 +1,6 @@
 {
-    "$schema": "https://json-schema.org/draft/2020-12/schema",
     "$id": "message-envelope.schema.json",
-    "title": "MessageEnvelope",
-    "type": "object",
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
     "properties": {
         "callMessage": {
             "$ref": "call-message.schema.json"
@@ -54,5 +52,7 @@
         "timestamp",
         "serverReceivedTimestamp",
         "serverDeliveredTimestamp"
-    ]
+    ],
+    "title": "MessageEnvelope",
+    "type": "object"
 }

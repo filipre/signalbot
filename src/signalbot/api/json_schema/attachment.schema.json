@@ -1,8 +1,6 @@
 {
-    "$schema": "https://json-schema.org/draft/2020-12/schema",
     "$id": "attachment.schema.json",
-    "title": "Attachment",
-    "type": "object",
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
     "properties": {
         "caption": {
             "type": "string"
@@ -28,5 +26,7 @@
         "width": {
             "type": "integer"
         }
-    }
+    },
+    "title": "Attachment",
+    "type": "object"
 }

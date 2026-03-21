@@ -1,12 +1,8 @@
 {
-    "$schema": "https://json-schema.org/draft/2020-12/schema",
     "$id": "call-message.schema.json",
-    "title": "CallMessage",
-    "type": "object",
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
     "properties": {
         "answerMessage": {
-            "title": "JsonCallMessage.Answer",
-            "type": "object",
             "properties": {
                 "id": {
                     "type": "integer"
@@ -17,11 +13,11 @@
             },
             "required": [
                 "id"
-            ]
+            ],
+            "title": "JsonCallMessage.Answer",
+            "type": "object"
         },
         "busyMessage": {
-            "title": "JsonCallMessage.Busy",
-            "type": "object",
             "properties": {
                 "id": {
                     "type": "integer"
@@ -29,11 +25,11 @@
             },
             "required": [
                 "id"
-            ]
+            ],
+            "title": "JsonCallMessage.Busy",
+            "type": "object"
         },
         "hangupMessage": {
-            "title": "JsonCallMessage.Hangup",
-            "type": "object",
             "properties": {
                 "deviceId": {
                     "type": "integer"
@@ -48,13 +44,12 @@
             "required": [
                 "id",
                 "deviceId"
-            ]
+            ],
+            "title": "JsonCallMessage.Hangup",
+            "type": "object"
         },
         "iceUpdateMessages": {
-            "type": "array",
             "items": {
-                "title": "JsonCallMessage.IceUpdate",
-                "type": "object",
                 "properties": {
                     "id": {
                         "type": "integer"
@@ -65,12 +60,13 @@
                 },
                 "required": [
                     "id"
-                ]
-            }
+                ],
+                "title": "JsonCallMessage.IceUpdate",
+                "type": "object"
+            },
+            "type": "array"
         },
         "offerMessage": {
-            "title": "JsonCallMessage.Offer",
-            "type": "object",
             "properties": {
                 "id": {
                     "type": "integer"
@@ -84,7 +80,11 @@
             },
             "required": [
                 "id"
-            ]
+            ],
+            "title": "JsonCallMessage.Offer",
+            "type": "object"
         }
-    }
+    },
+    "title": "CallMessage",
+    "type": "object"
 }

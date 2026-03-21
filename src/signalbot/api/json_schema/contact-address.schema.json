@@ -1,8 +1,6 @@
 {
-    "$schema": "https://json-schema.org/draft/2020-12/schema",
     "$id": "contact-address.schema.json",
-    "title": "ContactAddress",
-    "type": "object",
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
     "properties": {
         "city": {
             "type": "string"
@@ -31,5 +29,7 @@
         "type": {
             "type": "string"
         }
-    }
+    },
+    "title": "ContactAddress",
+    "type": "object"
 }

@@ -1,8 +1,6 @@
 {
-    "$schema": "https://json-schema.org/draft/2020-12/schema",
     "$id": "typing-message.schema.json",
-    "title": "TypingMessage",
-    "type": "object",
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
     "properties": {
         "action": {
             "type": "string"
@@ -16,5 +14,7 @@
     },
     "required": [
         "timestamp"
-    ]
+    ],
+    "title": "TypingMessage",
+    "type": "object"
 }

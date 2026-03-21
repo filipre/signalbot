@@ -1,23 +1,21 @@
 {
-    "$schema": "https://json-schema.org/draft/2020-12/schema",
     "$id": "shared-contact.schema.json",
-    "title": "SharedContact",
-    "type": "object",
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
     "properties": {
         "address": {
-            "type": "array",
             "items": {
                 "$ref": "contact-address.schema.json"
-            }
+            },
+            "type": "array"
         },
         "avatar": {
             "$ref": "contact-avatar.schema.json"
         },
         "email": {
-            "type": "array",
             "items": {
                 "$ref": "contact-email.schema.json"
-            }
+            },
+            "type": "array"
         },
         "name": {
             "$ref": "contact-name.schema.json"
@@ -26,10 +24,12 @@
             "type": "string"
         },
         "phone": {
-            "type": "array",
             "items": {
                 "$ref": "contact-phone.schema.json"
-            }
+            },
+            "type": "array"
         }
-    }
+    },
+    "title": "SharedContact",
+    "type": "object"
 }

@@ -1,17 +1,15 @@
 {
-    "$schema": "https://json-schema.org/draft/2020-12/schema",
     "$id": "poll-create.schema.json",
-    "title": "PollCreate",
-    "type": "object",
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
     "properties": {
         "allowMultiple": {
             "type": "boolean"
         },
         "options": {
-            "type": "array",
             "items": {
                 "type": "string"
-            }
+            },
+            "type": "array"
         },
         "question": {
             "type": "string"
@@ -19,5 +17,7 @@
     },
     "required": [
         "allowMultiple"
-    ]
+    ],
+    "title": "PollCreate",
+    "type": "object"
 }

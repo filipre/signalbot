@@ -1,8 +1,6 @@
 {
-    "$schema": "https://json-schema.org/draft/2020-12/schema",
     "$id": "contact-phone.schema.json",
-    "title": "ContactPhone",
-    "type": "object",
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
     "properties": {
         "label": {
             "type": "string"
@@ -13,5 +11,7 @@
         "value": {
             "type": "string"
         }
-    }
+    },
+    "title": "ContactPhone",
+    "type": "object"
 }

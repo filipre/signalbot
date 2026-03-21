@@ -1,8 +1,6 @@
 {
-    "$schema": "https://json-schema.org/draft/2020-12/schema",
     "$id": "group-info.schema.json",
-    "title": "GroupInfo",
-    "type": "object",
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
     "properties": {
         "groupId": {
             "type": "string"
@@ -19,5 +17,7 @@
     },
     "required": [
         "revision"
-    ]
+    ],
+    "title": "GroupInfo",
+    "type": "object"
 }

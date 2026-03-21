@@ -1,8 +1,6 @@
 {
-    "$schema": "https://json-schema.org/draft/2020-12/schema",
     "$id": "story-context.schema.json",
-    "title": "StoryContext",
-    "type": "object",
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
     "properties": {
         "authorNumber": {
             "type": "string"
@@ -16,5 +14,7 @@
     },
     "required": [
         "sentTimestamp"
-    ]
+    ],
+    "title": "StoryContext",
+    "type": "object"
 }

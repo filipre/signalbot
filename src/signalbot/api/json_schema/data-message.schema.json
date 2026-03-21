@@ -1,23 +1,21 @@
 {
-    "$schema": "https://json-schema.org/draft/2020-12/schema",
     "$id": "data-message.schema.json",
-    "title": "DataMessage",
-    "type": "object",
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
     "properties": {
         "adminDelete": {
             "$ref": "admin-delete.schema.json"
         },
         "attachments": {
-            "type": "array",
             "items": {
                 "$ref": "attachment.schema.json"
-            }
+            },
+            "type": "array"
         },
         "contacts": {
-            "type": "array",
             "items": {
                 "$ref": "shared-contact.schema.json"
-            }
+            },
+            "type": "array"
         },
         "expiresInSeconds": {
             "type": "integer"
@@ -29,10 +27,10 @@
             "type": "boolean"
         },
         "mentions": {
-            "type": "array",
             "items": {
                 "$ref": "mention.schema.json"
-            }
+            },
+            "type": "array"
         },
         "message": {
             "type": "string"
@@ -53,10 +51,10 @@
             "$ref": "poll-vote.schema.json"
         },
         "previews": {
-            "type": "array",
             "items": {
                 "$ref": "preview.schema.json"
-            }
+            },
+            "type": "array"
         },
         "quote": {
             "$ref": "quote.schema.json"
@@ -74,10 +72,10 @@
             "$ref": "story-context.schema.json"
         },
         "textStyles": {
-            "type": "array",
             "items": {
                 "$ref": "text-style.schema.json"
-            }
+            },
+            "type": "array"
         },
         "timestamp": {
             "type": "integer"
@@ -91,5 +89,7 @@
     },
     "required": [
         "timestamp"
-    ]
+    ],
+    "title": "DataMessage",
+    "type": "object"
 }

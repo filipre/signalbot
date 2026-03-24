@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import asyncio
+import copy
 import itertools
 import logging
 import re
@@ -164,6 +165,9 @@ class SignalBot:
                 " Add storage: {'type': 'in-memory'}"
                 " to the config to silence this error.",
             )
+
+    def get_group(self, internal_id: str) -> dict[str, Any]:
+        return copy.deepcopy(self._groups_by_internal_id[internal_id])
 
     def register(
         self,

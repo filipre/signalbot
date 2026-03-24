@@ -78,6 +78,9 @@ class TestProducer(TestCommon):
 
 
 class TestGetter(TestCommon):
+    def test_null_group(self):
+        assert not self.signal_bot.get_group("none")
+
     @pytest.mark.asyncio
     async def test_get_group(self, mocker: MockerFixture):
         class GroupInspector(Command):

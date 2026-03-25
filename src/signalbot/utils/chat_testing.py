@@ -71,6 +71,48 @@ class ChatTestCase:
             await self.signal_bot._consume_new_item(handler_ir)  # noqa: SLF001
 
     @classmethod
+    def new_reaction_message(cls, emoji: str) -> str:
+        timestamp = time.time()
+        new_uuid = str(uuid.uuid4())
+        message = {
+            "envelope": {
+                "source": ChatTestCase.phone_number,
+                "sourceNumber": ChatTestCase.phone_number,
+                "sourceUuid": new_uuid,
+                "sourceName": "some_source_name",
+                "sourceDevice": 1,
+                "timestamp": timestamp,
+                "syncMessage": {
+                    "sentMessage": {
+                        "timestamp": timestamp,
+                        "message": None,
+                        "expiresInSeconds": 0,
+                        "viewOnce": False,
+                        "reaction": {
+                            "emoji": emoji,
+                            "targetAuthor": ChatTestCase.phone_number,
+                            "targetAuthorNumber": ChatTestCase.phone_number,
+                            "targetAuthorUuid": new_uuid,
+                            "targetSentTimestamp": int(timestamp),
+                            "isRemove": False,
+                        },
+                        "mentions": [],
+                        "attachments": [],
+                        "contacts": [],
+                        "groupInfo": {
+                            "groupId": ChatTestCase.group_internal_id,
+                            "type": "DELIVER",
+                        },
+                        "destination": None,
+                        "destinationNumber": None,
+                        "destinationUuid": None,
+                    },
+                },
+            },
+        }
+        return json.dumps(message)
+
+    @classmethod
     def new_message(cls, text) -> str:  # noqa: ANN001
         timestamp = time.time()
         new_uuid = str(uuid.uuid4())
@@ -110,6 +152,11 @@ class ReceiveMessagesMock(MagicMock):
         json_messages = [ChatTestCase.new_message(m) for m in messages]
         mock_iterator = AsyncMock()
         mock_iterator.__aiter__.return_value = json_messages
+        self.return_value = mock_iterator
+
+    def define_raw(self, raw_messages: list[str]) -> None:
+        mock_iterator = AsyncMock()
+        mock_iterator.__aiter__.return_value = raw_messages
         self.return_value = mock_iterator
 
 

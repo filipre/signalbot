@@ -13,10 +13,17 @@ from signalbot.bot import (
     enable_console_logging,
 )
 from signalbot.bot_config import Config, InMemoryConfig, RedisConfig, SQLiteConfig
-from signalbot.command import Command, CommandError, regex_triggered, triggered
+from signalbot.command import (
+    Command,
+    CommandError,
+    reaction_triggered,
+    regex_triggered,
+    triggered,
+)
 from signalbot.context import Context
 from signalbot.link_previews import LinkPreview
 from signalbot.message import Message, MessageType, Quote, UnknownMessageFormatError
+from signalbot.reaction import Reaction
 
 __all__ = [
     "LOGGER_NAME",
@@ -31,6 +38,7 @@ __all__ = [
     "Message",
     "MessageType",
     "Quote",
+    "Reaction",
     "ReceiveMessagesError",
     "RedisConfig",
     "SQLiteConfig",
@@ -39,6 +47,7 @@ __all__ = [
     "SignalBot",
     "UnknownMessageFormatError",
     "enable_console_logging",
+    "reaction_triggered",
     "regex_triggered",
     "triggered",
 ]

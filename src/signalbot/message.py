@@ -7,6 +7,7 @@ from typing import TYPE_CHECKING
 
 from signalbot.link_previews import LinkPreview
 from signalbot.quote import Quote
+from signalbot.reaction import Reaction
 
 if TYPE_CHECKING:
     from signalbot.api import SignalAPI
@@ -22,6 +23,7 @@ class MessageType(Enum):
         DELETE_MESSAGE: Message received is a remote delete of a previous message
         READ_MESSAGE: User read some messages
         GROUP_UPDATE_MESSAGE: An update has been made to a group
+        REACTION_MESSAGE: Message received is a reaction to a previous message
         CONTACT_SYNC_MESSAGE: Message received is a contact sync
     """
 
@@ -31,6 +33,7 @@ class MessageType(Enum):
     DELETE_MESSAGE = auto()  # Message received is a remote delete of a previous message
     READ_MESSAGE = auto()  # User read some messages
     GROUP_UPDATE_MESSAGE = auto()  # An update has been made to a group
+    REACTION_MESSAGE = auto()  # Message received is a reaction to a previous message
     CONTACT_SYNC_MESSAGE = auto()  # Message received is a contact sync
 
 
@@ -55,7 +58,7 @@ class Message:
             the message.
         group: The UUID of the group chat the message was sent in, or `None` if the
             message was sent in a user chat.
-        reaction: The reaction emoji if the message is a reaction.
+        reaction: A `Reaction` object if the message is a reaction, or `None`.
         mentions: A list of UUIDs of users mentioned in the message.
         quote: An object representing the quoted message if the message is a
             quote.
@@ -81,7 +84,7 @@ class Message:
     view_once: bool = False
     link_previews: list[LinkPreview] = field(default_factory=list)
     group: str | None = None
-    reaction: str | None = None
+    reaction: Reaction | None = None
     mentions: list[str] = field(default_factory=list)
     quote: Quote | None = None
     read_messages: list[dict] | None = None
@@ -173,6 +176,9 @@ class Message:
         if "remoteDelete" in data_message:
             message_type = MessageType.DELETE_MESSAGE
             remote_delete_timestamp = data_message["remoteDelete"]["timestamp"]
+
+        if "reaction" in data_message:
+            message_type = MessageType.REACTION_MESSAGE
 
         updated_group_id = None
         if (
@@ -298,7 +304,7 @@ class Message:
             raise UnknownMessageFormatError from exc
 
     @classmethod
-    def _parse_group_information(cls, message: dict) -> str:
+    def _parse_group_information(cls, message: dict) -> str | None:
         try:
             return message["groupInfo"]["groupId"]
         except KeyError:
@@ -312,10 +318,10 @@ class Message:
             return []
 
     @classmethod
-    def _parse_reaction(cls, message: dict) -> str:
+    def _parse_reaction(cls, message: dict) -> Reaction | None:
         try:
-            return message["reaction"]["emoji"]
-        except KeyError:
+            return Reaction.model_validate(message["reaction"])
+        except (KeyError, ValueError):
             return None
 
     @classmethod

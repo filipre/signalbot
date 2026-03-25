@@ -82,7 +82,10 @@ class TestMessage:
 
     async def test_read_reaction(self):
         message = await Message.parse(self.signal_api, TestMessage.raw_reaction_message)
-        assert message.reaction == "👍"
+        assert message.type == MessageType.REACTION_MESSAGE
+        assert message.reaction.emoji == "👍"
+        assert message.reaction.target_sent_timestamp == 1632576001632
+        assert message.reaction.is_remove is False
 
     async def test_group_update(self):
         message = await Message.parse(

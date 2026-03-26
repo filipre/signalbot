@@ -4,7 +4,7 @@ import pytest
 from pytest_mock import MockerFixture
 
 from signalbot import Command, Context, triggered
-from signalbot.command import regex_triggered
+from signalbot.command import reaction_triggered, regex_triggered
 from signalbot.utils import (
     ChatTestCase,
     GetGroupsMock,
@@ -23,6 +23,18 @@ class TriggeredCaseSensitiveCommand(Command):
     @triggered("Trump", "Biden", case_sensitive=True)
     async def handle(self, context: Context):
         await context.send("I am triggered")
+
+
+class ReactionTriggeredCommand(Command):
+    @reaction_triggered()
+    async def handle(self, context: Context):
+        await context.send("I am triggered by reactions")
+
+
+class ReactionFilteredCommand(Command):
+    @reaction_triggered("👍", "❤️")
+    async def handle(self, context: Context):
+        await context.send("I am triggered by specific reactions")
 
 
 class RegexTriggeredCommand(Command):
@@ -177,3 +189,45 @@ class TestTriggeredGroups(TestCommon):
             TriggeredCommand(), groups=[ChatTestCase.group_internal_id + "a"]
         )
         await self._test_trigger(mocker, call_count=0)
+
+
+class TestReactionTriggered(TestCommon):
+    @pytest.fixture(autouse=True)
+    def setup(self):
+        super().setup()
+        self.signal_bot.register(ReactionTriggeredCommand(), contacts=True, groups=True)
+
+    async def test_reaction_triggered(self, mocker: MockerFixture):
+        mocks = self.mock_send_receive_get_groups(mocker)
+        mocks.receive_mock.define_raw([ChatTestCase.new_reaction_message("👍")])
+        await self.signal_bot._resolve_commands()
+        await self.run_bot()
+        assert mocks.send_mock.call_count == 1
+
+    async def test_non_reaction_skipped(self, mocker: MockerFixture):
+        mocks = self.mock_send_receive_get_groups(mocker)
+        mocks.receive_mock.define(["hello"])
+        await self.signal_bot._resolve_commands()
+        await self.run_bot()
+        assert mocks.send_mock.call_count == 0
+
+
+class TestReactionFiltered(TestCommon):
+    @pytest.fixture(autouse=True)
+    def setup(self):
+        super().setup()
+        self.signal_bot.register(ReactionFilteredCommand(), contacts=True, groups=True)
+
+    async def test_matching_emoji(self, mocker: MockerFixture):
+        mocks = self.mock_send_receive_get_groups(mocker)
+        mocks.receive_mock.define_raw([ChatTestCase.new_reaction_message("👍")])
+        await self.signal_bot._resolve_commands()
+        await self.run_bot()
+        assert mocks.send_mock.call_count == 1
+
+    async def test_non_matching_emoji(self, mocker: MockerFixture):
+        mocks = self.mock_send_receive_get_groups(mocker)
+        mocks.receive_mock.define_raw([ChatTestCase.new_reaction_message("😂")])
+        await self.signal_bot._resolve_commands()
+        await self.run_bot()
+        assert mocks.send_mock.call_count == 0

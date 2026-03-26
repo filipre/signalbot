@@ -77,6 +77,61 @@ class TestProducer(TestCommon):
         assert self.signal_bot._q.qsize() == 4  # noqa: PLR2004
 
 
+class TestGetter(TestCommon):
+    def test_null_group(self):
+        assert not self.signal_bot.get_group("none")
+
+    @pytest.mark.asyncio
+    async def test_get_group(self, mocker: MockerFixture):
+        class GroupInspector(Command):
+            def __init__(self):  # noqa: ANN204
+                self.found_group = None
+
+            async def handle(self, context: Context) -> None:
+                self.found_group = self.bot.get_group(context.message.group)
+
+        message = '{"envelope":{"source":"+4901234567890","sourceNumber":"+4901234567890","sourceUuid":"asdf","sourceName":"name","sourceDevice":1,"timestamp":1633169000000,"syncMessage":{"sentMessage":{"timestamp":1633169000000,"message":"Message 1","expiresInSeconds":0,"viewOnce":false,"mentions":[],"attachments":[],"contacts":[],"groupInfo":{"groupId":"Mg8LQTdaZJs8+LJCrtQgblqHx+xI2dX9JJ8hVA2kqt8=","type":"DELIVER"},"destination":null,"destinationNumber":null,"destinationUuid":null}}}}'  # noqa: E501
+        messages = [message]
+        mock_iterator = mocker.AsyncMock()
+        mock_iterator.__aiter__.return_value = messages
+        mock = mocker.patch("websockets.connect")
+        mock.return_value.__aenter__.return_value = mock_iterator
+
+        group_mock = mocker.AsyncMock()
+        fake_group = {
+            "name": "mocked group",
+            "id": self.group_id,
+            "internal_id": self.internal_id,
+        }
+        group_mock.return_value = [fake_group]
+        get_group_mock = mocker.patch(
+            "aiohttp.ClientSession.get", new_callable=mocker.AsyncMock
+        )
+        get_group_mock.return_value = mocker.AsyncMock(
+            spec=aiohttp.ClientResponse,
+            status_code=200,
+            json=group_mock,
+        )
+
+        self.signal_bot._q = asyncio.Queue()
+        self.signal_bot._signal = SignalAPI(
+            self.signal_service,
+            self.phone_number,
+        )
+
+        inspector = GroupInspector()
+        self.signal_bot.register(inspector)
+
+        await self.signal_bot._resolve_commands()
+
+        await self.signal_bot._produce(1337)
+
+        await self.signal_bot._consume_new_item(1337)
+
+        assert inspector.found_group == fake_group
+        assert inspector.found_group is not fake_group
+
+
 class TestSignalApiProtocolConfig:
     signal_service = "127.0.0.1:8080"
     phone_number = "+49123456789"

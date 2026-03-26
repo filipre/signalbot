@@ -76,6 +76,32 @@ def triggered(
     return decorator_triggered
 
 
+def reaction_triggered(
+    *by: str,
+) -> Callable[[Callable[P, T]], Callable[P, T]]:
+    """Decorator to trigger a command when a reaction is received.
+
+    Args:
+        *by: Optional emoji strings to filter on. If empty, triggers on any reaction.
+    """
+
+    def decorator_reaction_triggered(func: Callable[P, T]) -> Callable[P, T]:
+        @functools.wraps(func)
+        async def wrapper_reaction_triggered(
+            *args: P.args, **kwargs: P.kwargs
+        ) -> T | None:
+            context: Context = args[1]
+            if context.message.reaction is None:
+                return None
+            if by and context.message.reaction.emoji not in by:
+                return None
+            return await func(*args, **kwargs)
+
+        return wrapper_reaction_triggered
+
+    return decorator_reaction_triggered
+
+
 class Command(ABC):
     """Abstract base class for commands.
 

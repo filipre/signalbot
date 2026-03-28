@@ -22,6 +22,7 @@ nav:
     - LinkPreview: reference/linkpreview.md
     - Command: reference/command.md
     - Quote: reference/quote.md
+    - Reaction: reference/reaction.md
   - Troubleshooting: troubleshooting.md
   - Contributing: local_development.md
 

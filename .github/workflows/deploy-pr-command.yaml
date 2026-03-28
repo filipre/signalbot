@@ -25,7 +25,7 @@ jobs:
           INPUT_REF: ${{ github.event.client_payload.pull_request.head.sha }}
           INPUT_ENVIRONMENT: test.pypi.org
           INPUT_AUTO_MERGE: false
-          GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Set deployment status to in progress
         id: start_deployment
@@ -37,7 +37,7 @@ jobs:
           log_url: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
           state: in_progress
         env:
-          GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           INPUT_REPOSITORY: ${{ github.repository }}
 
       - name: Checkout Code
@@ -88,7 +88,7 @@ jobs:
           log_url: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
           state: success
         env:
-          GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           INPUT_REPOSITORY: ${{ github.repository }}
 
       - name: Set deployment status to failure
@@ -103,5 +103,5 @@ jobs:
           log_url: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
           state: failure
         env:
-          GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           INPUT_REPOSITORY: ${{ github.repository }}

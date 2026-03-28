@@ -82,3 +82,8 @@ ignore = [
     "INP001", # Missing __init__.py file
     "SLF001", # Access private attributes
 ]
+
+[tool.yamlfix]
+explicit_start = false
+whitelines = 1
+line_length = 120 # This should be 88 but the formatter breaks some }} in the github workflows.

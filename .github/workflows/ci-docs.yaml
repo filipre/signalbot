@@ -4,16 +4,13 @@ on:
   push:
     branches: [main]
     paths:
-      - 'docs/**'    # If the documentation files changed
-      - 'mkdocs.yml' # If the MkDocs configuration changed
-      - 'uv.lock'    # If the dependencies changed (in case docs dependencies were updated)
+      - docs/**  # If the documentation files changed
+      - mkdocs.yml  # If the MkDocs configuration changed
+      - uv.lock  # If the dependencies changed (in case docs dependencies were updated)
 
   pull_request:
     branches: [main]
-    paths:
-      - 'docs/**'
-      - 'mkdocs.yml'
-      - 'uv.lock'
+    paths: [docs/**, mkdocs.yml, uv.lock]
 
 jobs:
   docs:

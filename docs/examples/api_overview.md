@@ -49,6 +49,13 @@ Check the [commands section](#commands) to see the implementation of each comman
 </details>
 
 
+<details><summary>ReactionCommand & ThumbsUpCommand</summary>
+``` python
+--8<-- "examples/commands/reaction.py"
+```
+</details>
+
+
 <details><summary>RegexTriggeredCommand</summary>
 ``` python
 --8<-- "examples/commands/regex_triggered.py"

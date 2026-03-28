@@ -85,7 +85,7 @@ ignore = [
 ]
 # The pydantic models fail to load if the annotations are hidden behind the type
 # checking block. Ignore that rule for them.
-"**/py_schema/**.py" = [
+"**/py_receive/**.py" = [
     "TC001",
 ]
 "**/py_send/**.py" = [

@@ -1,6 +1,13 @@
 This bot showcases how to use most of the features in the library.
 Check the [commands section](#commands) to see the implementation of each command.
 
+This bot use additional libraries, install them with:
+```bash
+pip install signalbot[examples]
+```
+
+<br>Bot code:
+
 ``` python
 --8<-- "examples/bot.py"
 ```

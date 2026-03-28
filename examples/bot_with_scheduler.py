@@ -1,12 +1,7 @@
 import logging
 import os
 
-try:
-    import typer
-except ImportError as exc:
-    error_msg = "The 'typer' library is required to run this example."
-    error_msg += " Please install it with 'pip install typer'."
-    raise ImportError(error_msg) from exc
+import typer
 
 from signalbot import SignalBot, enable_console_logging
 

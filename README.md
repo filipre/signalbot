@@ -45,21 +45,3 @@ if __name__ == "__main__":
 ## Help
 
 See the [documentation](https://signalbot-org.github.io/signalbot/) for more details.
-
-## Other Projects
-
-There are a few other projects similar to this one. You may want to check them out and see if they fit your needs.
-
-|Project|Description|Language|Maintained|
-|-------|:---------:|:------:|:------:|
-|https://github.com/AsamK/signal-cli|A CLI and D-Bus interface for Signal|Java|✅|
-|https://github.com/bbernhard/pysignalclirestapi|Python Wrapper for REST API|Python|✅|
-|https://github.com/bbernhard/signal-cli-rest-api|REST API Wrapper for Signal CLI|Go|✅|
-|https://github.com/signal-bot/signal-bot|Bot Framework using Signal CLI|Python|❌|
-|https://github.com/signalapp/libsignal-service-java|Signal Library|Java|❌|
-|https://github.com/aaronetz/signal-bot|Bot Framework|Java|❌|
-|https://gitlab.com/signald/signald|A socket interface for Signal|Java|❌|
-|https://codeberg.org/lazlo/semaphore|signald Library / Bot Framework|Python|❌|
-|https://git.sr.ht/~nicoco/aiosignald|signald Library / Bot Framework|Python|❌|
-|https://gitlab.com/stavros/pysignald|signald Library / Bot Framework|Python|❌|
-|https://gitlab.com/signald/signald-go|signald Library|Go|❌|

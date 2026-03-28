@@ -16,7 +16,7 @@ jobs:
         uses: actions-cool/check-user-permission@main
         id: checkUser
         with:
-          require: "write"
+          require: write
 
       - name: Trigger the deploy-pr-command workflow and add a reaction to the comment
         if: steps.checkUser.outputs.require-result == 'true'

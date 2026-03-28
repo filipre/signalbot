@@ -88,6 +88,11 @@ ignore = [
 "**/py_schema/**.py" = [
     "TC001",
 ]
+"**/py_send/**.py" = [
+    "TC001",
+    "E501",
+]
+
 
 [tool.yamlfix]
 explicit_start = false

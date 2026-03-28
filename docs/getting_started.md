@@ -3,6 +3,9 @@ Signalbot uses [signal-cli-rest-api](https://github.com/bbernhard/signal-cli-res
 The first step is to set it up.
 Then signalbot can run in its own python environment.
 
+It is also possible to mock having signal-cli-rest-api running.
+Check out hown in the [mock_chat section](#mock-chat).
+
 ## Setup signal-cli-rest-api
 
 1. Install [docker](https://www.docker.com)
@@ -89,3 +92,10 @@ Confirm that the bot received a raw message, that the consumer worked on the mes
     Pong
     ```
 9. Check the other examples in the [examples section](examples/api_overview.md).
+
+
+## Mock chat
+You can mock receiving and sending messages to speed up development time.
+To do so, you can use [signalbot.utils.ChatTestCase](https://github.com/signalbot-org/signalbot/blob/a543f8a967c81325bc83035f68f23561556c11a6/src/signalbot/utils/chat_testing.py#L48) which sets up a "skeleton" bot.
+Then, you can send messages using the [@mock_chat](https://github.com/signalbot-org/signalbot/blob/a543f8a967c81325bc83035f68f23561556c11a6/src/signalbot/utils/chat_testing.py#L14) decorator.
+You can find an example implementation in [tests/test_chat.py](https://github.com/signalbot-org/signalbot/blob/main/tests/test_chat.py).

@@ -4,7 +4,7 @@ The first step is to set it up.
 Then signalbot can run in its own python environment.
 
 It is also possible to mock having signal-cli-rest-api running.
-Check out hown in the [mock_chat section](#mock-chat).
+Check out how in the [mock_chat section](#mock-chat).
 
 ## Setup signal-cli-rest-api
 

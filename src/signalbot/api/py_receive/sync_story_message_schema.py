@@ -6,13 +6,35 @@ from __future__ import annotations
 from pydantic import BaseModel, Field
 
 from .attachment_schema import Attachment
-from .shared import TextAttachment
+from .preview_schema import Preview
+
+
+class BackgroundGradient(BaseModel):
+    angle: int | None = None
+    colors: list[str] | None = None
+    end_color: str | None = Field(None, alias="endColor")
+    positions: list[float] | None = None
+    start_color: str | None = Field(None, alias="startColor")
+
+
+class TextAttachment(BaseModel):
+    background_color: str | None = Field(None, alias="backgroundColor")
+    background_gradient: BackgroundGradient | None = Field(
+        None,
+        alias="backgroundGradient",
+        title="JsonStoryMessage.TextAttachment.Gradient",
+    )
+    preview: Preview | None = None
+    style: str | None = None
+    text: str | None = None
+    text_background_color: str | None = Field(None, alias="textBackgroundColor")
+    text_foreground_color: str | None = Field(None, alias="textForegroundColor")
 
 
 class SyncStoryMessage(BaseModel):
-    destination_number: str = Field(..., alias="destinationNumber")
-    destination_uuid: str = Field(..., alias="destinationUuid")
-    allows_replies: bool = Field(..., alias="allowsReplies")
+    allows_replies: bool | None = Field(None, alias="allowsReplies")
+    destination_number: str | None = Field(None, alias="destinationNumber")
+    destination_uuid: str | None = Field(None, alias="destinationUuid")
     file_attachment: Attachment | None = Field(None, alias="fileAttachment")
     group_id: str | None = Field(None, alias="groupId")
     text_attachment: TextAttachment | None = Field(

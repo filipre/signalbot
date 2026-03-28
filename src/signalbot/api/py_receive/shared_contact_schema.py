@@ -9,7 +9,7 @@ from .contact_address_schema import ContactAddress
 from .contact_avatar_schema import ContactAvatar
 from .contact_email_schema import ContactEmail
 from .contact_name_schema import ContactName
-from .shared import ContactPhone
+from .contact_phone_schema import ContactPhone
 
 
 class SharedContact(BaseModel):

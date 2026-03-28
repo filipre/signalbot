@@ -5,7 +5,10 @@ from __future__ import annotations
 
 from pydantic import BaseModel, Field
 
-from .shared import AnswerMessage
+
+class AnswerMessage(BaseModel):
+    id: int
+    opaque: str | None = None
 
 
 class BusyMessage(BaseModel):
@@ -18,8 +21,9 @@ class HangupMessage(BaseModel):
     type: str | None = None
 
 
-class IceUpdateMessage(AnswerMessage):
-    pass
+class IceUpdateMessage(BaseModel):
+    id: int
+    opaque: str | None = None
 
 
 class OfferMessage(BaseModel):

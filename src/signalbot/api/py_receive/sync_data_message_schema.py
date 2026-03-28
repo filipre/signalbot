@@ -19,21 +19,21 @@ from .preview_schema import Preview
 from .quote_schema import Quote
 from .reaction_schema import Reaction
 from .remote_delete_schema import RemoteDelete
-from .shared import UnpinMessage
 from .shared_contact_schema import SharedContact
 from .sticker_schema import Sticker
 from .story_context_schema import StoryContext
 from .text_style_schema import TextStyle
+from .unpin_message_schema import UnpinMessage
 
 
 class SyncDataMessage(BaseModel):
-    destination: str | None = None
-    destination_number: str = Field(..., alias="destinationNumber")
-    destination_uuid: str = Field(..., alias="destinationUuid")
-    edit_message: EditMessage | None = Field(None, alias="editMessage")
     admin_delete: AdminDelete | None = Field(None, alias="adminDelete")
     attachments: list[Attachment] | None = None
     contacts: list[SharedContact] | None = None
+    destination: str | None = None
+    destination_number: str | None = Field(None, alias="destinationNumber")
+    destination_uuid: str | None = Field(None, alias="destinationUuid")
+    edit_message: EditMessage | None = Field(None, alias="editMessage")
     expires_in_seconds: int | None = Field(None, alias="expiresInSeconds")
     group_info: GroupInfo | None = Field(None, alias="groupInfo")
     is_expiration_update: bool | None = Field(None, alias="isExpirationUpdate")
@@ -51,6 +51,6 @@ class SyncDataMessage(BaseModel):
     sticker: Sticker | None = None
     story_context: StoryContext | None = Field(None, alias="storyContext")
     text_styles: list[TextStyle] | None = Field(None, alias="textStyles")
-    timestamp: int
+    timestamp: int | None = None
     unpin_message: UnpinMessage | None = Field(None, alias="unpinMessage")
     view_once: bool | None = Field(None, alias="viewOnce")

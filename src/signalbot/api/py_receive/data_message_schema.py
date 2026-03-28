@@ -18,11 +18,11 @@ from .preview_schema import Preview
 from .quote_schema import Quote
 from .reaction_schema import Reaction
 from .remote_delete_schema import RemoteDelete
-from .shared import UnpinMessage
 from .shared_contact_schema import SharedContact
 from .sticker_schema import Sticker
 from .story_context_schema import StoryContext
 from .text_style_schema import TextStyle
+from .unpin_message_schema import UnpinMessage
 
 
 class DataMessage(BaseModel):

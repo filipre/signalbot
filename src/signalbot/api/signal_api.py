@@ -7,10 +7,10 @@ from typing import TYPE_CHECKING, Any, Literal
 import aiohttp
 import websockets
 
-
 if TYPE_CHECKING:
-    from signalbot.api.generated_send import SendMessageV2
     from collections.abc import AsyncIterator
+
+    from signalbot.api.generated_send import SendMessageV2
 
 
 class ConnectionMode(str, Enum):

@@ -36,6 +36,26 @@ class TestAPI:
         assert resp.status_code == status_code
 
     @pytest.mark.asyncio
+    async def test_poll(self, mocker: MockerFixture):
+        status_code = 201
+        mock2 = mocker.AsyncMock()
+        mock2.return_value = {"timestamp": "1774791959123"}
+
+        mock = mocker.patch("aiohttp.ClientSession.post", new_callable=mocker.AsyncMock)
+        mock.return_value = mocker.AsyncMock(
+            spec=aiohttp.ClientResponse,
+            status_code=status_code,
+            json=mock2,
+        )
+
+        receiver = self.group_id
+        question = "How much is the fish?"
+        answers = ["hyper hyper", "3,80 DM"]
+        resp = await self.signal_api.poll(receiver, question, answers)
+
+        assert resp.status_code == status_code
+
+    @pytest.mark.asyncio
     async def test_receive(self, mocker: MockerFixture):
         message1 = '{"envelope":{"source":"+4901234567890","sourceNumber":"+4901234567890","sourceUuid":"asdf","sourceName":"name","sourceDevice":1,"timestamp":1633169000000,"syncMessage":{"sentMessage":{"timestamp":1633169000000,"message":"Message 1","expiresInSeconds":0,"viewOnce":false,"mentions":[],"attachments":[],"contacts":[],"groupInfo":{"groupId":"group1","type":"DELIVER"},"destination":null,"destinationNumber":null,"destinationUuid":null}}}}'  # noqa: E501
         message2 = '{"envelope":{"source":"+4901234567890","sourceNumber":"+4901234567890","sourceUuid":"asdf","sourceName":"name","sourceDevice":1,"timestamp":1633169000000,"syncMessage":{"sentMessage":{"timestamp":1633169000000,"message":"Message 2","expiresInSeconds":0,"viewOnce":false,"mentions":[],"attachments":[],"contacts":[],"groupInfo":{"groupId":"group1","type":"DELIVER"},"destination":null,"destinationNumber":null,"destinationUuid":null}}}}'  # noqa: E501
@@ -59,6 +79,11 @@ class TestAPI:
     def test_send_uri(self):
         expected_uri = f"https://{self.signal_service}/v2/send"
         actual_uri = self.signal_api._signal_api_uris.send_rest_uri()
+        assert actual_uri == expected_uri
+
+    def test_poll_uri(self):
+        expected_uri = f"https://{self.signal_service}/v1/polls/{self.phone_number}"
+        actual_uri = self.signal_api._signal_api_uris.poll_rest_uri()
         assert actual_uri == expected_uri
 
     def test_attachment_rest_uri(self):

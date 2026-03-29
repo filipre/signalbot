@@ -32,8 +32,8 @@ from signalbot.storage import RedisStorage, SQLiteStorage
 if TYPE_CHECKING:
     from pathlib import Path
 
-    from signalbot.api.generated.api import SendMessageV2
-    from signalbot.api.messages import ReceiveDataMessage
+    from signalbot.api.receive_messages import ReceiveDataMessage
+    from signalbot.api.requests import SendMessage
 
 CommandList: TypeAlias = list[
     tuple[
@@ -284,7 +284,7 @@ class SignalBot:
 
     async def send(
         self,
-        data_message: SendMessageV2,
+        data_message: SendMessage,
     ) -> int:
         """Send or edit a message.
 

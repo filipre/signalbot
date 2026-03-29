@@ -6,7 +6,7 @@ from signalbot.api import (
     SendMessageError,
     SignalAPI,
 )
-from signalbot.api.messages.link_previews import LinkPreview
+from signalbot.api.receive_messages.link_previews import LinkPreview
 from signalbot.bot import (
     LOGGER_NAME,
     MIN_SIGNAL_CLI_REST_API_VERSION,

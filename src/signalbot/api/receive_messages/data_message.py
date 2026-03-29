@@ -4,7 +4,7 @@ import base64
 from pathlib import Path
 from typing import TYPE_CHECKING
 
-from signalbot.api.generated.api import SendMessageV2, TextMode
+from signalbot.api.generated.api import TextMode
 from signalbot.api.generated.data import LinkPreviewType, MessageMention
 from signalbot.api.generated_receive.attachment_schema import (
     Attachment as BaseAttachment,
@@ -16,7 +16,8 @@ from signalbot.api.generated_receive.quote_schema import Quote
 from signalbot.api.generated_receive.reaction_schema import Reaction
 from signalbot.api.generated_receive.sticker_schema import Sticker
 from signalbot.api.generated_receive.text_style_schema import TextStyle
-from signalbot.api.messages.base_message import BaseMessage
+from signalbot.api.receive_messages.base_message import BaseMessage
+from signalbot.api.requests import SendMessage
 
 if TYPE_CHECKING:
     from signalbot.api import SignalAPI
@@ -183,6 +184,24 @@ class ReceiveDataMessage(BaseMessage):
         """
         return not self.is_group()
 
+    def source_or_group_uuid(self) -> str:
+        """Get the source of the message.
+
+        Returns:
+            The source of the message.
+        """
+        if self.group_info is not None and self.group_info.group_id is not None:
+            return self.group_info.group_id
+
+        if self.source_uuid is not None:
+            return self.source_uuid
+
+        if self.source_number is not None:
+            return self.source_number
+
+        error_msg = "Message does not contain a source"
+        raise ValueError(error_msg)
+
     def _to_send_mentions(
         self, mentions: list[Mention] | None
     ) -> list[MessageMention] | None:
@@ -198,12 +217,12 @@ class ReceiveDataMessage(BaseMessage):
             for mention in mentions
         ]
 
-    def to_send_message(self, recipients: list[str]) -> SendMessageV2:
-        """Convert the received message to a SendMessageV2 that can be sent using the
+    def to_send_message(self, recipients: list[str]) -> SendMessage:
+        """Convert the received message to a SendMessage that can be sent using the
             API.
 
         Returns:
-            A SendMessageV2 object that can be sent using the API.
+            A SendMessage object that can be sent using the API.
         """
         base_64_attachments = None
         if self.attachments is not None:
@@ -238,7 +257,7 @@ class ReceiveDataMessage(BaseMessage):
         if self.text_styles is not None and len(self.text_styles) > 0:
             text_style = TextMode(self.text_styles[0].style)
 
-        return SendMessageV2(
+        return SendMessage(
             base64_attachments=base_64_attachments,
             edit_timestamp=None,
             link_preview=link_preview,

@@ -10,7 +10,7 @@ import websockets
 if TYPE_CHECKING:
     from collections.abc import AsyncIterator
 
-    from signalbot.api.generated import SendMessageV2
+    from signalbot.api.requests import SendMessage
 
 
 class ConnectionMode(str, Enum):
@@ -61,7 +61,7 @@ class SignalAPI:
 
     async def send(
         self,
-        data_message: SendMessageV2,
+        data_message: SendMessage,
     ) -> aiohttp.ClientResponse:
         uri = self._signal_api_uris.send_rest_uri()
 

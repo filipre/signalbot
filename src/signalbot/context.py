@@ -4,9 +4,9 @@ from copy import deepcopy
 from typing import TYPE_CHECKING, Any, Literal
 
 if TYPE_CHECKING:
-    from signalbot.api.generated.api import SendMessageV2
-    from signalbot.api.messages.data_message import ReceiveDataMessage
-    from signalbot.api.messages.link_previews import LinkPreview
+    from signalbot.api.receive_messages.data_message import ReceiveDataMessage
+    from signalbot.api.receive_messages.link_previews import LinkPreview
+    from signalbot.api.requests import SendMessage
     from signalbot.bot import SignalBot
 
 
@@ -23,12 +23,12 @@ class Context:
 
     async def send(
         self,
-        data_message: SendMessageV2,
+        data_message: SendMessage,
     ) -> int:
         """Same as
          [signalbot.SignalBot.send()](bot.md#signalbot.SignalBot.send)
         but with the recipient set to the message's recipient."""
-        data_message.recipients = [self.message.source_uuid]
+        data_message.recipients = [self.message.source_or_group_uuid()]
         return await self.bot.send(data_message)
 
     async def edit(  # noqa: PLR0913

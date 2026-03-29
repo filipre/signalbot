@@ -4,15 +4,91 @@ import json
 from dataclasses import dataclass, field
 from enum import Enum, auto
 from typing import TYPE_CHECKING
-from pydantic import BaseModel
-from signalbot.api.receive_messages import ReceiveDataMessage
+
+from signalbot.api.receive_messages import ReceiveDataMessage, ReceivedMessage
 from signalbot.api.receive_messages.link_previews import Preview
 from signalbot.quote import Quote
 from signalbot.reaction import Reaction
-from signalbot.api.generated_receive.message_envelope_schema import MessageEnvelope
 
 if TYPE_CHECKING:
     from signalbot.api import SignalAPI
+    from signalbot.api.generated_receive.message_envelope_schema import MessageEnvelope
+
+
+async def _parse_sync_messages(
+    signal: SignalAPI, message_envelope: MessageEnvelope
+) -> ReceiveDataMessage | None:
+
+    if message_envelope.sync_message is not None:
+        sync_message = message_envelope.sync_message
+        if sync_message.sent_message is not None:
+            return await ReceiveDataMessage.from_message_envelope_sync_message(
+                message_envelope, signal
+            )
+
+        if sync_message.read_messages is not None:
+            pass
+
+        if sync_message.sent_story_message is not None:
+            pass
+
+    return None
+
+
+async def _parse_main_messages(
+    signal: SignalAPI, message_envelope: MessageEnvelope
+) -> ReceiveDataMessage | None:
+    if message_envelope.data_message is not None:
+        return await ReceiveDataMessage.from_message_envelope(message_envelope, signal)
+
+    if message_envelope.sync_message is not None:
+        pass
+
+    if message_envelope.edit_message is not None:
+        pass
+
+    if message_envelope.receipt_message is not None:
+        pass
+
+    if message_envelope.typing_message is not None:
+        pass
+
+    return None
+
+
+async def parse(signal: SignalAPI, raw_message_str: str) -> ReceiveDataMessage:
+    """Parse a raw JSON message string from the Signal API into a Message object.
+
+    Args:
+        signal: An instance of the `SignalAPI` class, used to fetch attachments and
+            link previews if necessary.
+        raw_message_str: The raw JSON string of the message as received from the
+            Signal API.
+
+    Returns:
+        A `Message` object representing the parsed message.
+
+    Raises:
+        UnknownMessageFormatError: If the message format is unrecognized or if
+            required fields are missing.
+    """
+    try:
+        raw_message = json.loads(raw_message_str)
+    except Exception as exc:
+        raise UnknownMessageFormatError from exc
+
+    message = ReceivedMessage.model_validate(raw_message)
+
+    parsed_message = await _parse_main_messages(signal, message.envelope)
+    if parsed_message is not None:
+        return parsed_message
+
+    parsed_message = await _parse_sync_messages(signal, message.envelope)
+    if parsed_message is not None:
+        return parsed_message
+
+    error_msg = "MessageEnvelope does not contain a recognizable message type"
+    raise UnknownMessageFormatError(error_msg)
 
 
 class MessageType(Enum):
@@ -84,7 +160,7 @@ class Message:
     base64_attachments: list[str] = field(default_factory=list)
     attachments_local_filenames: list[str] = field(default_factory=list)
     view_once: bool = False
-    link_previews: list[LinkPreview] = field(default_factory=list)
+    link_previews: list[Preview] = field(default_factory=list)
     group: str | None = None
     reaction: Reaction | None = None
     mentions: list[str] = field(default_factory=list)
@@ -353,7 +429,7 @@ class Message:
                     base64_thumbnail = await signal.get_attachment(img_id)
 
                 parsed_previews.append(
-                    LinkPreview(
+                    Preview(
                         base64_thumbnail=base64_thumbnail,
                         title=preview["title"],
                         description=preview["description"],

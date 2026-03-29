@@ -4,6 +4,8 @@ import base64
 from pathlib import Path
 from typing import TYPE_CHECKING
 
+from signalbot.api.generated.api import SendMessageV2, TextMode
+from signalbot.api.generated.data import LinkPreviewType, MessageMention
 from signalbot.api.generated_receive.attachment_schema import (
     Attachment as BaseAttachment,
 )
@@ -14,8 +16,6 @@ from signalbot.api.generated_receive.quote_schema import Quote
 from signalbot.api.generated_receive.reaction_schema import Reaction
 from signalbot.api.generated_receive.sticker_schema import Sticker
 from signalbot.api.generated_receive.text_style_schema import TextStyle
-from signalbot.api.generated_send.api import SendMessageV2, TextMode
-from signalbot.api.generated_send.data import LinkPreviewType, MessageMention
 from signalbot.api.messages.base_message import BaseMessage
 
 if TYPE_CHECKING:

@@ -10,7 +10,7 @@ import websockets
 if TYPE_CHECKING:
     from collections.abc import AsyncIterator
 
-    from signalbot.api.generated_send import SendMessageV2
+    from signalbot.api.generated import SendMessageV2
 
 
 class ConnectionMode(str, Enum):

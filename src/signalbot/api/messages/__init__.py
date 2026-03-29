@@ -1,4 +1,4 @@
-from signalbot.api.generated_send.api import SendMessageV2
+from signalbot.api.generated.api import SendMessageV2
 from signalbot.api.messages.data_message import ReceiveDataMessage
 from signalbot.api.messages.link_previews import LinkPreview
 from signalbot.api.messages.remote_delete import RemoteDelete

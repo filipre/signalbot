@@ -88,7 +88,7 @@ ignore = [
 "**/generated_receive/**.py" = [
     "TC001",
 ]
-"**/generated_send/**.py" = [
+"**/generated/**.py" = [
     "TC001",
     "E501",
 ]

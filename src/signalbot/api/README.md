@@ -1,6 +1,6 @@
 # API classes
 
-The classes in the [generated_receive folder](./generated_receive/) were automatically generated from the [JSON Schema](https://json-schema.org/) files in the [json_schema_receive folder](./json_schema_receive).
+The classes in the [generated_receive folder](./generated_receive/) were automatically generated from the [JSON Schema](https://json-schema.org/) files in the [json_schema_message_envelope folder](./json_schema_message_envelope).
 To convert from JSON Schema to pydantic dataclasses the [datamodel-code-generator tool](https://datamodel-code-generator.koxudaxi.dev/) is used.
 
 Those files were copied over from the [signal-cli repository](https://github.com/AsamK/signal-cli).
@@ -13,7 +13,7 @@ To generate the files run these commands at the root of the repository
 
 ```bash
 uv run datamodel-codegen \
---input ./src/signalbot/api/json_schema_receive/ \
+--input ./src/signalbot/api/json_schema_message_envelope/ \
 --input-file-type jsonschema \
 --output-model-type pydantic_v2.BaseModel \
 --formatters ruff-check ruff-format \

@@ -5,7 +5,7 @@ from typing import TYPE_CHECKING, Any, Literal
 
 if TYPE_CHECKING:
     from signalbot.api.receive_messages.data_message import ReceiveDataMessage
-    from signalbot.api.receive_messages.link_previews import LinkPreview
+    from signalbot.api.receive_messages.link_previews import Preview
     from signalbot.api.requests import SendMessage
     from signalbot.bot import SignalBot
 
@@ -37,7 +37,7 @@ class Context:
         edit_timestamp: int,
         *,
         base64_attachments: list[str] | None = None,
-        link_preview: LinkPreview | None = None,
+        link_preview: Preview | None = None,
         mentions: list[dict[str, Any]] | None = None,
         text_mode: str | None = None,
         view_once: bool = False,

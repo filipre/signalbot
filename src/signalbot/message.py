@@ -4,10 +4,12 @@ import json
 from dataclasses import dataclass, field
 from enum import Enum, auto
 from typing import TYPE_CHECKING
-
-from signalbot.link_previews import LinkPreview
+from pydantic import BaseModel
+from signalbot.api.receive_messages import ReceiveDataMessage
+from signalbot.api.receive_messages.link_previews import Preview
 from signalbot.quote import Quote
 from signalbot.reaction import Reaction
+from signalbot.api.generated_receive.message_envelope_schema import MessageEnvelope
 
 if TYPE_CHECKING:
     from signalbot.api import SignalAPI

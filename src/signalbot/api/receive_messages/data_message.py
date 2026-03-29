@@ -6,17 +6,15 @@ from typing import TYPE_CHECKING
 
 from signalbot.api.generated.api import TextMode
 from signalbot.api.generated.data import LinkPreviewType, MessageMention
-from signalbot.api.generated_receive.attachment_schema import (
-    Attachment as BaseAttachment,
-)
 from signalbot.api.generated_receive.group_info_schema import GroupInfo
 from signalbot.api.generated_receive.mention_schema import Mention
-from signalbot.api.generated_receive.preview_schema import Preview as BasePreview
 from signalbot.api.generated_receive.quote_schema import Quote
 from signalbot.api.generated_receive.reaction_schema import Reaction
 from signalbot.api.generated_receive.sticker_schema import Sticker
 from signalbot.api.generated_receive.text_style_schema import TextStyle
+from signalbot.api.receive_messages.attachments import Attachment
 from signalbot.api.receive_messages.base_message import BaseMessage
+from signalbot.api.receive_messages.link_previews import Preview
 from signalbot.api.requests import SendMessage
 
 if TYPE_CHECKING:
@@ -26,14 +24,6 @@ if TYPE_CHECKING:
     )
     from signalbot.api.generated_receive.message_envelope_schema import MessageEnvelope
     from signalbot.api.generated_receive.sync_data_message_schema import SyncDataMessage
-
-
-class Preview(BasePreview):
-    base64_thumbnail: str | None = None
-
-
-class Attachment(BaseAttachment):
-    base64_content: str | None = None
 
 
 class ReceiveDataMessage(BaseMessage):

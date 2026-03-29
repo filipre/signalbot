@@ -6,7 +6,7 @@ from signalbot.api import (
     SendMessageError,
     SignalAPI,
 )
-from signalbot.api.receive_messages.link_previews import LinkPreview
+from signalbot.api.receive_messages.link_previews import Preview
 from signalbot.bot import (
     LOGGER_NAME,
     MIN_SIGNAL_CLI_REST_API_VERSION,
@@ -34,9 +34,9 @@ __all__ = [
     "ConnectionMode",
     "Context",
     "InMemoryConfig",
-    "LinkPreview",
     "Message",
     "MessageType",
+    "Preview",
     "Quote",
     "Reaction",
     "ReceiveMessagesError",

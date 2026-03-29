@@ -93,6 +93,11 @@ ignore = [
     "E501",
 ]
 
+[tool.ruff.lint.flake8-type-checking]
+runtime-evaluated-base-classes = [
+  "pydantic.BaseModel",
+  "signalbot.api.messages.base_message.BaseMessage"
+]
 
 [tool.yamlfix]
 explicit_start = false

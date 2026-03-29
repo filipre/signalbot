@@ -93,3 +93,12 @@ class GroupUpdateMessage(BaseMessage):
             and message_envelope.data_message.group_info is not None
             and message_envelope.data_message.group_info.type == "UPDATE"
         )
+
+    def is_group(self) -> bool:
+        return True
+
+    def is_private(self) -> bool:
+        return False
+
+    def source_or_group_uuid(self) -> str:
+        return self.group_info.group_id

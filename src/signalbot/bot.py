@@ -44,7 +44,7 @@ CommandList: TypeAlias = list[
         Command,
         list[str] | bool,
         list[str] | bool,
-        Callable[[Message], bool] | None,
+        Callable[[ReceivedMessageType], bool] | None,
     ]
 ]
 
@@ -684,7 +684,9 @@ class SignalBot:
                 return True
 
             # b) whitelisted numbers
-            if isinstance(contacts, list) and message.source in contacts:
+            if isinstance(contacts, list) and (
+                message.source_number in contacts or message.source_uuid in contacts
+            ):
                 return True
 
         # Case 2: Group message
@@ -694,7 +696,9 @@ class SignalBot:
                 return True
 
             # b) whitelisted group ids
-            group_id = self._groups_by_internal_id.get(message.group, {}).get("id")
+            group_id = self._groups_by_internal_id.get(
+                message.source_or_group_uuid(), {}
+            ).get("id")
             if isinstance(group_ids, list) and group_id and group_id in group_ids:
                 return True
 
@@ -702,8 +706,8 @@ class SignalBot:
 
     def _should_react_for_lambda(
         self,
-        message: Message,
-        f: Callable[[Message], bool] | None = None,
+        message: ReceivedMessageType,
+        f: Callable[[ReceivedMessageType], bool] | None = None,
     ) -> bool:
         if f is None:
             return True

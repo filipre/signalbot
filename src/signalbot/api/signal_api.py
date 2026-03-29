@@ -7,7 +7,9 @@ from typing import TYPE_CHECKING, Any, Literal
 import aiohttp
 import websockets
 
+
 if TYPE_CHECKING:
+    from signalbot.api.py_send import SendMessageV2
     from collections.abc import AsyncIterator
 
 
@@ -52,56 +54,19 @@ class SignalAPI:
             self.connection = websockets.connect(uri, ping_interval=None)
             async with self.connection as websocket:
                 async for raw_message in websocket:
-                    yield raw_message
+                    yield str(raw_message)
 
         except Exception as e:
             raise ReceiveMessagesError from e
 
-    async def send(  # noqa: C901, PLR0913
+    async def send(
         self,
-        receiver: str,
-        message: str,
-        *,
-        base64_attachments: list | None = None,
-        link_preview: dict[str, Any] | None = None,
-        quote_author: str | None = None,
-        quote_mentions: list | None = None,
-        quote_message: str | None = None,
-        quote_timestamp: int | None = None,
-        mentions: list[dict[str, Any]] | None = None,
-        text_mode: str | None = None,
-        edit_timestamp: int | None = None,
-        view_once: bool = False,
+        data_message: SendMessageV2,
     ) -> aiohttp.ClientResponse:
         uri = self._signal_api_uris.send_rest_uri()
-        if base64_attachments is None:
-            base64_attachments = []
 
-        payload = {
-            "base64_attachments": base64_attachments,
-            "message": message,
-            "number": self.phone_number,
-            "recipients": [receiver],
-        }
-
-        if quote_author:
-            payload["quote_author"] = quote_author
-        if quote_mentions:
-            payload["quote_mentions"] = quote_mentions
-        if quote_message:
-            payload["quote_message"] = quote_message
-        if quote_timestamp:
-            payload["quote_timestamp"] = quote_timestamp
-        if mentions:
-            payload["mentions"] = mentions
-        if text_mode:
-            payload["text_mode"] = text_mode
-        if edit_timestamp:
-            payload["edit_timestamp"] = edit_timestamp
-        if link_preview:
-            payload["link_preview"] = link_preview
-        if view_once:
-            payload["view_once"] = True
+        data_message.number = self.phone_number
+        payload = data_message.model_dump(exclude_none=True)
 
         try:
             async with aiohttp.ClientSession() as session:

@@ -26,13 +26,14 @@ from signalbot.bot_config import (
 )
 from signalbot.command import Command
 from signalbot.context import Context
-from signalbot.message import Message, MessageType, UnknownMessageFormatError
+from signalbot.message import Message, UnknownMessageFormatError
 from signalbot.storage import RedisStorage, SQLiteStorage
 
 if TYPE_CHECKING:
     from pathlib import Path
 
-    from signalbot.api.messages.link_previews import LinkPreview
+    from signalbot.api.py_send.api import SendMessageV2
+    from signalbot.api.messages import ReceiveDataMessage
 
 CommandList: TypeAlias = list[
     tuple[
@@ -281,69 +282,32 @@ class SignalBot:
         """Return the signal-cli-rest-api mode."""
         return await self._signal.get_signal_cli_rest_api_mode()
 
-    async def send(  # noqa: PLR0913
+    async def send(
         self,
-        receiver: str,
-        text: str,
-        *,
-        base64_attachments: list | None = None,
-        link_preview: LinkPreview | None = None,
-        quote_author: str | None = None,
-        quote_mentions: list | None = None,
-        quote_message: str | None = None,
-        quote_timestamp: int | None = None,
-        mentions: (
-            list[dict[str, Any]] | None
-        ) = None,  # [{ "author": "uuid" , "start": 0, "length": 1 }]
-        edit_timestamp: int | None = None,
-        text_mode: str | None = None,
-        view_once: bool = False,
+        data_message: SendMessageV2,
     ) -> int:
         """Send or edit a message.
 
         Args:
-            receiver: The recipient of the message.
-            text: The content of the message.
-            base64_attachments: List of attachments encoded in base64.
-            link_preview: Link previews to be sent with the message.
-            quote_author: The author of the quoted message, required if quote_message is
-                set.
-            quote_mentions: List of mentioned users in the quoted message, required if
-                quote_message is set.
-            quote_message: The content of the quoted message, required if quote_message
-                is set.
-            quote_timestamp: The timestamp of the quoted message, required if
-                quote_message is set.
-            mentions: List of dictionary of mentions, it has the format
-                `[{ "author": "uuid" , "start": 0, "length": 1 }]`.
-            edit_timestamp: The timestamp of the message to edit, if not set a new
-                message will be sent.
-            text_mode: The text mode of the message, can be "normal" or "styled".
-            view_once: Whether the message should be view once or not.
+            receiver: Send recipient of the message.
 
         Returns:
             The timestamp of the sent or edited message.
         """
-        receiver = self._resolve_receiver(receiver)
-        link_preview_raw = link_preview.model_dump() if link_preview else None
+        if data_message.recipients is None:
+            error_msg = "Message must have at least one recipient"
+            raise ValueError(error_msg)
 
-        resp = await self._signal.send(
-            receiver,
-            text,
-            base64_attachments=base64_attachments,
-            link_preview=link_preview_raw,
-            quote_author=quote_author,
-            quote_mentions=quote_mentions,
-            quote_message=quote_message,
-            quote_timestamp=quote_timestamp,
-            mentions=mentions,
-            text_mode=text_mode,
-            edit_timestamp=edit_timestamp,
-            view_once=view_once,
-        )
+        data_message.recipients = [
+            self._resolve_receiver(recipient) for recipient in data_message.recipients
+        ]
+
+        resp = await self._signal.send(data_message)
         resp_payload = await resp.json()
         timestamp = int(resp_payload["timestamp"])
-        self._logger.info(f"[Bot] New message {timestamp} sent:\n{text}")  # noqa: G004
+        self._logger.info(
+            f"[Bot] New message {timestamp} sent:\n{data_message.message}"  # noqa: G004
+        )
 
         return timestamp
 
@@ -512,11 +476,12 @@ class SignalBot:
 
         self._logger.info("[Bot] Group updated")
 
-    async def _process_updates(self, message: Message) -> None:
+    async def _process_updates(self, message: ReceiveDataMessage) -> None:
         # Update groups if message is from an unknown group
         if (
-            message.is_group()
-            and self._groups_by_internal_id.get(message.group) is None
+            message.group_info is not None
+            and message.group_info.group_id is not None
+            and self._groups_by_internal_id.get(message.group_info.group_id) is None
         ):
             await self._detect_groups()
 

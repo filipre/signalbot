@@ -4,9 +4,10 @@ from copy import deepcopy
 from typing import TYPE_CHECKING, Any, Literal
 
 if TYPE_CHECKING:
+    from signalbot.api.messages.data_message import ReceiveDataMessage
     from signalbot.api.messages.link_previews import LinkPreview
+    from signalbot.api.py_send.api import SendMessageV2
     from signalbot.bot import SignalBot
-    from signalbot.message import Message
 
 
 class Context:
@@ -16,32 +17,19 @@ class Context:
     the bot's methods manually.
     """
 
-    def __init__(self, bot: SignalBot, message: Message) -> None:
+    def __init__(self, bot: SignalBot, message: ReceiveDataMessage) -> None:
         self.bot = bot
         self.message = message
 
-    async def send(  # noqa: PLR0913
+    async def send(
         self,
-        text: str,
-        *,
-        base64_attachments: list[str] | None = None,
-        link_preview: LinkPreview | None = None,
-        mentions: list[dict[str, Any]] | None = None,
-        text_mode: str | None = None,
-        view_once: bool = False,
+        data_message: SendMessageV2,
     ) -> int:
         """Same as
          [signalbot.SignalBot.send()](bot.md#signalbot.SignalBot.send)
         but with the recipient set to the message's recipient."""
-        return await self.bot.send(
-            self.message.recipient(),
-            text,
-            base64_attachments=base64_attachments,
-            mentions=mentions,
-            text_mode=text_mode,
-            link_preview=link_preview,
-            view_once=view_once,
-        )
+        data_message.recipients = [self.message.source_uuid]
+        return await self.bot.send(data_message)
 
     async def edit(  # noqa: PLR0913
         self,

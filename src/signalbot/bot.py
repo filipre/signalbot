@@ -17,6 +17,11 @@ from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from packaging.version import Version
 
 from signalbot.api import ReceiveMessagesError, SignalAPI
+from signalbot.api.receive_messages import (
+    GroupUpdateMessage,
+    ReceiveDataMessage,
+    ReceivedMessageType,
+)
 from signalbot.bot_config import (
     Config,
     InMemoryConfig,
@@ -26,13 +31,12 @@ from signalbot.bot_config import (
 )
 from signalbot.command import Command
 from signalbot.context import Context
-from signalbot.message import Message, UnknownMessageFormatError
+from signalbot.message import Message, UnknownMessageFormatError, parse
 from signalbot.storage import RedisStorage, SQLiteStorage
 
 if TYPE_CHECKING:
     from pathlib import Path
 
-    from signalbot.api.receive_messages import ReceiveDataMessage
     from signalbot.api.requests import SendMessage
 
 CommandList: TypeAlias = list[
@@ -476,17 +480,18 @@ class SignalBot:
 
         self._logger.info("[Bot] Group updated")
 
-    async def _process_updates(self, message: ReceiveDataMessage) -> None:
+    async def _process_updates(self, message: ReceivedMessageType) -> None:
         # Update groups if message is from an unknown group
         if (
-            message.group_info is not None
+            isinstance(message, GroupUpdateMessage | ReceiveDataMessage)
+            and message.group_info is not None
             and message.group_info.group_id is not None
             and self._groups_by_internal_id.get(message.group_info.group_id) is None
         ):
             await self._detect_groups()
 
-        if message.type == MessageType.GROUP_UPDATE_MESSAGE:
-            await self._update_group(message.updated_group_id)
+        if isinstance(message, GroupUpdateMessage):
+            await self._update_group(message.group_info.group_id)
 
     def _resolve_receiver(self, receiver: str) -> str:
         if self._is_phone_number(receiver):
@@ -653,7 +658,7 @@ class SignalBot:
                 self._logger.info(f"[Raw Message] {raw_message}")  # noqa: G004
 
                 try:
-                    message = await Message.parse(self._signal, raw_message)
+                    message = await parse(self._signal, raw_message)
                 except UnknownMessageFormatError:
                     continue
 
@@ -667,7 +672,7 @@ class SignalBot:
 
     def _should_react_for_contact(
         self,
-        message: Message,
+        message: ReceivedMessageType,
         contacts: list[str] | bool,  # noqa: FBT001
         group_ids: list[str] | bool,  # noqa: FBT001
     ) -> bool:
@@ -705,7 +710,7 @@ class SignalBot:
 
         return f(message)
 
-    async def _ask_commands_to_handle(self, message: Message) -> None:
+    async def _ask_commands_to_handle(self, message: ReceivedMessageType) -> None:
         for command, contacts, group_ids, f in self.commands:
             if not self._should_react_for_contact(message, contacts, group_ids):
                 continue

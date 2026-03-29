@@ -5,7 +5,12 @@ from dataclasses import dataclass, field
 from enum import Enum, auto
 from typing import TYPE_CHECKING
 
-from signalbot.api.receive_messages import ReceiveDataMessage, ReceivedMessage
+from signalbot.api.receive_messages import (
+    GroupUpdateMessage,
+    ReceiveDataMessage,
+    ReceivedMessage,
+    ReceivedMessageType,
+)
 from signalbot.api.receive_messages.link_previews import Preview
 from signalbot.quote import Quote
 from signalbot.reaction import Reaction
@@ -17,12 +22,15 @@ if TYPE_CHECKING:
 
 async def _parse_sync_messages(
     signal: SignalAPI, message_envelope: MessageEnvelope
-) -> ReceiveDataMessage | None:
+) -> ReceivedMessageType | None:
 
     if message_envelope.sync_message is not None:
         sync_message = message_envelope.sync_message
         if sync_message.sent_message is not None:
-            return await ReceiveDataMessage.from_message_envelope_sync_message(
+            if GroupUpdateMessage.message_envelope_is_group_update(message_envelope):
+                return GroupUpdateMessage.from_message_envelope(message_envelope)
+
+            return await ReceiveDataMessage.from_message_envelope(
                 message_envelope, signal
             )
 
@@ -37,8 +45,10 @@ async def _parse_sync_messages(
 
 async def _parse_main_messages(
     signal: SignalAPI, message_envelope: MessageEnvelope
-) -> ReceiveDataMessage | None:
+) -> ReceivedMessageType | None:
     if message_envelope.data_message is not None:
+        if GroupUpdateMessage.message_envelope_is_group_update(message_envelope):
+            return GroupUpdateMessage.from_message_envelope(message_envelope)
         return await ReceiveDataMessage.from_message_envelope(message_envelope, signal)
 
     if message_envelope.sync_message is not None:
@@ -56,7 +66,7 @@ async def _parse_main_messages(
     return None
 
 
-async def parse(signal: SignalAPI, raw_message_str: str) -> ReceiveDataMessage:
+async def parse(signal: SignalAPI, raw_message_str: str) -> ReceivedMessageType:
     """Parse a raw JSON message string from the Signal API into a Message object.
 
     Args:

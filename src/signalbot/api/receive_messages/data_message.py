@@ -135,27 +135,21 @@ class ReceiveDataMessage(BaseMessage):
     async def from_message_envelope(
         cls, message_envelope: MessageEnvelope, signal: SignalAPI
     ) -> ReceiveDataMessage:
-        data_message = message_envelope.data_message
-        if data_message is None:
-            error_msg = "MessageEnvelope does not contain a DataMessage"
-            raise ValueError(error_msg)
+        if message_envelope.data_message is not None:
+            return await cls._internal_parse(
+                message_envelope, message_envelope.data_message, signal
+            )
 
-        return await cls._internal_parse(message_envelope, data_message, signal)
+        if (
+            message_envelope.sync_message is not None
+            and message_envelope.sync_message.sent_message is not None
+        ):
+            return await cls._internal_parse(
+                message_envelope, message_envelope.sync_message.sent_message, signal
+            )
 
-    @classmethod
-    async def from_message_envelope_sync_message(
-        cls, message_envelope: MessageEnvelope, signal: SignalAPI
-    ) -> ReceiveDataMessage:
-        if message_envelope.sync_message is None:
-            error_msg = "MessageEnvelope does not contain a SyncMessage"
-            raise ValueError(error_msg)
-
-        data_message = message_envelope.sync_message.sent_message
-        if data_message is None:
-            error_msg = "SyncMessage does not contain a SentMessage"
-            raise ValueError(error_msg)
-
-        return await cls._internal_parse(message_envelope, data_message, signal)
+        error_msg = "MessageEnvelope does not contain a DataMessage"
+        raise ValueError(error_msg)
 
     def is_group(self) -> bool:
         """Check if the message is a group message.

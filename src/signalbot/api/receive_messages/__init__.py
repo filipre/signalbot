@@ -6,7 +6,9 @@ from signalbot.api.receive_messages.received_message import ReceivedMessage
 from signalbot.api.receive_messages.remote_delete import RemoteDelete
 from signalbot.api.receive_messages.typing_message import TypingMessage
 
-ReceiveDataMessage.model_rebuild()
+ReceivedMessageType = (
+    ReceiveDataMessage | GroupUpdateMessage | RemoteDelete | TypingMessage
+)
 
 __all__ = [
     "Attachment",
@@ -14,6 +16,7 @@ __all__ = [
     "Preview",
     "ReceiveDataMessage",
     "ReceivedMessage",
+    "ReceivedMessageType",
     "RemoteDelete",
     "TypingMessage",
 ]

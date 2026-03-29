@@ -4,9 +4,9 @@ from copy import deepcopy
 from typing import TYPE_CHECKING, Any, Literal
 
 if TYPE_CHECKING:
+    from signalbot.api.generated_send.api import SendMessageV2
     from signalbot.api.messages.data_message import ReceiveDataMessage
     from signalbot.api.messages.link_previews import LinkPreview
-    from signalbot.api.py_send.api import SendMessageV2
     from signalbot.bot import SignalBot
 
 

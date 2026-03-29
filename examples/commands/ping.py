@@ -1,6 +1,6 @@
 from examples.commands.help import CommandWithHelpMessage
 from signalbot import Context, triggered
-from signalbot.api.py_send.api import SendMessageV2
+from signalbot.api.generated_send.api import SendMessageV2
 
 
 class PingCommand(CommandWithHelpMessage):

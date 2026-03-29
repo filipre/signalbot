@@ -4,25 +4,27 @@ import base64
 from pathlib import Path
 from typing import TYPE_CHECKING
 
+from signalbot.api.generated_receive.attachment_schema import (
+    Attachment as BaseAttachment,
+)
+from signalbot.api.generated_receive.group_info_schema import GroupInfo
+from signalbot.api.generated_receive.mention_schema import Mention
+from signalbot.api.generated_receive.preview_schema import Preview as BasePreview
+from signalbot.api.generated_receive.quote_schema import Quote
+from signalbot.api.generated_receive.reaction_schema import Reaction
+from signalbot.api.generated_receive.sticker_schema import Sticker
+from signalbot.api.generated_receive.text_style_schema import TextStyle
+from signalbot.api.generated_send.api import SendMessageV2, TextMode
+from signalbot.api.generated_send.data import LinkPreviewType, MessageMention
 from signalbot.api.messages.base_message import BaseMessage
-from signalbot.api.py_receive.attachment_schema import Attachment as BaseAttachment
-from signalbot.api.py_receive.group_info_schema import GroupInfo
-from signalbot.api.py_receive.mention_schema import Mention
-from signalbot.api.py_receive.preview_schema import Preview as BasePreview
-from signalbot.api.py_receive.quote_schema import Quote
-from signalbot.api.py_receive.reaction_schema import Reaction
-from signalbot.api.py_receive.sticker_schema import Sticker
-from signalbot.api.py_receive.text_style_schema import TextStyle
-from signalbot.api.py_send.api import SendMessageV2, TextMode
-from signalbot.api.py_send.data import LinkPreviewType, MessageMention
 
 if TYPE_CHECKING:
     from signalbot.api import SignalAPI
-    from signalbot.api.py_receive.data_message_schema import (
+    from signalbot.api.generated_receive.data_message_schema import (
         DataMessage as DataMessageBase,
     )
-    from signalbot.api.py_receive.message_envelope_schema import MessageEnvelope
-    from signalbot.api.py_receive.sync_data_message_schema import SyncDataMessage
+    from signalbot.api.generated_receive.message_envelope_schema import MessageEnvelope
+    from signalbot.api.generated_receive.sync_data_message_schema import SyncDataMessage
 
 
 class Preview(BasePreview):

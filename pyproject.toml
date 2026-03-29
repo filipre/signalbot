@@ -85,10 +85,10 @@ ignore = [
 ]
 # The pydantic models fail to load if the annotations are hidden behind the type
 # checking block. Ignore that rule for them.
-"**/py_receive/**.py" = [
+"**/generated_receive/**.py" = [
     "TC001",
 ]
-"**/py_send/**.py" = [
+"**/generated_send/**.py" = [
     "TC001",
     "E501",
 ]

@@ -1,12 +1,12 @@
 # API classes
 
-The classes in the [py_receive folder](./py_receive/) were automatically generated from the [JSON Schema](https://json-schema.org/) files in the [json_schema_receive folder](./json_schema_receive).
+The classes in the [generated_receive folder](./generated_receive/) were automatically generated from the [JSON Schema](https://json-schema.org/) files in the [json_schema_receive folder](./json_schema_receive).
 To convert from JSON Schema to pydantic dataclasses the [datamodel-code-generator tool](https://datamodel-code-generator.koxudaxi.dev/) is used.
 
 Those files were copied over from the [signal-cli repository](https://github.com/AsamK/signal-cli).
 From this [PR](https://github.com/AsamK/signal-cli/pull/1952).
 
-The same for the [py_send](./py_send/) and [json_schema_send](./json_schema_send) folders.
+The same for the [generated_send](./generated_send/) and [json_schema_send](./json_schema_send) folders.
 Those come from signal-cli-rest-api and were copied directly from their documentation https://bbernhard.github.io/signal-cli-rest-api/
 
 To generate the files run these commands at the root of the repository
@@ -23,7 +23,7 @@ uv run datamodel-codegen \
 --no-use-type-checking-imports \
 --all-exports-scope recursive \
 --all-exports-collision-strategy minimal-prefix \
---output ./src/signalbot/api/py_receive
+--output ./src/signalbot/api/generated_receive
 ```
 
 uv run datamodel-codegen \
@@ -37,4 +37,4 @@ uv run datamodel-codegen \
 --no-use-type-checking-imports \
 --all-exports-scope recursive \
 --all-exports-collision-strategy minimal-prefix \
---output ./src/signalbot/api/py_send
+--output ./src/signalbot/api/generated_send

@@ -9,7 +9,7 @@ import websockets
 
 
 if TYPE_CHECKING:
-    from signalbot.api.py_send import SendMessageV2
+    from signalbot.api.generated_send import SendMessageV2
     from collections.abc import AsyncIterator
 
 

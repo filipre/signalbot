@@ -32,7 +32,7 @@ from signalbot.storage import RedisStorage, SQLiteStorage
 if TYPE_CHECKING:
     from pathlib import Path
 
-    from signalbot.api.py_send.api import SendMessageV2
+    from signalbot.api.generated_send.api import SendMessageV2
     from signalbot.api.messages import ReceiveDataMessage
 
 CommandList: TypeAlias = list[

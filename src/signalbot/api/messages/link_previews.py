@@ -12,7 +12,6 @@ class LinkPreview(BaseModel):
         title: The title of the link preview.
         description: The description of the link preview, if available.
         url: The url of the link preview.
-        id: The local filename for a received link preview.
     """
 
     base64_thumbnail: str | None

@@ -4,25 +4,25 @@ import base64
 from pathlib import Path
 from typing import TYPE_CHECKING
 
-from pydantic import BaseModel
-
 from signalbot.api.messages.base_message import BaseMessage
-from signalbot.api.py_schema.attachment_schema import Attachment as BaseAttachment
-from signalbot.api.py_schema.preview_schema import Preview as BasePreview
+from signalbot.api.py_receive.attachment_schema import Attachment as BaseAttachment
+from signalbot.api.py_receive.group_info_schema import GroupInfo
+from signalbot.api.py_receive.mention_schema import Mention
+from signalbot.api.py_receive.preview_schema import Preview as BasePreview
+from signalbot.api.py_receive.quote_schema import Quote
+from signalbot.api.py_receive.reaction_schema import Reaction
+from signalbot.api.py_receive.sticker_schema import Sticker
+from signalbot.api.py_receive.text_style_schema import TextStyle
+from signalbot.api.py_send.api import SendMessageV2, TextMode
+from signalbot.api.py_send.data import LinkPreviewType, MessageMention
 
 if TYPE_CHECKING:
     from signalbot.api import SignalAPI
-    from signalbot.api.py_schema.data_message_schema import (
+    from signalbot.api.py_receive.data_message_schema import (
         DataMessage as DataMessageBase,
     )
-    from signalbot.api.py_schema.group_info_schema import GroupInfo
-    from signalbot.api.py_schema.mention_schema import Mention
-    from signalbot.api.py_schema.message_envelope_schema import MessageEnvelope
-    from signalbot.api.py_schema.quote_schema import Quote
-    from signalbot.api.py_schema.reaction_schema import Reaction
-    from signalbot.api.py_schema.sticker_schema import Sticker
-    from signalbot.api.py_schema.sync_data_message_schema import SyncDataMessage
-    from signalbot.api.py_schema.text_style_schema import TextStyle
+    from signalbot.api.py_receive.message_envelope_schema import MessageEnvelope
+    from signalbot.api.py_receive.sync_data_message_schema import SyncDataMessage
 
 
 class Preview(BasePreview):
@@ -38,7 +38,7 @@ class ReceiveDataMessage(BaseMessage):
     attachments: list[Attachment] | None = None
     expires_in_seconds: int | None = None
     mentions: list[Mention] | None = None
-    message: str | None = None
+    text: str | None = None
     previews: list[Preview] | None = None
     base64_previews: list[str] | None = None
     quote: Quote | None = None
@@ -91,6 +91,12 @@ class ReceiveDataMessage(BaseMessage):
                 for preview in data_message.previews
             ]
 
+        timestamp = (
+            data_message.timestamp
+            if data_message.timestamp is not None
+            else message_envelope.timestamp
+        )
+
         received_data_message = ReceiveDataMessage(
             server_delivered_timestamp=message_envelope.server_delivered_timestamp,
             server_received_timestamp=message_envelope.server_received_timestamp,
@@ -100,11 +106,11 @@ class ReceiveDataMessage(BaseMessage):
             source_number=message_envelope.source_number,
             source_uuid=message_envelope.source_uuid,
             group_info=data_message.group_info,
-            timestamp=data_message.timestamp,
+            timestamp=timestamp,
             attachments=attachments,
             expires_in_seconds=data_message.expires_in_seconds,
             mentions=data_message.mentions,
-            message=data_message.message,
+            text=data_message.message,
             previews=link_previews,
             quote=data_message.quote,
             reaction=data_message.reaction,
@@ -175,12 +181,27 @@ class ReceiveDataMessage(BaseMessage):
         """
         return not self.is_group()
 
-    def to_send_message(self, recipients: list[str]) -> SendDataMessage:
-        """Convert the received message to a SendDataMessage that can be sent using the
+    def _to_send_mentions(
+        self, mentions: list[Mention] | None
+    ) -> list[MessageMention] | None:
+        if mentions is None:
+            return None
+
+        return [
+            MessageMention(
+                author=mention.uuid,
+                length=mention.length,
+                start=mention.start,
+            )
+            for mention in mentions
+        ]
+
+    def to_send_message(self, recipients: list[str]) -> SendMessageV2:
+        """Convert the received message to a SendMessageV2 that can be sent using the
             API.
 
         Returns:
-            A SendDataMessage object that can be sent using the API.
+            A SendMessageV2 object that can be sent using the API.
         """
         base_64_attachments = None
         if self.attachments is not None:
@@ -201,30 +222,36 @@ class ReceiveDataMessage(BaseMessage):
                     base64_content = attachment.base64_content
                 base_64_attachments.append(base64_content)
 
-        return SendDataMessage(
-            recipients=recipients,
+        link_preview = None
+        if self.previews is not None and len(self.previews) > 0:
+            preview = self.previews[0]
+            link_preview = LinkPreviewType(
+                base64_thumbnail=preview.base64_thumbnail,
+                description=preview.description,
+                title=preview.title,
+                url=preview.url,
+            )
+
+        text_style = None
+        if self.text_styles is not None and len(self.text_styles) > 0:
+            text_style = TextMode(self.text_styles[0].style)
+
+        return SendMessageV2(
             base64_attachments=base_64_attachments,
-            expires_in_seconds=self.expires_in_seconds,
-            mentions=self.mentions,
-            message=self.message,
-            previews=self.previews,
-            quote=self.quote,
-            reaction=self.reaction,
-            sticker=self.sticker,
-            text_styles=self.text_styles,
+            edit_timestamp=None,
+            link_preview=link_preview,
+            mentions=self._to_send_mentions(self.mentions),
+            message=self.text,
+            notify_self=None,
+            number=None,
+            quote_author=self.quote.author if self.quote is not None else None,
+            quote_mentions=self._to_send_mentions(self.quote.mentions)
+            if self.quote is not None
+            else None,
+            quote_message=self.quote.text if self.quote is not None else None,
+            quote_timestamp=self.quote.id if self.quote is not None else None,
+            recipients=recipients,
+            # sticker=self.sticker, # Not clear how to send stickers yet
+            text_mode=text_style,
             view_once=self.view_once,
         )
-
-
-class SendDataMessage(BaseModel):
-    recipients: list[str]
-    base64_attachments: list[str] | None = None
-    expires_in_seconds: int | None = None
-    mentions: list[Mention] | None = None
-    message: str | None = None
-    previews: list[Preview] | None = None
-    quote: Quote | None = None
-    reaction: Reaction | None = None
-    sticker: Sticker | None = None
-    text_styles: list[TextStyle] | None = None
-    view_once: bool | None = None

@@ -16,7 +16,7 @@ license = { text = "MIT" }
 maintainers = [{name = "René Filip"}, {name = "Era Dorta"}]
 name = "signalbot"
 readme = "README.md"
-requires-python = ">=3.9"
+requires-python = ">=3.10"
 version = "1.0.1"
 dependencies = [
   "APScheduler>=3.11.0",

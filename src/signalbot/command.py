@@ -3,12 +3,14 @@ from __future__ import annotations
 import functools
 import re
 from abc import ABC, abstractmethod
-from typing import TYPE_CHECKING, Callable, ParamSpec, TypeVar
+from typing import TYPE_CHECKING, ParamSpec, TypeVar
 
 T = TypeVar("T")
 P = ParamSpec("P")
 
 if TYPE_CHECKING:
+    from collections.abc import Callable
+
     from signalbot.bot import SignalBot
     from signalbot.context import Context
 

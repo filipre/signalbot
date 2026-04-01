@@ -319,3 +319,81 @@ class TestRegisterCommand(TestCommon):
         expected_user_chats_cmd1 = [user_number3]
         assert self.signal_bot.commands[0][1] == expected_user_chats_cmd0
         assert self.signal_bot.commands[1][1] == expected_user_chats_cmd1
+
+
+@pytest.mark.asyncio
+class TestPoll(TestCommon):
+    async def test_poll_with_phone_number(self, mocker: MockerFixture):
+        receiver = "+49987654321"
+        question = "What's your favorite color?"
+        answers = ["Red", "Blue", "Green"]
+        timestamp = 1633169000000
+
+        # Mock the SignalAPI.poll method
+        poll_mock = mocker.AsyncMock()
+        poll_mock.return_value = mocker.AsyncMock(
+            spec=aiohttp.ClientResponse,
+            json=mocker.AsyncMock(return_value={"timestamp": timestamp}),
+        )
+        mocker.patch.object(self.signal_bot._signal, "poll", poll_mock)
+
+        result = await self.signal_bot.poll(receiver, question, answers)
+
+        assert result == timestamp
+        poll_mock.assert_called_once_with(
+            receiver, question, answers, allow_multiple_selections=False
+        )
+
+    async def test_poll_with_group_id(self, mocker: MockerFixture):
+        receiver = self.group_id
+        question = "What should we do?"
+        answers = ["Option A", "Option B"]
+        timestamp = 1633169000001
+
+        # Mock the SignalAPI.poll method
+        poll_mock = mocker.AsyncMock()
+        poll_mock.return_value = mocker.AsyncMock(
+            spec=aiohttp.ClientResponse,
+            json=mocker.AsyncMock(return_value={"timestamp": timestamp}),
+        )
+        mocker.patch.object(self.signal_bot._signal, "poll", poll_mock)
+
+        result = await self.signal_bot.poll(receiver, question, answers)
+
+        assert result == timestamp
+        poll_mock.assert_called_once_with(
+            receiver,
+            question,
+            answers,
+            allow_multiple_selections=False,
+        )
+
+    async def test_poll_with_multiple_selections(self, mocker: MockerFixture):
+        receiver = "+49987654321"
+        question = "Which colors do you like?"
+        answers = ["Red", "Blue", "Green", "Yellow"]
+        timestamp = 1633169000002
+        allow_multiple = True
+
+        # Mock the SignalAPI.poll method
+        poll_mock = mocker.AsyncMock()
+        poll_mock.return_value = mocker.AsyncMock(
+            spec=aiohttp.ClientResponse,
+            json=mocker.AsyncMock(return_value={"timestamp": timestamp}),
+        )
+        mocker.patch.object(self.signal_bot._signal, "poll", poll_mock)
+
+        result = await self.signal_bot.poll(
+            receiver,
+            question,
+            answers,
+            allow_multiple_selections=allow_multiple,
+        )
+
+        assert result == timestamp
+        poll_mock.assert_called_once_with(
+            receiver,
+            question,
+            answers,
+            allow_multiple_selections=True,
+        )

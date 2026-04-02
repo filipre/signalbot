@@ -38,6 +38,7 @@ from signalbot.storage import RedisStorage, SQLiteStorage
 if TYPE_CHECKING:
     from pathlib import Path
 
+    from signalbot.api.generated.client import About
     from signalbot.api.requests import SendMessage
 
 CommandList: TypeAlias = list[
@@ -233,7 +234,7 @@ class SignalBot:
             await asyncio.sleep(self.config.retry_interval)
 
     async def _check_signal_cli_rest_api_version(self) -> None:
-        version = await self.signal_cli_rest_api_version()
+        version = (await self.signal_cli_rest_api_about()).version
 
         # `unset` version is for preview versions of signal-cli-rest-api
         if version == "unset":
@@ -248,7 +249,7 @@ class SignalBot:
             raise RuntimeError(error_msg)
 
     async def _check_signal_cli_rest_api_mode(self) -> None:
-        mode = await self.signal_cli_rest_api_mode()
+        mode = (await self.signal_cli_rest_api_about()).mode
         if mode != "json-rpc":
             error_msg = (
                 f"Wrong signal-cli-rest-api mode, found '{mode}', expected 'json-rpc'"
@@ -279,13 +280,9 @@ class SignalBot:
 
             self._event_loop.run_forever()
 
-    async def signal_cli_rest_api_version(self) -> str:
-        """Return the signal-cli-rest-api version."""
-        return await self._signal.get_signal_cli_rest_api_version()
-
-    async def signal_cli_rest_api_mode(self) -> str:
-        """Return the signal-cli-rest-api mode."""
-        return await self._signal.get_signal_cli_rest_api_mode()
+    async def signal_cli_rest_api_about(self) -> About:
+        """Return the signal-cli-rest-api about information."""
+        return await self._signal.get_signal_cli_about()
 
     async def send(
         self,

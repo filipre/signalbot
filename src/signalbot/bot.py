@@ -10,7 +10,7 @@ import traceback
 import uuid
 from collections import defaultdict
 from collections.abc import Callable, Mapping
-from typing import TYPE_CHECKING, Any, Literal, TypeAlias
+from typing import TYPE_CHECKING, Literal, TypeAlias
 
 import phonenumbers
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
@@ -38,8 +38,9 @@ from signalbot.storage import RedisStorage, SQLiteStorage
 if TYPE_CHECKING:
     from pathlib import Path
 
-    from signalbot.api.generated import About
+    from signalbot.api.generated import About, GroupEntry
     from signalbot.api.requests import SendMessage
+
 
 CommandList: TypeAlias = list[
     tuple[
@@ -117,7 +118,7 @@ class SignalBot:
         self._commands_to_be_registered: CommandList = []  # populated by .register()
         self.commands: CommandList = []  # populated by .start()
 
-        self.groups = []  # populated by .start()
+        self.groups: list[GroupEntry] = []  # populated by .start()
         self._groups_by_id = {}
         self._groups_by_internal_id = {}
         self._groups_by_name = defaultdict(list)
@@ -173,7 +174,7 @@ class SignalBot:
                 " to the config to silence this error.",
             )
 
-    def get_group(self, internal_id: str) -> dict[str, Any] | None:
+    def get_group(self, internal_id: str) -> GroupEntry | None:
         if internal_id in self._groups_by_internal_id:
             return copy.deepcopy(self._groups_by_internal_id[internal_id])
         return None
@@ -478,36 +479,33 @@ class SignalBot:
         # reset group lookups to avoid stale data
         self.groups = await self._signal.get_groups()
 
-        self._groups_by_id: dict[str, dict[str, Any]] = {}
-        self._groups_by_internal_id: dict[str, dict[str, Any]] = {}
-        self._groups_by_name: defaultdict[str, list[dict[str, Any]]] = defaultdict(list)
+        self._groups_by_id: dict[str, GroupEntry] = {}
+        self._groups_by_internal_id: dict[str, GroupEntry] = {}
+        self._groups_by_name: defaultdict[str, list[GroupEntry]] = defaultdict(list)
         for group in self.groups:
-            self._groups_by_id[group["id"]] = group
-            self._groups_by_internal_id[group["internal_id"]] = group
-            self._groups_by_name[group["name"]].append(group)
+            self._groups_by_id[group.id] = group
+            self._groups_by_internal_id[group.internal_id] = group
+            self._groups_by_name[group.name].append(group)
 
         self._logger.info(f"[Bot] {len(self.groups)} groups detected")  # noqa: G004
 
     async def _update_group(self, group_internal_id: str) -> None:
         # look up group that requires update
         group = await self._signal.get_group(
-            self._groups_by_internal_id[group_internal_id]["id"]
+            self._groups_by_internal_id[group_internal_id].id
         )
 
-        current_group_name = self._groups_by_internal_id[group_internal_id][
-            "name"
-        ]  # group name may have been updated
+        current_group_name = self._groups_by_internal_id[group_internal_id].name
+        # group name may have been updated
         self._groups_by_name[current_group_name] = [
-            g
-            for g in self._groups_by_name[current_group_name]
-            if g["id"] != group["id"]
+            g for g in self._groups_by_name[current_group_name] if g.id != group.id
         ]
         self.groups = [
-            group if g["internal_id"] == group_internal_id else g for g in self.groups
+            group if g.internal_id == group_internal_id else g for g in self.groups
         ]
-        self._groups_by_id[group["id"]] = group
-        self._groups_by_internal_id[group["internal_id"]] = group
-        self._groups_by_name[group["name"]].append(group)
+        self._groups_by_id[group.id] = group
+        self._groups_by_internal_id[group.internal_id] = group
+        self._groups_by_name[group.name].append(group)
 
         self._logger.info("[Bot] Group updated")
 
@@ -543,7 +541,7 @@ class SignalBot:
     def _resolve_group_receiver(self, group_id_or_name: str) -> str | None:
         group = self._groups_by_id.get(group_id_or_name)
         if group is not None:
-            return group["id"]
+            return group.id
 
         if self._is_group_id(group_id_or_name):
             error_msg = f"[Bot] Group with id '{group_id_or_name}' not found. There "
@@ -553,11 +551,11 @@ class SignalBot:
 
         group = self._groups_by_internal_id.get(group_id_or_name)
         if group is not None:
-            return group["id"]
+            return group.id
 
         group = self._get_group_by_name(group_id_or_name)
         if group is not None:
-            return group["id"]
+            return group.id
 
         return None
 
@@ -620,7 +618,7 @@ class SignalBot:
             return False
         return internal_id[-1] == "="
 
-    def _get_group_by_name(self, group_name: str) -> dict[str, Any] | None:
+    def _get_group_by_name(self, group_name: str) -> GroupEntry | None:
         groups = self._groups_by_name.get(group_name)
         if groups is not None:
             if len(groups) > 1:

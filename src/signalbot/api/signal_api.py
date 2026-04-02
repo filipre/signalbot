@@ -2,12 +2,12 @@ from __future__ import annotations
 
 import base64
 from enum import Enum
-from typing import TYPE_CHECKING, Any, Literal
+from typing import TYPE_CHECKING, Literal
 
 import aiohttp
 import websockets
 
-from signalbot.api.generated import About
+from signalbot.api.generated import About, GroupEntry
 
 if TYPE_CHECKING:
     from collections.abc import AsyncIterator
@@ -190,26 +190,26 @@ class SignalAPI:
         ) as exc:
             raise StopTypingError from exc
 
-    async def get_groups(self) -> list[dict[str, Any]]:
+    async def get_groups(self) -> list[GroupEntry]:
         uri = self._signal_api_uris.groups_uri()
         try:
             async with aiohttp.ClientSession() as session:
                 resp = await session.get(uri)
                 resp.raise_for_status()
-                return await resp.json()
+                return [GroupEntry.model_validate(group) for group in await resp.json()]
         except (
             aiohttp.ClientError,
             aiohttp.http_exceptions.HttpProcessingError,
         ) as exc:
             raise GroupsError from exc
 
-    async def get_group(self, group_id: str) -> dict[str, Any]:
+    async def get_group(self, group_id: str) -> GroupEntry:
         uri = self._signal_api_uris.group_id_uri(group_id)
         try:
             async with aiohttp.ClientSession() as session:
                 resp = await session.get(uri)
                 resp.raise_for_status()
-                return await resp.json()
+                return GroupEntry.model_validate(await resp.json())
         except (
             aiohttp.ClientError,
             aiohttp.http_exceptions.HttpProcessingError,

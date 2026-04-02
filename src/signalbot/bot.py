@@ -315,6 +315,39 @@ class SignalBot:
 
         return timestamp
 
+    async def poll(
+        self,
+        receiver: str,
+        question: str,
+        answers: list[str],
+        *,
+        allow_multiple_selections: bool = False,
+    ) -> int:
+        """Create a poll.
+
+        Args:
+            receiver: The recipient of the message.
+            question: The poll question.
+            answers: List of answer options for the poll.
+            allow_multiple_selections: Whether multiple answers can be selected.
+
+        Returns:
+            The timestamp the poll was created.
+        """
+        receiver = self._resolve_receiver(receiver)
+
+        resp = await self._signal.poll(
+            receiver,
+            question,
+            answers,
+            allow_multiple_selections=allow_multiple_selections,
+        )
+        resp_payload = await resp.json()
+        timestamp = int(resp_payload["timestamp"])
+        self._logger.info("[Bot] New poll created:\n%s", question)
+
+        return timestamp
+
     async def react(self, message: Message, emoji: str) -> None:
         """React to a message with an emoji.
 

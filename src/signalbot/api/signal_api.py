@@ -80,6 +80,34 @@ class SignalAPI:
         ) as exc:
             raise SendMessageError from exc
 
+    async def poll(
+        self,
+        receiver: str,
+        question: str,
+        answers: list[str],
+        *,
+        allow_multiple_selections: bool = False,
+    ) -> aiohttp.ClientResponse:
+        uri = self._signal_api_uris.poll_rest_uri()
+        payload = {
+            "recipient": receiver,
+            "question": question,
+            "answers": answers,
+            "allow_multiple_selections": allow_multiple_selections,
+        }
+
+        try:
+            async with aiohttp.ClientSession() as session:
+                resp = await session.post(uri, json=payload)
+                resp.raise_for_status()
+                return resp
+        except (
+            aiohttp.ClientError,
+            aiohttp.http_exceptions.HttpProcessingError,
+            KeyError,
+        ) as exc:
+            raise SendMessageError from exc
+
     async def react(
         self,
         recipient: str,
@@ -371,6 +399,11 @@ class SignalAPIURIs:
 
     def send_rest_uri(self) -> str:
         return f"{self.https_or_http}://{self.signal_service}/v2/send"
+
+    def poll_rest_uri(self) -> str:
+        return (
+            f"{self.https_or_http}://{self.signal_service}/v1/polls/{self.phone_number}"
+        )
 
     def react_rest_uri(self) -> str:
         return f"{self.https_or_http}://{self.signal_service}/v1/reactions/{self.phone_number}"

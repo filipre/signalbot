@@ -7,7 +7,7 @@ from typing import TYPE_CHECKING, Any, Literal
 import aiohttp
 import websockets
 
-from signalbot.api.generated.client import About
+from signalbot.api.generated import About
 
 if TYPE_CHECKING:
     from collections.abc import AsyncIterator

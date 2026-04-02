@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from copy import deepcopy
 
-from signalbot.api.generated.api import SendMessageV2
+from signalbot.api.generated import SendMessageV2
 
 
 class SendMessage(SendMessageV2):

@@ -20,8 +20,10 @@ class Type(Enum):
 
 
 class SendMessageResult(BaseModel):
-    group_id: str | None = Field(None, alias="groupId")
-    recipient_address: RecipientAddress | None = Field(None, alias="recipientAddress")
-    retry_after_seconds: int | None = Field(None, alias="retryAfterSeconds")
+    group_id: str | None = Field(default=None, alias="groupId")
+    recipient_address: RecipientAddress | None = Field(
+        default=None, alias="recipientAddress"
+    )
+    retry_after_seconds: int | None = Field(default=None, alias="retryAfterSeconds")
     token: str | None = None
     type: Type | None = None

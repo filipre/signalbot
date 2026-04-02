@@ -8,8 +8,8 @@ from pydantic import BaseModel, Field
 
 class PollVote(BaseModel):
     author: str | None = None
-    author_number: str | None = Field(None, alias="authorNumber")
-    author_uuid: str | None = Field(None, alias="authorUuid")
-    option_indexes: list[int] | None = Field(None, alias="optionIndexes")
+    author_number: str | None = Field(default=None, alias="authorNumber")
+    author_uuid: str | None = Field(default=None, alias="authorUuid")
+    option_indexes: list[int] | None = Field(default=None, alias="optionIndexes")
     target_sent_timestamp: int = Field(..., alias="targetSentTimestamp")
     vote_count: int = Field(..., alias="voteCount")

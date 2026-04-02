@@ -13,9 +13,9 @@ from .text_style_schema import TextStyle
 class Quote(BaseModel):
     attachments: list[QuotedAttachment] | None = None
     author: str | None = None
-    author_number: str | None = Field(None, alias="authorNumber")
-    author_uuid: str | None = Field(None, alias="authorUuid")
+    author_number: str | None = Field(default=None, alias="authorNumber")
+    author_uuid: str | None = Field(default=None, alias="authorUuid")
     id: int
     mentions: list[Mention] | None = None
     text: str | None = None
-    text_styles: list[TextStyle] | None = Field(None, alias="textStyles")
+    text_styles: list[TextStyle] | None = Field(default=None, alias="textStyles")

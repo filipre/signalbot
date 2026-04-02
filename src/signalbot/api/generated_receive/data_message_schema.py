@@ -26,26 +26,26 @@ from .unpin_message_schema import UnpinMessage
 
 
 class DataMessage(BaseModel):
-    admin_delete: AdminDelete | None = Field(None, alias="adminDelete")
+    admin_delete: AdminDelete | None = Field(default=None, alias="adminDelete")
     attachments: list[Attachment] | None = None
     contacts: list[SharedContact] | None = None
-    expires_in_seconds: int | None = Field(None, alias="expiresInSeconds")
-    group_info: GroupInfo | None = Field(None, alias="groupInfo")
-    is_expiration_update: bool | None = Field(None, alias="isExpirationUpdate")
+    expires_in_seconds: int | None = Field(default=None, alias="expiresInSeconds")
+    group_info: GroupInfo | None = Field(default=None, alias="groupInfo")
+    is_expiration_update: bool | None = Field(default=None, alias="isExpirationUpdate")
     mentions: list[Mention] | None = None
     message: str | None = None
     payment: Payment | None = None
-    pin_message: PinMessage | None = Field(None, alias="pinMessage")
-    poll_create: PollCreate | None = Field(None, alias="pollCreate")
-    poll_terminate: PollTerminate | None = Field(None, alias="pollTerminate")
-    poll_vote: PollVote | None = Field(None, alias="pollVote")
+    pin_message: PinMessage | None = Field(default=None, alias="pinMessage")
+    poll_create: PollCreate | None = Field(default=None, alias="pollCreate")
+    poll_terminate: PollTerminate | None = Field(default=None, alias="pollTerminate")
+    poll_vote: PollVote | None = Field(default=None, alias="pollVote")
     previews: list[Preview] | None = None
     quote: Quote | None = None
     reaction: Reaction | None = None
-    remote_delete: RemoteDelete | None = Field(None, alias="remoteDelete")
+    remote_delete: RemoteDelete | None = Field(default=None, alias="remoteDelete")
     sticker: Sticker | None = None
-    story_context: StoryContext | None = Field(None, alias="storyContext")
-    text_styles: list[TextStyle] | None = Field(None, alias="textStyles")
+    story_context: StoryContext | None = Field(default=None, alias="storyContext")
+    text_styles: list[TextStyle] | None = Field(default=None, alias="textStyles")
     timestamp: int
-    unpin_message: UnpinMessage | None = Field(None, alias="unpinMessage")
-    view_once: bool | None = Field(None, alias="viewOnce")
+    unpin_message: UnpinMessage | None = Field(default=None, alias="unpinMessage")
+    view_once: bool | None = Field(default=None, alias="viewOnce")

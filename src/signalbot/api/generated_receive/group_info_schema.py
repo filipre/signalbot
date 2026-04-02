@@ -7,7 +7,7 @@ from pydantic import BaseModel, Field
 
 
 class GroupInfo(BaseModel):
-    group_id: str | None = Field(None, alias="groupId")
-    group_name: str | None = Field(None, alias="groupName")
+    group_id: str | None = Field(default=None, alias="groupId")
+    group_name: str | None = Field(default=None, alias="groupName")
     revision: int
     type: str | None = None

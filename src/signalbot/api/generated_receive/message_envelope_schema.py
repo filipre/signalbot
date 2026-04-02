@@ -15,18 +15,18 @@ from .typing_message_schema import TypingMessage
 
 
 class MessageEnvelope(BaseModel):
-    call_message: CallMessage | None = Field(None, alias="callMessage")
-    data_message: DataMessage | None = Field(None, alias="dataMessage")
-    edit_message: EditMessage | None = Field(None, alias="editMessage")
-    receipt_message: ReceiptMessage | None = Field(None, alias="receiptMessage")
+    call_message: CallMessage | None = Field(default=None, alias="callMessage")
+    data_message: DataMessage | None = Field(default=None, alias="dataMessage")
+    edit_message: EditMessage | None = Field(default=None, alias="editMessage")
+    receipt_message: ReceiptMessage | None = Field(default=None, alias="receiptMessage")
     server_delivered_timestamp: int = Field(..., alias="serverDeliveredTimestamp")
     server_received_timestamp: int = Field(..., alias="serverReceivedTimestamp")
     source: str | None = None
-    source_device: int | None = Field(None, alias="sourceDevice")
-    source_name: str | None = Field(None, alias="sourceName")
-    source_number: str | None = Field(None, alias="sourceNumber")
-    source_uuid: str | None = Field(None, alias="sourceUuid")
-    story_message: StoryMessage | None = Field(None, alias="storyMessage")
-    sync_message: SyncMessage | None = Field(None, alias="syncMessage")
+    source_device: int | None = Field(default=None, alias="sourceDevice")
+    source_name: str | None = Field(default=None, alias="sourceName")
+    source_number: str | None = Field(default=None, alias="sourceNumber")
+    source_uuid: str | None = Field(default=None, alias="sourceUuid")
+    story_message: StoryMessage | None = Field(default=None, alias="storyMessage")
+    sync_message: SyncMessage | None = Field(default=None, alias="syncMessage")
     timestamp: int
-    typing_message: TypingMessage | None = Field(None, alias="typingMessage")
+    typing_message: TypingMessage | None = Field(default=None, alias="typingMessage")

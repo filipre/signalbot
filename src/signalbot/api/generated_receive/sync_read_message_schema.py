@@ -8,6 +8,6 @@ from pydantic import BaseModel, Field
 
 class SyncReadMessage(BaseModel):
     sender: str | None = None
-    sender_number: str | None = Field(None, alias="senderNumber")
-    sender_uuid: str | None = Field(None, alias="senderUuid")
+    sender_number: str | None = Field(default=None, alias="senderNumber")
+    sender_uuid: str | None = Field(default=None, alias="senderUuid")
     timestamp: int

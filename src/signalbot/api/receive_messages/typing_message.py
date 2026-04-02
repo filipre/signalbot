@@ -8,5 +8,5 @@ from pydantic import BaseModel, Field
 
 class TypingMessage(BaseModel):
     action: str | None = None
-    group_id: str | None = Field(None, alias="groupId")
+    group_id: str | None = Field(default=None, alias="groupId")
     timestamp: int

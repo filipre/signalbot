@@ -8,10 +8,10 @@ from pydantic import BaseModel, Field
 
 class Attachment(BaseModel):
     caption: str | None = None
-    content_type: str | None = Field(None, alias="contentType")
+    content_type: str | None = Field(default=None, alias="contentType")
     filename: str | None = None
     height: int | None = None
     id: str | None = None
     size: int | None = None
-    upload_timestamp: int | None = Field(None, alias="uploadTimestamp")
+    upload_timestamp: int | None = Field(default=None, alias="uploadTimestamp")
     width: int | None = None

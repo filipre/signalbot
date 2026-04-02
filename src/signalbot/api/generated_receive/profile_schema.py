@@ -8,9 +8,9 @@ from pydantic import BaseModel, Field
 
 class Profile(BaseModel):
     about: str | None = None
-    about_emoji: str | None = Field(None, alias="aboutEmoji")
-    family_name: str | None = Field(None, alias="familyName")
-    given_name: str | None = Field(None, alias="givenName")
+    about_emoji: str | None = Field(default=None, alias="aboutEmoji")
+    family_name: str | None = Field(default=None, alias="familyName")
+    given_name: str | None = Field(default=None, alias="givenName")
     has_avatar: bool = Field(..., alias="hasAvatar")
     last_update_timestamp: int = Field(..., alias="lastUpdateTimestamp")
-    mobile_coin_address: str | None = Field(None, alias="mobileCoinAddress")
+    mobile_coin_address: str | None = Field(default=None, alias="mobileCoinAddress")

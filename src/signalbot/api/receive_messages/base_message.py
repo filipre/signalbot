@@ -8,7 +8,7 @@ from pydantic import BaseModel, Field
 class BaseMessage(ABC, BaseModel):
     server_delivered_timestamp: int
     server_received_timestamp: int
-    source: str | None = Field(None, deprecated=True)
+    source: str | None = Field(default=None, deprecated=True)
     source_device: int | None = None
     source_name: str | None = None
     source_number: str | None = None

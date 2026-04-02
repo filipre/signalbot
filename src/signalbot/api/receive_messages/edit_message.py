@@ -9,5 +9,5 @@ from .data_message import ReceiveDataMessage
 
 
 class EditMessage(BaseModel):
-    data_message: ReceiveDataMessage | None = Field(None, alias="dataMessage")
+    data_message: ReceiveDataMessage | None = Field(default=None, alias="dataMessage")
     target_sent_timestamp: int = Field(..., alias="targetSentTimestamp")

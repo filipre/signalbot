@@ -7,7 +7,7 @@ from pydantic import BaseModel, Field
 
 
 class AdminDelete(BaseModel):
-    target_author: str | None = Field(None, alias="targetAuthor")
-    target_author_number: str | None = Field(None, alias="targetAuthorNumber")
-    target_author_uuid: str | None = Field(None, alias="targetAuthorUuid")
+    target_author: str | None = Field(default=None, alias="targetAuthor")
+    target_author_number: str | None = Field(default=None, alias="targetAuthorNumber")
+    target_author_uuid: str | None = Field(default=None, alias="targetAuthorUuid")
     target_sent_timestamp: int = Field(..., alias="targetSentTimestamp")

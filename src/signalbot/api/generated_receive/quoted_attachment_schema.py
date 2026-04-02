@@ -9,6 +9,6 @@ from .attachment_schema import Attachment
 
 
 class QuotedAttachment(BaseModel):
-    content_type: str | None = Field(None, alias="contentType")
+    content_type: str | None = Field(default=None, alias="contentType")
     filename: str | None = None
     thumbnail: Attachment | None = None

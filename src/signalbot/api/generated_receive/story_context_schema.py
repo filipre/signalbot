@@ -7,6 +7,6 @@ from pydantic import BaseModel, Field
 
 
 class StoryContext(BaseModel):
-    author_number: str | None = Field(None, alias="authorNumber")
-    author_uuid: str | None = Field(None, alias="authorUuid")
+    author_number: str | None = Field(default=None, alias="authorNumber")
+    author_uuid: str | None = Field(default=None, alias="authorUuid")
     sent_timestamp: int = Field(..., alias="sentTimestamp")

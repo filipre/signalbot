@@ -11,5 +11,7 @@ class Internal(BaseModel):
     discoverable_by_phonenumber: bool | None = Field(
         None, alias="discoverableByPhonenumber"
     )
-    shares_phone_number: bool | None = Field(None, alias="sharesPhoneNumber")
-    unidentified_access_mode: str | None = Field(None, alias="unidentifiedAccessMode")
+    shares_phone_number: bool | None = Field(default=None, alias="sharesPhoneNumber")
+    unidentified_access_mode: str | None = Field(
+        default=None, alias="unidentifiedAccessMode"
+    )

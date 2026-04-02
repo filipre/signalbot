@@ -19,9 +19,13 @@ class Type(Enum):
 
 
 class SyncMessage(BaseModel):
-    blocked_group_ids: list[str] | None = Field(None, alias="blockedGroupIds")
-    blocked_numbers: list[str] | None = Field(None, alias="blockedNumbers")
-    read_messages: list[SyncReadMessage] | None = Field(None, alias="readMessages")
-    sent_message: SyncDataMessage | None = Field(None, alias="sentMessage")
-    sent_story_message: SyncStoryMessage | None = Field(None, alias="sentStoryMessage")
+    blocked_group_ids: list[str] | None = Field(default=None, alias="blockedGroupIds")
+    blocked_numbers: list[str] | None = Field(default=None, alias="blockedNumbers")
+    read_messages: list[SyncReadMessage] | None = Field(
+        default=None, alias="readMessages"
+    )
+    sent_message: SyncDataMessage | None = Field(default=None, alias="sentMessage")
+    sent_story_message: SyncStoryMessage | None = Field(
+        default=None, alias="sentStoryMessage"
+    )
     type: Type | None = None

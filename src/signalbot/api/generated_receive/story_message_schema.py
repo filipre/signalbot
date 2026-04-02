@@ -12,13 +12,13 @@ from .preview_schema import Preview
 class BackgroundGradient(BaseModel):
     angle: int | None = None
     colors: list[str] | None = None
-    end_color: str | None = Field(None, alias="endColor")
+    end_color: str | None = Field(default=None, alias="endColor")
     positions: list[float] | None = None
-    start_color: str | None = Field(None, alias="startColor")
+    start_color: str | None = Field(default=None, alias="startColor")
 
 
 class TextAttachment(BaseModel):
-    background_color: str | None = Field(None, alias="backgroundColor")
+    background_color: str | None = Field(default=None, alias="backgroundColor")
     background_gradient: BackgroundGradient | None = Field(
         None,
         alias="backgroundGradient",
@@ -27,14 +27,14 @@ class TextAttachment(BaseModel):
     preview: Preview | None = None
     style: str | None = None
     text: str | None = None
-    text_background_color: str | None = Field(None, alias="textBackgroundColor")
-    text_foreground_color: str | None = Field(None, alias="textForegroundColor")
+    text_background_color: str | None = Field(default=None, alias="textBackgroundColor")
+    text_foreground_color: str | None = Field(default=None, alias="textForegroundColor")
 
 
 class StoryMessage(BaseModel):
     allows_replies: bool = Field(..., alias="allowsReplies")
-    file_attachment: Attachment | None = Field(None, alias="fileAttachment")
-    group_id: str | None = Field(None, alias="groupId")
+    file_attachment: Attachment | None = Field(default=None, alias="fileAttachment")
+    group_id: str | None = Field(default=None, alias="groupId")
     text_attachment: TextAttachment | None = Field(
         None, alias="textAttachment", title="JsonStoryMessage.TextAttachment"
     )

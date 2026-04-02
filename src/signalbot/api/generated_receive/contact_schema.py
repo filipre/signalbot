@@ -11,17 +11,17 @@ from .profile_schema import Profile
 
 class Contact(BaseModel):
     color: str | None = None
-    family_name: str | None = Field(None, alias="familyName")
-    given_name: str | None = Field(None, alias="givenName")
+    family_name: str | None = Field(default=None, alias="familyName")
+    given_name: str | None = Field(default=None, alias="givenName")
     internal: Internal | None = None
     is_archived: bool = Field(..., alias="isArchived")
     is_blocked: bool = Field(..., alias="isBlocked")
     is_hidden: bool = Field(..., alias="isHidden")
     message_expiration_time: int = Field(..., alias="messageExpirationTime")
     name: str | None = None
-    nick_family_name: str | None = Field(None, alias="nickFamilyName")
-    nick_given_name: str | None = Field(None, alias="nickGivenName")
-    nick_name: str | None = Field(None, alias="nickName")
+    nick_family_name: str | None = Field(default=None, alias="nickFamilyName")
+    nick_given_name: str | None = Field(default=None, alias="nickGivenName")
+    nick_name: str | None = Field(default=None, alias="nickName")
     note: str | None = None
     number: str | None = None
     profile: Profile | None = None

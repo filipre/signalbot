@@ -7,5 +7,5 @@ from pydantic import BaseModel, Field
 
 
 class Sticker(BaseModel):
-    pack_id: str | None = Field(None, alias="packId")
+    pack_id: str | None = Field(default=None, alias="packId")
     sticker_id: int = Field(..., alias="stickerId")

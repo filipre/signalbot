@@ -15,7 +15,9 @@ class AddDeviceRequest(BaseModel):
 
 
 class AddStickerPackRequest(BaseModel):
-    pack_id: str | None = Field(None, examples=["9a32eda01a7a28574f2eb48668ae0dc4"])
+    pack_id: str | None = Field(
+        default=None, examples=["9a32eda01a7a28574f2eb48668ae0dc4"]
+    )
     pack_key: str | None = Field(
         None,
         examples=["19546e18eba0ff69dea78eb591465289d39e16f35e58389ae779d4f9455aff3a"],
@@ -31,7 +33,7 @@ class ChangeGroupMembersRequest(BaseModel):
 
 
 class ClosePollRequest(BaseModel):
-    poll_timestamp: str | None = Field(None, examples=["1769271479"])
+    poll_timestamp: str | None = Field(default=None, examples=["1769271479"])
     recipient: str | None = Field(
         None, examples=["<phone number> OR <username> OR <group id>"]
     )
@@ -48,20 +50,24 @@ class CreateGroupResponse(BaseModel):
 
 
 class CreatePollRequest(BaseModel):
-    allow_multiple_selections: bool | None = Field(None, examples=[True])
-    answers: list[str] | None = Field(None, examples=[["apple", "banana", "orange"]])
-    question: str | None = Field(None, examples=["What's your favourite fruit?"])
+    allow_multiple_selections: bool | None = Field(default=None, examples=[True])
+    answers: list[str] | None = Field(
+        default=None, examples=[["apple", "banana", "orange"]]
+    )
+    question: str | None = Field(
+        default=None, examples=["What's your favourite fruit?"]
+    )
     recipient: str | None = Field(
         None, examples=["<phone number> OR <username> OR <group id>"]
     )
 
 
 class CreatePollResponse(BaseModel):
-    timestamp: str | None = Field(None, examples=["1769271479"])
+    timestamp: str | None = Field(default=None, examples=["1769271479"])
 
 
 class DeleteLocalAccountDataRequest(BaseModel):
-    ignore_registered: bool | None = Field(None, examples=[False])
+    ignore_registered: bool | None = Field(default=None, examples=[False])
 
 
 class DeviceLinkUriResponse(BaseModel):
@@ -73,12 +79,14 @@ class Error(BaseModel):
 
 
 class LoggingConfiguration(BaseModel):
-    level: str | None = Field(None, alias="Level")
+    level: str | None = Field(default=None, alias="Level")
 
 
 class RateLimitChallengeRequest(BaseModel):
-    captcha: str | None = Field(None, examples=["signalcaptcha://{captcha value}"])
-    challenge_token: str | None = Field(None, examples=["<challenge token>"])
+    captcha: str | None = Field(
+        default=None, examples=["signalcaptcha://{captcha value}"]
+    )
+    challenge_token: str | None = Field(default=None, examples=["<challenge token>"])
 
 
 class Reaction(BaseModel):
@@ -151,11 +159,11 @@ class SetPinRequest(BaseModel):
 
 
 class SetUsernameRequest(BaseModel):
-    username: str | None = Field(None, examples=["test"])
+    username: str | None = Field(default=None, examples=["test"])
 
 
 class TrustIdentityRequest(BaseModel):
-    trust_all_known_keys: bool | None = Field(None, examples=[False])
+    trust_all_known_keys: bool | None = Field(default=None, examples=[False])
     verified_safety_number: str | None = None
 
 
@@ -172,8 +180,8 @@ class TypingIndicatorRequest(BaseModel):
 
 
 class UnregisterNumberRequest(BaseModel):
-    delete_account: bool | None = Field(None, examples=[False])
-    delete_local_data: bool | None = Field(None, examples=[False])
+    delete_account: bool | None = Field(default=None, examples=[False])
+    delete_local_data: bool | None = Field(default=None, examples=[False])
 
 
 class UpdateAccountSettingsRequest(BaseModel):
@@ -198,12 +206,12 @@ class VerifyNumberSettings(BaseModel):
 
 
 class VoteRequest(BaseModel):
-    poll_author: str | None = Field(None, examples=["<phone number> OR <uuid>"])
-    poll_timestamp: str | None = Field(None, examples=["1769271479"])
+    poll_author: str | None = Field(default=None, examples=["<phone number> OR <uuid>"])
+    poll_timestamp: str | None = Field(default=None, examples=["1769271479"])
     recipient: str | None = Field(
         None, examples=["<phone number> OR <username> OR <group id>"]
     )
-    selected_answers: list[int] | None = Field(None, examples=[[1]])
+    selected_answers: list[int] | None = Field(default=None, examples=[[1]])
 
 
 class Configuration(BaseModel):
@@ -221,7 +229,7 @@ class CreateGroupRequest(BaseModel):
 
 class SendMessageV2(BaseModel):
     base64_attachments: list[str] | None = Field(
-        None,
+        default=None,
         examples=[
             [
                 "<BASE64 ENCODED DATA>",

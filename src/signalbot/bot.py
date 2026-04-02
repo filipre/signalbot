@@ -22,6 +22,7 @@ from signalbot.api.receive_messages import (
     ReceiveDataMessage,
     ReceivedMessageType,
 )
+from signalbot.api.requests import SentMessage
 from signalbot.bot_config import (
     Config,
     InMemoryConfig,
@@ -289,14 +290,14 @@ class SignalBot:
     async def send(
         self,
         data_message: SendMessage,
-    ) -> int:
+    ) -> SentMessage:
         """Send or edit a message.
 
         Args:
-            receiver: Send recipient of the message.
+            data_message: The message to send.
 
         Returns:
-            The timestamp of the sent or edited message.
+            A SentMessage instance.
         """
         if data_message.recipients is None:
             error_msg = "Message must have at least one recipient"
@@ -313,7 +314,7 @@ class SignalBot:
             f"[Bot] New message {timestamp} sent:\n{data_message.message}"  # noqa: G004
         )
 
-        return timestamp
+        return SentMessage.from_send_message(data_message, timestamp)
 
     async def poll(
         self,

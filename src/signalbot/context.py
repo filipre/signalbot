@@ -6,7 +6,7 @@ from typing import TYPE_CHECKING, Any, Literal
 if TYPE_CHECKING:
     from signalbot.api.receive_messages.data_message import ReceiveDataMessage
     from signalbot.api.receive_messages.link_previews import Preview
-    from signalbot.api.requests import SendMessage
+    from signalbot.api.requests import SendMessage, SentMessage
     from signalbot.bot import SignalBot
 
 
@@ -24,7 +24,7 @@ class Context:
     async def send(
         self,
         data_message: SendMessage,
-    ) -> int:
+    ) -> SentMessage:
         """Same as
          [signalbot.SignalBot.send()](bot.md#signalbot.SignalBot.send)
         but with the recipient set to the message's recipient."""
@@ -61,7 +61,7 @@ class Context:
         text: str,
         *,
         base64_attachments: list[str] | None = None,
-        link_preview: LinkPreview | None = None,
+        link_preview: Preview | None = None,
         mentions: (
             list[dict[str, Any]] | None
         ) = None,  # [{ "author": "uuid" , "start": 0, "length": 1 }]

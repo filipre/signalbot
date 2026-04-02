@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import base64
+from copy import deepcopy
 from pathlib import Path
 from typing import TYPE_CHECKING
 
@@ -208,10 +209,11 @@ class ReceiveDataMessage(BaseMessage):
         Returns:
             A SendMessage object that can be sent using the API.
         """
+        copy = deepcopy(self)
         base_64_attachments = None
-        if self.attachments is not None:
+        if copy.attachments is not None:
             base_64_attachments = []
-            for attachment in self.attachments:
+            for attachment in copy.attachments:
                 if attachment.base64_content is None:
                     if attachment.id is None:
                         error_msg = (
@@ -228,8 +230,8 @@ class ReceiveDataMessage(BaseMessage):
                 base_64_attachments.append(base64_content)
 
         link_preview = None
-        if self.previews is not None and len(self.previews) > 0:
-            preview = self.previews[0]
+        if copy.previews is not None and len(copy.previews) > 0:
+            preview = copy.previews[0]
             link_preview = LinkPreviewType(
                 base64_thumbnail=preview.base64_thumbnail,
                 description=preview.description,
@@ -238,25 +240,25 @@ class ReceiveDataMessage(BaseMessage):
             )
 
         text_style = None
-        if self.text_styles is not None and len(self.text_styles) > 0:
-            text_style = TextMode(self.text_styles[0].style)
+        if copy.text_styles is not None and len(copy.text_styles) > 0:
+            text_style = TextMode(copy.text_styles[0].style)
 
         return SendMessage(
             base64_attachments=base_64_attachments,
             edit_timestamp=None,
             link_preview=link_preview,
-            mentions=self._to_send_mentions(self.mentions),
-            message=self.text,
+            mentions=self._to_send_mentions(copy.mentions),
+            message=copy.text,
             notify_self=None,
             number=None,
-            quote_author=self.quote.author if self.quote is not None else None,
-            quote_mentions=self._to_send_mentions(self.quote.mentions)
-            if self.quote is not None
+            quote_author=copy.quote.author if copy.quote is not None else None,
+            quote_mentions=self._to_send_mentions(copy.quote.mentions)
+            if copy.quote is not None
             else None,
-            quote_message=self.quote.text if self.quote is not None else None,
-            quote_timestamp=self.quote.id if self.quote is not None else None,
+            quote_message=copy.quote.text if copy.quote is not None else None,
+            quote_timestamp=copy.quote.id if copy.quote is not None else None,
             recipients=recipients,
-            # sticker=self.sticker, # Not clear how to send stickers yet
+            # sticker=copy.sticker, # Not clear how to send stickers yet
             text_mode=text_style,
-            view_once=self.view_once,
+            view_once=copy.view_once,
         )

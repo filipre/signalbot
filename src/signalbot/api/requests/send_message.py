@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from copy import deepcopy
+
 from signalbot.api.generated.api import SendMessageV2
 
 
@@ -14,6 +16,7 @@ class SentMessage(SendMessage):
     def from_send_message(
         cls, send_message: SendMessage, timestamp: int
     ) -> SentMessage:
+        send_message = deepcopy(send_message)
         return cls(
             base64_attachments=send_message.base64_attachments,
             edit_timestamp=send_message.edit_timestamp,

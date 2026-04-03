@@ -19,28 +19,13 @@ class BaseMessage(ABC, BaseModel):
 
     @abstractmethod
     def is_group(self) -> bool:
-        pass
-
-    @abstractmethod
-    def is_private(self) -> bool:
-        pass
-
-    @abstractmethod
-    def source_or_group_uuid(self) -> str:
-        pass
-
-
-class BaseMessageWithGroup(BaseMessage):
-    group_info: GroupInfo | None = None
-
-    def is_group(self) -> bool:
         """Check if the message is a group message.
 
         Returns:
             True if the message is a group message, False otherwise.
         """
-        return self.group_info is not None and self.group_info.group_id is not None
 
+    @abstractmethod
     def is_private(self) -> bool:
         """Check if the message is a private (one-on-one) message.
 
@@ -48,14 +33,29 @@ class BaseMessageWithGroup(BaseMessage):
         Returns:
             True if the message is a private (one-on-one) message, False otherwise.
         """
-        return not self.is_group()
 
+    @abstractmethod
     def source_or_group_uuid(self) -> str:
         """Get the source of the message.
 
         Returns:
             The source of the message.
         """
+
+
+class BaseMessageWithGroup(BaseMessage):
+    group_info: GroupInfo | None = None
+
+    def is_group(self) -> bool:
+
+        return self.group_info is not None and self.group_info.group_id is not None
+
+    def is_private(self) -> bool:
+
+        return not self.is_group()
+
+    def source_or_group_uuid(self) -> str:
+
         if self.group_info is not None and self.group_info.group_id is not None:
             return self.group_info.group_id
 

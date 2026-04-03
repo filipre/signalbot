@@ -122,7 +122,14 @@ class Command(ABC):
 
     def __init__(self) -> None:
         # The bot attribute is assigned after calling bot.register(Command())
-        self.bot: SignalBot | None = None
+        self._bot: SignalBot | None = None
+
+    @property
+    def bot(self) -> SignalBot:
+        if self._bot is None:
+            error_msg = "Command is not registered with a bot."
+            raise CommandError(error_msg)
+        return self._bot
 
     def setup(self) -> None:
         """Optional setup method that can be overridden by subclasses.

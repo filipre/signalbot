@@ -312,7 +312,7 @@ class SignalBot:
         resp_payload = await resp.json()
         timestamp = int(resp_payload["timestamp"])
         self._logger.info(
-            f"[Bot] New message {timestamp} sent:\n{data_message.message}"  # noqa: G004
+            f"[Bot] New message {timestamp} sent:\n{data_message.text}"  # noqa: G004
         )
 
         return SentMessage.from_send_message(data_message, timestamp)

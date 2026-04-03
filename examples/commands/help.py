@@ -20,4 +20,4 @@ class HelpCommand(CommandWithHelpMessage):
         for command, _, _, _ in self.bot.commands:
             if isinstance(command, CommandWithHelpMessage):
                 help_message += f"\t - {command.help_message()}\n"
-        await context.send(SendMessage(message=help_message))
+        await context.send(SendMessage(text=help_message))

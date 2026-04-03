@@ -212,7 +212,7 @@ class ReceiveDataMessage(BaseMessageWithGroup):
             edit_timestamp=None,
             link_preview=link_preview,
             mentions=self._to_send_mentions(copy.mentions),
-            message=copy.text,
+            text=copy.text,
             notify_self=None,
             number=None,
             quote_author=copy.quote.author if copy.quote is not None else None,

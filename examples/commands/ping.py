@@ -9,4 +9,4 @@ class PingCommand(CommandWithHelpMessage):
 
     @triggered("ping")
     async def handle(self, context: Context) -> None:
-        await context.send(SendMessage(message="pong"))
+        await context.send(SendMessage(text="pong"))

@@ -22,7 +22,7 @@ class SentMessage(SendMessage):
             edit_timestamp=send_message.edit_timestamp,
             link_preview=send_message.link_preview,
             mentions=send_message.mentions,
-            message=send_message.message,
+            text=send_message.text,
             notify_self=send_message.notify_self,
             number=send_message.number,
             quote_author=send_message.quote_author,

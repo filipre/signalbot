@@ -38,3 +38,28 @@ uv run datamodel-codegen \
 --all-exports-scope recursive \
 --all-exports-collision-strategy minimal-prefix \
 --output ./src/signalbot/api/generated
+
+## Manual modications
+
+* Rename the `message` field in `SendMessageV2` class in `src/signalbot/api/generated/api.py` to `text`
+    1. Replace the
+        ```
+        message: str | None = None
+        ```
+        with
+        ```
+        text: str | None = Field(
+            default=None,
+            validation_alias=AliasChoices("text", "message"),
+            serialization_alias="message",
+        )
+        ```
+    2. Add a model_config in the class `model_config = ConfigDict(serialize_by_alias=True)`
+    3. Replace the pydantic import
+        ```
+        from pydantic import BaseModel, Field
+        ```
+        with
+        ```
+        from pydantic import AliasChoices, BaseModel, ConfigDict, Field
+        ```

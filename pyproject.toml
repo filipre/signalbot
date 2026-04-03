@@ -96,7 +96,8 @@ ignore = [
 [tool.ruff.lint.flake8-type-checking]
 runtime-evaluated-base-classes = [
   "pydantic.BaseModel",
-  "signalbot.api.receive_messages.BaseMessage"
+  "signalbot.api.receive_messages.BaseMessage",
+  "signalbot.api.receive_messages.BaseMessageWithGroup"
 ]
 
 [tool.yamlfix]

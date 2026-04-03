@@ -7,14 +7,13 @@ from typing import TYPE_CHECKING
 
 from signalbot.api.generated import LinkPreviewType, MessageMention, TextMode
 from signalbot.api.generated_receive import (
-    GroupInfo,
     Mention,
     Quote,
     Reaction,
     Sticker,
     TextStyle,
 )
-from signalbot.api.receive_messages import Attachment, BaseMessage, Preview
+from signalbot.api.receive_messages import Attachment, BaseMessageWithGroup, Preview
 from signalbot.api.requests import SendMessage
 
 if TYPE_CHECKING:
@@ -26,8 +25,7 @@ if TYPE_CHECKING:
     )
 
 
-class ReceiveDataMessage(BaseMessage):
-    group_info: GroupInfo | None = None
+class ReceiveDataMessage(BaseMessageWithGroup):
     attachments: list[Attachment] | None = None
     expires_in_seconds: int | None = None
     mentions: list[Mention] | None = None
@@ -149,41 +147,6 @@ class ReceiveDataMessage(BaseMessage):
             )
 
         error_msg = "MessageEnvelope does not contain a DataMessage"
-        raise ValueError(error_msg)
-
-    def is_group(self) -> bool:
-        """Check if the message is a group message.
-
-        Returns:
-            True if the message is a group message, False otherwise.
-        """
-        return self.group_info is not None and self.group_info.group_id is not None
-
-    def is_private(self) -> bool:
-        """Check if the message is a private (one-on-one) message.
-
-
-        Returns:
-            True if the message is a private (one-on-one) message, False otherwise.
-        """
-        return not self.is_group()
-
-    def source_or_group_uuid(self) -> str:
-        """Get the source of the message.
-
-        Returns:
-            The source of the message.
-        """
-        if self.group_info is not None and self.group_info.group_id is not None:
-            return self.group_info.group_id
-
-        if self.source_uuid is not None:
-            return self.source_uuid
-
-        if self.source_number is not None:
-            return self.source_number
-
-        error_msg = "Message does not contain a source"
         raise ValueError(error_msg)
 
     def _to_send_mentions(

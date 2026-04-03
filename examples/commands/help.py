@@ -17,7 +17,7 @@ class HelpCommand(CommandWithHelpMessage):
     @triggered("help")
     async def handle(self, context: Context) -> None:
         help_message = "Available commands:\n"
-        command: CommandWithHelpMessage
         for command, _, _, _ in self.bot.commands:
-            help_message += f"\t - {command.help_message()}\n"
+            if isinstance(command, CommandWithHelpMessage):
+                help_message += f"\t - {command.help_message()}\n"
         await context.send(SendMessage(message=help_message))

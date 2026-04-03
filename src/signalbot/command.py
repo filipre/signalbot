@@ -131,6 +131,13 @@ class Command(ABC):
             raise CommandError(error_msg)
         return self._bot
 
+    @bot.setter
+    def bot(self, bot: SignalBot) -> None:
+        if self._bot is not None:
+            error_msg = "Command is already registered with a bot."
+            raise CommandError(error_msg)
+        self._bot = bot
+
     def setup(self) -> None:
         """Optional setup method that can be overridden by subclasses.
         This method is called after the command is registered with the bot but

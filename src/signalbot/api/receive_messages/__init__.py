@@ -1,4 +1,5 @@
 from signalbot.api.receive_messages.attachments import Attachment
+from signalbot.api.receive_messages.base_message import BaseMessage
 from signalbot.api.receive_messages.data_message import ReceiveDataMessage
 from signalbot.api.receive_messages.group_update_message import GroupUpdateMessage
 from signalbot.api.receive_messages.link_previews import Preview
@@ -12,6 +13,7 @@ ReceivedMessageType = (
 
 __all__ = [
     "Attachment",
+    "BaseMessage",
     "GroupUpdateMessage",
     "Preview",
     "ReceiveDataMessage",

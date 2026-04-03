@@ -5,6 +5,10 @@ import re
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING, ParamSpec, TypeVar
 
+from signalbot.api.receive_messages import (
+    ReceiveDataMessage,
+)
+
 T = TypeVar("T")
 P = ParamSpec("P")
 
@@ -32,8 +36,10 @@ def regex_triggered(
             *args: P.args, **kwargs: P.kwargs
         ) -> T | None:
             context: Context = args[1]
+            if not isinstance(context.message, ReceiveDataMessage):
+                return None
             text = context.message.text
-            if not isinstance(text, str):
+            if text is None:
                 return None
             matches = [bool(re.search(pattern, text)) for pattern in by]
             if True not in matches:
@@ -60,8 +66,11 @@ def triggered(
         @functools.wraps(func)
         async def wrapper_triggered(*args: P.args, **kwargs: P.kwargs) -> T | None:
             context: Context = args[1]
+            if not isinstance(context.message, ReceiveDataMessage):
+                return None
+
             text = context.message.text
-            if not isinstance(text, str):
+            if text is None:
                 return None
 
             by_words = by

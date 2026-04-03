@@ -1,6 +1,7 @@
 from abc import abstractmethod
 
 from signalbot import Command, Context, triggered
+from signalbot.api.requests import SendMessage
 
 
 class CommandWithHelpMessage(Command):
@@ -19,4 +20,4 @@ class HelpCommand(CommandWithHelpMessage):
         command: CommandWithHelpMessage
         for command, _, _, _ in self.bot.commands:
             help_message += f"\t - {command.help_message()}\n"
-        await context.send(help_message)
+        await context.send(SendMessage(message=help_message))

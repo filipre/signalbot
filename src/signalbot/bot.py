@@ -45,11 +45,12 @@ if TYPE_CHECKING:
 CommandList: TypeAlias = list[
     tuple[
         Command,
-        list[str] | bool,
-        list[str] | bool,
-        Callable[[ReceivedMessageType], bool] | None,
+        list[str] | bool,  # contacts
+        list[str] | bool | None,  # groups
+        Callable[[ReceivedMessageType], bool] | None,  # lambda filter
     ]
 ]
+
 
 LOGGER_NAME = "signalbot"
 """
@@ -184,7 +185,7 @@ class SignalBot:
         command: Command,
         contacts: list[str] | bool = True,  # noqa: FBT001, FBT002
         groups: list[str] | bool = True,  # noqa: FBT001, FBT002
-        f: Callable[[Message], bool] | None = None,
+        f: Callable[[ReceivedMessageType], bool] | None = None,
     ) -> None:
         """Register a command with optional contact/group filters.
 

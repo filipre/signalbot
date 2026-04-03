@@ -20,9 +20,10 @@ from signalbot.api.requests import SendMessage
 if TYPE_CHECKING:
     from signalbot.api import SignalAPI
     from signalbot.api.generated_receive import (
-        DataMessage as DataMessageBase,
+        DataMessage,
+        MessageEnvelope,
+        SyncDataMessage,
     )
-    from signalbot.api.generated_receive import MessageEnvelope, SyncDataMessage
 
 
 class ReceiveDataMessage(BaseMessage):
@@ -66,7 +67,7 @@ class ReceiveDataMessage(BaseMessage):
     async def _internal_parse(
         cls,
         message_envelope: MessageEnvelope,
-        data_message: DataMessageBase | SyncDataMessage,
+        data_message: DataMessage | SyncDataMessage,
         signal: SignalAPI,
     ) -> ReceiveDataMessage:
         attachments = None

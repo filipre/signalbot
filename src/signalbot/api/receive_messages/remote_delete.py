@@ -21,7 +21,7 @@ class RemoteDelete(BaseMessageWithGroup):
         data_message: DataMessage | SyncDataMessage,
         remote_delete: BaseRemoteDelete,
     ) -> RemoteDelete:
-        return RemoteDelete(
+        return cls(
             server_delivered_timestamp=message_envelope.server_delivered_timestamp,
             server_received_timestamp=message_envelope.server_received_timestamp,
             source=message_envelope.source,

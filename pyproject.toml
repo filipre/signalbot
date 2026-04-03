@@ -83,13 +83,9 @@ ignore = [
     "INP001", # Missing __init__.py file
     "SLF001", # Access private attributes
 ]
-# The pydantic models fail to load if the annotations are hidden behind the type
-# checking block. Ignore that rule for them.
-"**/generated_receive/**.py" = [
-    "TC001",
-]
+
+# Ignore line too long for the generated models, since they are generated and not meant to be edited by hand.
 "**/generated/**.py" = [
-    "TC001",
     "E501",
 ]
 

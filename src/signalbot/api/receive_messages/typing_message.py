@@ -32,7 +32,7 @@ class TypingMessage(BaseMessage):
             error_msg = "TypingMessage is missing required field: action"
             raise ValueError(error_msg)
 
-        return TypingMessage(
+        return cls(
             server_delivered_timestamp=message_envelope.server_delivered_timestamp,
             server_received_timestamp=message_envelope.server_received_timestamp,
             source=message_envelope.source,

@@ -13,7 +13,9 @@ from signalbot.api.generated_receive import (
     Sticker,
     TextStyle,
 )
-from signalbot.api.receive_messages import Attachment, BaseMessageWithGroup, Preview
+from signalbot.api.receive_messages.attachments import Attachment
+from signalbot.api.receive_messages.base_message import BaseMessageWithGroup
+from signalbot.api.receive_messages.link_previews import Preview
 from signalbot.api.requests import SendMessage
 
 if TYPE_CHECKING:

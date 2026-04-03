@@ -3,7 +3,7 @@ from __future__ import annotations
 from enum import StrEnum
 from typing import TYPE_CHECKING
 
-from signalbot.api.receive_messages import BaseMessage
+from signalbot.api.receive_messages.base_message import BaseMessage
 
 if TYPE_CHECKING:
     from signalbot.api.generated_receive import (

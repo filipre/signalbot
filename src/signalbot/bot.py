@@ -142,7 +142,9 @@ class SignalBot:
             self._event_loop = asyncio.new_event_loop()
             asyncio.set_event_loop(self._event_loop)
 
-        self._q = asyncio.Queue()
+        self._q: asyncio.Queue[tuple[Command, ReceivedMessageType, float]] = (
+            asyncio.Queue()
+        )
 
         self._produce_tasks: set[asyncio.Task] = set()
         self._consume_tasks: set[asyncio.Task] = set()

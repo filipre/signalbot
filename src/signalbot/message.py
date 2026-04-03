@@ -10,6 +10,7 @@ from signalbot.api.receive_messages import (
     ReceiveDataMessage,
     ReceivedMessage,
     ReceivedMessageType,
+    TypingMessage,
 )
 from signalbot.api.receive_messages.link_previews import Preview
 from signalbot.quote import Quote
@@ -61,7 +62,7 @@ async def _parse_main_messages(
         pass
 
     if message_envelope.typing_message is not None:
-        pass
+        return await TypingMessage.from_message_envelope(message_envelope)
 
     return None
 

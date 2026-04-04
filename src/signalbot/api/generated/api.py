@@ -19,7 +19,7 @@ class AddStickerPackRequest(BaseModel):
         default=None, examples=["9a32eda01a7a28574f2eb48668ae0dc4"]
     )
     pack_key: str | None = Field(
-        None,
+        default=None,
         examples=["19546e18eba0ff69dea78eb591465289d39e16f35e58389ae779d4f9455aff3a"],
     )
 
@@ -35,7 +35,7 @@ class ChangeGroupMembersRequest(BaseModel):
 class ClosePollRequest(BaseModel):
     poll_timestamp: str | None = Field(default=None, examples=["1769271479"])
     recipient: str | None = Field(
-        None, examples=["<phone number> OR <username> OR <group id>"]
+        default=None, examples=["<phone number> OR <username> OR <group id>"]
     )
 
 
@@ -58,7 +58,7 @@ class CreatePollRequest(BaseModel):
         default=None, examples=["What's your favourite fruit?"]
     )
     recipient: str | None = Field(
-        None, examples=["<phone number> OR <username> OR <group id>"]
+        default=None, examples=["<phone number> OR <username> OR <group id>"]
     )
 
 
@@ -138,7 +138,7 @@ class SendMessageResponse(BaseModel):
 
 class SendMessageV1(BaseModel):
     base64_attachment: str | None = Field(
-        None,
+        default=None,
         examples=[
             "'<BASE64 ENCODED DATA>' OR 'data:<MIME-TYPE>;base64,<BASE64 ENCODED DATA>' OR 'data:<MIME-TYPE>;filename=<FILENAME>;base64,<BASE64 ENCODED DATA>'"
         ],
@@ -209,7 +209,7 @@ class VoteRequest(BaseModel):
     poll_author: str | None = Field(default=None, examples=["<phone number> OR <uuid>"])
     poll_timestamp: str | None = Field(default=None, examples=["1769271479"])
     recipient: str | None = Field(
-        None, examples=["<phone number> OR <username> OR <group id>"]
+        default=None, examples=["<phone number> OR <username> OR <group id>"]
     )
     selected_answers: list[int] | None = Field(default=None, examples=[[1]])
 

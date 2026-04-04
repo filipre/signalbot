@@ -38,6 +38,7 @@ uv run datamodel-codegen \
 --disable-timestamp \
 --use-exact-imports \
 --use-default-kwarg \
+--module-split-mode=single \
 --no-use-type-checking-imports \
 --all-exports-scope recursive \
 --all-exports-collision-strategy minimal-prefix \

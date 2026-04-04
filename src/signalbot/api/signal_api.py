@@ -68,7 +68,7 @@ class SignalAPI:
         uri = self._signal_api_uris.send_rest_uri()
 
         data_message.number = self.phone_number
-        payload = data_message.model_dump(exclude_none=True)
+        payload = data_message.model_dump(exclude_none=True, by_alias=True)
 
         try:
             async with aiohttp.ClientSession() as session:

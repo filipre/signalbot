@@ -5,7 +5,7 @@ from __future__ import annotations
 
 from enum import Enum
 
-from pydantic import AliasChoices, BaseModel, ConfigDict, Field
+from pydantic import AliasChoices, BaseModel, Field
 
 from .data import GroupPermissions, LinkPreviewType, MessageMention
 
@@ -243,7 +243,7 @@ class SendMessageV2(BaseModel):
     mentions: list[MessageMention] | None = None
     text: str | None = Field(
         default=None,
-        validation_alias=AliasChoices("text", "message"),
+        validation_alias=AliasChoices("message", "text"),
         serialization_alias="message",
     )
     notify_self: bool | None = None
@@ -256,8 +256,6 @@ class SendMessageV2(BaseModel):
     sticker: str | None = None
     text_mode: TextMode | None = None
     view_once: bool | None = None
-
-    model_config = ConfigDict(serialize_by_alias=True)
 
 
 class UpdateGroupRequest(BaseModel):

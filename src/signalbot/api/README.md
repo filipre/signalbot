@@ -31,6 +31,7 @@ uv run datamodel-codegen \
 uv run datamodel-codegen \
 --input ./src/signalbot/api/json_schema/signal-cli-rest-api.json \
 --input-file-type jsonschema \
+--aliases src/signalbot/api/json_schema_receive_aliases.json \
 --output-model-type pydantic_v2.BaseModel \
 --formatters ruff-check ruff-format \
 --snake-case-field \
@@ -45,25 +46,17 @@ uv run datamodel-codegen \
 
 ## Manual modications
 
-* Rename the `message` field in `SendMessageV2` class in `src/signalbot/api/generated/api.py` to `text`
-    1. Replace the
-        ```
-        message: str | None = None
-        ```
-        with
-        ```
-        text: str | None = Field(
-            default=None,
-            validation_alias=AliasChoices("text", "message"),
-            serialization_alias="message",
-        )
-        ```
-    2. Add a model_config in the class `model_config = ConfigDict(serialize_by_alias=True)`
-    3. Replace the pydantic import
-        ```
-        from pydantic import BaseModel, Field
-        ```
-        with
-        ```
-        from pydantic import AliasChoices, BaseModel, ConfigDict, Field
-        ```
+* Add a `serialization_alias` to the `text` field in `SendMessageV2` class in `src/signalbot/api/generated/api.py` by replacing
+    ```python
+    text: str | None = Field(
+        default=None, validation_alias=AliasChoices("message", "text")
+    )
+    ```
+    with
+    ```python
+    text: str | None = Field(
+        default=None,
+        validation_alias=AliasChoices("message", "text"),
+        serialization_alias="message",
+    )
+    ```

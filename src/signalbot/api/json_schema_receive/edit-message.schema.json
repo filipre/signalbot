@@ -1,0 +1,17 @@
+{
+    "$id": "edit-message.schema.json",
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "properties": {
+        "dataMessage": {
+            "$ref": "data-message.schema.json"
+        },
+        "targetSentTimestamp": {
+            "type": "integer"
+        }
+    },
+    "required": [
+        "targetSentTimestamp"
+    ],
+    "title": "EditMessage",
+    "type": "object"
+}

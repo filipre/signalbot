@@ -4,9 +4,9 @@ from copy import deepcopy
 from typing import TYPE_CHECKING, Any, Literal
 
 if TYPE_CHECKING:
+    from signalbot.api.receive_messages import Preview, ReceivedMessageType
+    from signalbot.api.requests import SendMessage, SentMessage
     from signalbot.bot import SignalBot
-    from signalbot.link_previews import LinkPreview
-    from signalbot.message import Message
 
 
 class Context:
@@ -16,32 +16,19 @@ class Context:
     the bot's methods manually.
     """
 
-    def __init__(self, bot: SignalBot, message: Message) -> None:
+    def __init__(self, bot: SignalBot, message: ReceivedMessageType) -> None:
         self.bot = bot
         self.message = message
 
-    async def send(  # noqa: PLR0913
+    async def send(
         self,
-        text: str,
-        *,
-        base64_attachments: list[str] | None = None,
-        link_preview: LinkPreview | None = None,
-        mentions: list[dict[str, Any]] | None = None,
-        text_mode: str | None = None,
-        view_once: bool = False,
-    ) -> int:
+        data_message: SendMessage,
+    ) -> SentMessage:
         """Same as
          [signalbot.SignalBot.send()](bot.md#signalbot.SignalBot.send)
         but with the recipient set to the message's recipient."""
-        return await self.bot.send(
-            self.message.recipient(),
-            text,
-            base64_attachments=base64_attachments,
-            mentions=mentions,
-            text_mode=text_mode,
-            link_preview=link_preview,
-            view_once=view_once,
-        )
+        data_message.recipients = [self.message.source_or_group_uuid()]
+        return await self.bot.send(data_message)
 
     async def edit(  # noqa: PLR0913
         self,
@@ -49,7 +36,7 @@ class Context:
         edit_timestamp: int,
         *,
         base64_attachments: list[str] | None = None,
-        link_preview: LinkPreview | None = None,
+        link_preview: Preview | None = None,
         mentions: list[dict[str, Any]] | None = None,
         text_mode: str | None = None,
         view_once: bool = False,
@@ -73,7 +60,7 @@ class Context:
         text: str,
         *,
         base64_attachments: list[str] | None = None,
-        link_preview: LinkPreview | None = None,
+        link_preview: Preview | None = None,
         mentions: (
             list[dict[str, Any]] | None
         ) = None,  # [{ "author": "uuid" , "start": 0, "length": 1 }]

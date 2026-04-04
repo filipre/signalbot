@@ -1,0 +1,27 @@
+{
+    "$id": "mention.schema.json",
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "properties": {
+        "length": {
+            "type": "integer"
+        },
+        "name": {
+            "type": "string"
+        },
+        "number": {
+            "type": "string"
+        },
+        "start": {
+            "type": "integer"
+        },
+        "uuid": {
+            "type": "string"
+        }
+    },
+    "required": [
+        "start",
+        "length"
+    ],
+    "title": "Mention",
+    "type": "object"
+}

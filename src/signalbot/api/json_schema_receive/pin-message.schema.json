@@ -1,0 +1,27 @@
+{
+    "$id": "pin-message.schema.json",
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "properties": {
+        "pinDurationSeconds": {
+            "type": "integer"
+        },
+        "targetAuthor": {
+            "type": "string"
+        },
+        "targetAuthorNumber": {
+            "type": "string"
+        },
+        "targetAuthorUuid": {
+            "type": "string"
+        },
+        "targetSentTimestamp": {
+            "type": "integer"
+        }
+    },
+    "required": [
+        "targetSentTimestamp",
+        "pinDurationSeconds"
+    ],
+    "title": "PinMessage",
+    "type": "object"
+}

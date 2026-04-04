@@ -1,0 +1,23 @@
+{
+    "$id": "poll-create.schema.json",
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "properties": {
+        "allowMultiple": {
+            "type": "boolean"
+        },
+        "options": {
+            "items": {
+                "type": "string"
+            },
+            "type": "array"
+        },
+        "question": {
+            "type": "string"
+        }
+    },
+    "required": [
+        "allowMultiple"
+    ],
+    "title": "PollCreate",
+    "type": "object"
+}

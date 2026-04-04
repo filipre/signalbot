@@ -1,0 +1,90 @@
+{
+    "$id": "call-message.schema.json",
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "properties": {
+        "answerMessage": {
+            "properties": {
+                "id": {
+                    "type": "integer"
+                },
+                "opaque": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "id"
+            ],
+            "title": "JsonCallMessage.Answer",
+            "type": "object"
+        },
+        "busyMessage": {
+            "properties": {
+                "id": {
+                    "type": "integer"
+                }
+            },
+            "required": [
+                "id"
+            ],
+            "title": "JsonCallMessage.Busy",
+            "type": "object"
+        },
+        "hangupMessage": {
+            "properties": {
+                "deviceId": {
+                    "type": "integer"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "type": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "id",
+                "deviceId"
+            ],
+            "title": "JsonCallMessage.Hangup",
+            "type": "object"
+        },
+        "iceUpdateMessages": {
+            "items": {
+                "properties": {
+                    "id": {
+                        "type": "integer"
+                    },
+                    "opaque": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "id"
+                ],
+                "title": "JsonCallMessage.IceUpdate",
+                "type": "object"
+            },
+            "type": "array"
+        },
+        "offerMessage": {
+            "properties": {
+                "id": {
+                    "type": "integer"
+                },
+                "opaque": {
+                    "type": "string"
+                },
+                "type": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "id"
+            ],
+            "title": "JsonCallMessage.Offer",
+            "type": "object"
+        }
+    },
+    "title": "CallMessage",
+    "type": "object"
+}

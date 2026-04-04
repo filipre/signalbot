@@ -1,0 +1,58 @@
+{
+    "$id": "message-envelope.schema.json",
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "properties": {
+        "callMessage": {
+            "$ref": "call-message.schema.json"
+        },
+        "dataMessage": {
+            "$ref": "data-message.schema.json"
+        },
+        "editMessage": {
+            "$ref": "edit-message.schema.json"
+        },
+        "receiptMessage": {
+            "$ref": "receipt-message.schema.json"
+        },
+        "serverDeliveredTimestamp": {
+            "type": "integer"
+        },
+        "serverReceivedTimestamp": {
+            "type": "integer"
+        },
+        "source": {
+            "type": "string"
+        },
+        "sourceDevice": {
+            "type": "integer"
+        },
+        "sourceName": {
+            "type": "string"
+        },
+        "sourceNumber": {
+            "type": "string"
+        },
+        "sourceUuid": {
+            "type": "string"
+        },
+        "storyMessage": {
+            "$ref": "story-message.schema.json"
+        },
+        "syncMessage": {
+            "$ref": "sync-message.schema.json"
+        },
+        "timestamp": {
+            "type": "integer"
+        },
+        "typingMessage": {
+            "$ref": "typing-message.schema.json"
+        }
+    },
+    "required": [
+        "timestamp",
+        "serverReceivedTimestamp",
+        "serverDeliveredTimestamp"
+    ],
+    "title": "MessageEnvelope",
+    "type": "object"
+}

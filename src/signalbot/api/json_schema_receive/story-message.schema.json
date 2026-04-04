@@ -1,0 +1,71 @@
+{
+    "$id": "story-message.schema.json",
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "properties": {
+        "allowsReplies": {
+            "type": "boolean"
+        },
+        "fileAttachment": {
+            "$ref": "attachment.schema.json"
+        },
+        "groupId": {
+            "type": "string"
+        },
+        "textAttachment": {
+            "properties": {
+                "backgroundColor": {
+                    "type": "string"
+                },
+                "backgroundGradient": {
+                    "properties": {
+                        "angle": {
+                            "type": "integer"
+                        },
+                        "colors": {
+                            "items": {
+                                "type": "string"
+                            },
+                            "type": "array"
+                        },
+                        "endColor": {
+                            "type": "string"
+                        },
+                        "positions": {
+                            "items": {
+                                "type": "number"
+                            },
+                            "type": "array"
+                        },
+                        "startColor": {
+                            "type": "string"
+                        }
+                    },
+                    "title": "JsonStoryMessage.TextAttachment.Gradient",
+                    "type": "object"
+                },
+                "preview": {
+                    "$ref": "preview.schema.json"
+                },
+                "style": {
+                    "type": "string"
+                },
+                "text": {
+                    "type": "string"
+                },
+                "textBackgroundColor": {
+                    "type": "string"
+                },
+                "textForegroundColor": {
+                    "type": "string"
+                }
+            },
+            "title": "JsonStoryMessage.TextAttachment",
+            "type": "object"
+        }
+    },
+    "required": [
+        "allowsReplies"
+    ],
+    "title": "StoryMessage",
+    "type": "object"
+}

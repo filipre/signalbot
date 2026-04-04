@@ -1,0 +1,23 @@
+{
+    "$id": "admin-delete.schema.json",
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "properties": {
+        "targetAuthor": {
+            "type": "string"
+        },
+        "targetAuthorNumber": {
+            "type": "string"
+        },
+        "targetAuthorUuid": {
+            "type": "string"
+        },
+        "targetSentTimestamp": {
+            "type": "integer"
+        }
+    },
+    "required": [
+        "targetSentTimestamp"
+    ],
+    "title": "AdminDelete",
+    "type": "object"
+}

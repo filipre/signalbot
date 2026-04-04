@@ -1,0 +1,35 @@
+{
+    "$id": "shared-contact.schema.json",
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "properties": {
+        "address": {
+            "items": {
+                "$ref": "contact-address.schema.json"
+            },
+            "type": "array"
+        },
+        "avatar": {
+            "$ref": "contact-avatar.schema.json"
+        },
+        "email": {
+            "items": {
+                "$ref": "contact-email.schema.json"
+            },
+            "type": "array"
+        },
+        "name": {
+            "$ref": "contact-name.schema.json"
+        },
+        "organization": {
+            "type": "string"
+        },
+        "phone": {
+            "items": {
+                "$ref": "contact-phone.schema.json"
+            },
+            "type": "array"
+        }
+    },
+    "title": "SharedContact",
+    "type": "object"
+}

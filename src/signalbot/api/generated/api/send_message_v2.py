@@ -26,7 +26,9 @@ class SendMessageV2(BaseModel):
     link_preview: LinkPreviewType | None = None
     mentions: list[MessageMention] | None = None
     text: str | None = Field(
-        default=None, validation_alias=AliasChoices("message", "text")
+        default=None,
+        validation_alias=AliasChoices("message", "text"),
+        serialization_alias="message",
     )
     notify_self: bool | None = None
     number: str | None = None

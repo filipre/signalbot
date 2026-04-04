@@ -34,17 +34,17 @@ class OfferMessage(BaseModel):
 
 class CallMessage(BaseModel):
     answer_message: AnswerMessage | None = Field(
-        None, alias="answerMessage", title="JsonCallMessage.Answer"
+        default=None, alias="answerMessage", title="JsonCallMessage.Answer"
     )
     busy_message: BusyMessage | None = Field(
-        None, alias="busyMessage", title="JsonCallMessage.Busy"
+        default=None, alias="busyMessage", title="JsonCallMessage.Busy"
     )
     hangup_message: HangupMessage | None = Field(
-        None, alias="hangupMessage", title="JsonCallMessage.Hangup"
+        default=None, alias="hangupMessage", title="JsonCallMessage.Hangup"
     )
     ice_update_messages: list[IceUpdateMessage] | None = Field(
-        None, alias="iceUpdateMessages"
+        default=None, alias="iceUpdateMessages"
     )
     offer_message: OfferMessage | None = Field(
-        None, alias="offerMessage", title="JsonCallMessage.Offer"
+        default=None, alias="offerMessage", title="JsonCallMessage.Offer"
     )

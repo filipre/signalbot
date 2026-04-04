@@ -20,12 +20,14 @@ uv run datamodel-codegen \
 --snake-case-field \
 --disable-timestamp \
 --use-exact-imports \
+--use-default-kwarg \
 --no-use-type-checking-imports \
 --all-exports-scope recursive \
 --all-exports-collision-strategy minimal-prefix \
 --output ./src/signalbot/api/generated_receive
 ```
 
+```bash
 uv run datamodel-codegen \
 --input ./src/signalbot/api/json_schema/signal-cli-rest-api.json \
 --input-file-type jsonschema \
@@ -34,10 +36,12 @@ uv run datamodel-codegen \
 --snake-case-field \
 --disable-timestamp \
 --use-exact-imports \
+--use-default-kwarg \
 --no-use-type-checking-imports \
 --all-exports-scope recursive \
 --all-exports-collision-strategy minimal-prefix \
 --output ./src/signalbot/api/generated
+```
 
 ## Manual modications
 

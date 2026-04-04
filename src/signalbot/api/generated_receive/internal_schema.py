@@ -9,7 +9,7 @@ from pydantic import BaseModel, Field
 class Internal(BaseModel):
     capabilities: list[str] | None = None
     discoverable_by_phonenumber: bool | None = Field(
-        None, alias="discoverableByPhonenumber"
+        default=None, alias="discoverableByPhonenumber"
     )
     shares_phone_number: bool | None = Field(default=None, alias="sharesPhoneNumber")
     unidentified_access_mode: str | None = Field(

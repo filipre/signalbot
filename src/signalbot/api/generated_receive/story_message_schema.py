@@ -20,7 +20,7 @@ class BackgroundGradient(BaseModel):
 class TextAttachment(BaseModel):
     background_color: str | None = Field(default=None, alias="backgroundColor")
     background_gradient: BackgroundGradient | None = Field(
-        None,
+        default=None,
         alias="backgroundGradient",
         title="JsonStoryMessage.TextAttachment.Gradient",
     )
@@ -36,5 +36,5 @@ class StoryMessage(BaseModel):
     file_attachment: Attachment | None = Field(default=None, alias="fileAttachment")
     group_id: str | None = Field(default=None, alias="groupId")
     text_attachment: TextAttachment | None = Field(
-        None, alias="textAttachment", title="JsonStoryMessage.TextAttachment"
+        default=None, alias="textAttachment", title="JsonStoryMessage.TextAttachment"
     )

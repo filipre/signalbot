@@ -7,5 +7,5 @@ from pydantic import BaseModel
 
 
 class SearchResponse(BaseModel):
-    number: str | None = None
-    registered: bool | None = None
+    number: str
+    registered: bool

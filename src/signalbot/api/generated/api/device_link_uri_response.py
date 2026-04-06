@@ -7,4 +7,4 @@ from pydantic import BaseModel
 
 
 class DeviceLinkUriResponse(BaseModel):
-    device_link_uri: str | None = None
+    device_link_uri: str

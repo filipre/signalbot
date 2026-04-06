@@ -10,15 +10,15 @@ from .nickname import Nickname
 
 
 class ListContactsResponse(BaseModel):
-    blocked: bool | None = None
-    color: str | None = None
-    given_name: str | None = None
-    message_expiration: str | None = None
-    name: str | None = None
-    nickname: Nickname | None = None
-    note: str | None = None
-    number: str | None = None
-    profile: ContactProfile | None = None
-    profile_name: str | None = None
-    username: str | None = None
-    uuid: str | None = None
+    blocked: bool
+    color: str
+    given_name: str
+    message_expiration: str
+    name: str
+    nickname: Nickname
+    note: str
+    number: str
+    profile: ContactProfile
+    profile_name: str
+    username: str
+    uuid: str

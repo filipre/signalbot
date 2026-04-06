@@ -7,4 +7,4 @@ from pydantic import BaseModel
 
 
 class ChangeGroupAdminsRequest(BaseModel):
-    admins: list[str] | None = None
+    admins: list[str]

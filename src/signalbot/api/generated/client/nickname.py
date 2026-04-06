@@ -7,6 +7,6 @@ from pydantic import BaseModel
 
 
 class Nickname(BaseModel):
-    family_name: str | None = None
-    given_name: str | None = None
-    name: str | None = None
+    family_name: str
+    given_name: str
+    name: str

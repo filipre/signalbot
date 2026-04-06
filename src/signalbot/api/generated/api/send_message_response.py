@@ -7,4 +7,4 @@ from pydantic import BaseModel
 
 
 class SendMessageResponse(BaseModel):
-    timestamp: str | None = None
+    timestamp: str

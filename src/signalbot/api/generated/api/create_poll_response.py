@@ -7,4 +7,4 @@ from pydantic import BaseModel, Field
 
 
 class CreatePollResponse(BaseModel):
-    timestamp: str | None = Field(default=None, examples=["1769271479"])
+    timestamp: str = Field(..., examples=["1769271479"])

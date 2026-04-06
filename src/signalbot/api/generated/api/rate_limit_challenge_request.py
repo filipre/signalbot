@@ -7,7 +7,5 @@ from pydantic import BaseModel, Field
 
 
 class RateLimitChallengeRequest(BaseModel):
-    captcha: str | None = Field(
-        default=None, examples=["signalcaptcha://{captcha value}"]
-    )
-    challenge_token: str | None = Field(default=None, examples=["<challenge token>"])
+    captcha: str = Field(..., examples=["signalcaptcha://{captcha value}"])
+    challenge_token: str = Field(..., examples=["<challenge token>"])

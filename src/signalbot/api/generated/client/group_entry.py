@@ -9,14 +9,14 @@ from signalbot.api.generated.data.group_permissions import GroupPermissions
 
 
 class GroupEntry(BaseModel):
-    admins: list[str] | None = None
-    blocked: bool | None = None
-    description: str | None = None
-    id: str | None = None
-    internal_id: str | None = None
-    invite_link: str | None = None
-    members: list[str] | None = None
-    name: str | None = None
-    pending_invites: list[str] | None = None
-    pending_requests: list[str] | None = None
-    permissions: GroupPermissions | None = None
+    admins: list[str]
+    blocked: bool
+    description: str
+    id: str
+    internal_id: str
+    invite_link: str
+    members: list[str]
+    name: str
+    pending_invites: list[str]
+    pending_requests: list[str]
+    permissions: GroupPermissions

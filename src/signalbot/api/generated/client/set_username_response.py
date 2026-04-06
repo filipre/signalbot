@@ -7,5 +7,5 @@ from pydantic import BaseModel
 
 
 class SetUsernameResponse(BaseModel):
-    username: str | None = None
-    username_link: str | None = None
+    username: str
+    username_link: str

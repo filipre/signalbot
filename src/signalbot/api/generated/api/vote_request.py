@@ -7,9 +7,7 @@ from pydantic import BaseModel, Field
 
 
 class VoteRequest(BaseModel):
-    poll_author: str | None = Field(default=None, examples=["<phone number> OR <uuid>"])
-    poll_timestamp: str | None = Field(default=None, examples=["1769271479"])
-    recipient: str | None = Field(
-        default=None, examples=["<phone number> OR <username> OR <group id>"]
-    )
-    selected_answers: list[int] | None = Field(default=None, examples=[[1]])
+    poll_author: str = Field(..., examples=["<phone number> OR <uuid>"])
+    poll_timestamp: str = Field(..., examples=["1769271479"])
+    recipient: str = Field(..., examples=["<phone number> OR <username> OR <group id>"])
+    selected_answers: list[int] = Field(..., examples=[[1]])

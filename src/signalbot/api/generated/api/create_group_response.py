@@ -7,4 +7,4 @@ from pydantic import BaseModel
 
 
 class CreateGroupResponse(BaseModel):
-    id: str | None = None
+    id: str

@@ -7,4 +7,4 @@ from pydantic import BaseModel
 
 
 class TypingIndicatorRequest(BaseModel):
-    recipient: str | None = None
+    recipient: str

@@ -7,8 +7,8 @@ from pydantic import BaseModel
 
 
 class About(BaseModel):
-    build: int | None = None
-    capabilities: dict[str, list[str]] | None = None
-    mode: str | None = None
-    version: str | None = None
-    versions: list[str] | None = None
+    build: int
+    capabilities: dict[str, list[str]]
+    mode: str
+    version: str
+    versions: list[str]

@@ -7,10 +7,8 @@ from pydantic import BaseModel, Field
 
 
 class AddStickerPackRequest(BaseModel):
-    pack_id: str | None = Field(
-        default=None, examples=["9a32eda01a7a28574f2eb48668ae0dc4"]
-    )
-    pack_key: str | None = Field(
-        default=None,
+    pack_id: str = Field(..., examples=["9a32eda01a7a28574f2eb48668ae0dc4"])
+    pack_key: str = Field(
+        ...,
         examples=["19546e18eba0ff69dea78eb591465289d39e16f35e58389ae779d4f9455aff3a"],
     )

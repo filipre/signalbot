@@ -7,6 +7,6 @@ from pydantic import BaseModel
 
 
 class MessageMention(BaseModel):
-    author: str | None = None
-    length: int | None = None
-    start: int | None = None
+    author: str
+    length: int
+    start: int

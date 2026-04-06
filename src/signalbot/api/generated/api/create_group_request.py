@@ -14,6 +14,6 @@ class CreateGroupRequest(BaseModel):
     description: str | None = None
     expiration_time: int | None = None
     group_link: GroupLink | None = None
-    members: list[str] | None = None
-    name: str | None = None
+    members: list[str]
+    name: str
     permissions: GroupPermissions | None = None

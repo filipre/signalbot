@@ -7,5 +7,5 @@ from pydantic import BaseModel
 
 
 class RemoteDeleteRequest(BaseModel):
-    recipient: str | None = None
-    timestamp: int | None = None
+    recipient: str
+    timestamp: int

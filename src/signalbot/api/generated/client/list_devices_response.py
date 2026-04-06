@@ -7,7 +7,7 @@ from pydantic import BaseModel
 
 
 class ListDevicesResponse(BaseModel):
-    creation_timestamp: int | None = None
-    id: int | None = None
-    last_seen_timestamp: int | None = None
-    name: str | None = None
+    creation_timestamp: int
+    id: int
+    last_seen_timestamp: int
+    name: str

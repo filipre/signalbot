@@ -6,5 +6,7 @@ from __future__ import annotations
 from pydantic import BaseModel
 
 
-class TrustModeRequest(BaseModel):
-    trust_mode: str
+class PinMessageInGroupRequest(BaseModel):
+    duration: int | None = None
+    target_author: str
+    timestamp: int

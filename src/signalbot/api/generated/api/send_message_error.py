@@ -7,6 +7,6 @@ from pydantic import BaseModel
 
 
 class SendMessageError(BaseModel):
-    account: str | None = None
+    account: str
     challenge_tokens: list[str] | None = None
-    error: str | None = None
+    error: str

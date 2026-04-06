@@ -7,8 +7,8 @@ from pydantic import BaseModel
 
 
 class ContactProfile(BaseModel):
-    about: str | None = None
-    given_name: str | None = None
-    has_avatar: bool | None = None
-    last_updated_timestamp: int | None = None
-    lastname: str | None = None
+    about: str
+    given_name: str
+    has_avatar: bool
+    last_updated_timestamp: int
+    lastname: str

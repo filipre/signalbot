@@ -7,4 +7,4 @@ from pydantic import BaseModel
 
 
 class TrustModeResponse(BaseModel):
-    trust_mode: str | None = None
+    trust_mode: str

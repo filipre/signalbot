@@ -7,9 +7,9 @@ from pydantic import BaseModel
 
 
 class IdentityEntry(BaseModel):
-    added: str | None = None
-    fingerprint: str | None = None
-    number: str | None = None
-    safety_number: str | None = None
-    status: str | None = None
-    uuid: str | None = None
+    added: str
+    fingerprint: str
+    number: str
+    safety_number: str
+    status: str
+    uuid: str

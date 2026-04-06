@@ -25,18 +25,14 @@ class SendMessageV2(BaseModel):
     edit_timestamp: int | None = None
     link_preview: LinkPreviewType | None = None
     mentions: list[MessageMention] | None = None
-    text: str | None = Field(
-        default=None,
-        validation_alias=AliasChoices("message", "text"),
-        serialization_alias="message",
-    )
+    text: str = Field(..., validation_alias=AliasChoices("message", "text"))
     notify_self: bool | None = None
-    number: str | None = None
+    number: str
     quote_author: str | None = None
     quote_mentions: list[MessageMention] | None = None
     quote_message: str | None = None
     quote_timestamp: int | None = None
-    recipients: list[str] | None = None
+    recipients: list[str]
     sticker: str | None = None
     text_mode: TextMode | None = None
     view_once: bool | None = None

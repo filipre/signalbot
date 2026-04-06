@@ -7,4 +7,4 @@ from pydantic import BaseModel, Field
 
 
 class LoggingConfiguration(BaseModel):
-    level: str | None = Field(default=None, alias="Level")
+    level: str = Field(..., alias="Level")

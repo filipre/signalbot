@@ -7,4 +7,4 @@ from pydantic import BaseModel, Field
 
 
 class SetUsernameRequest(BaseModel):
-    username: str | None = Field(default=None, examples=["test"])
+    username: str = Field(..., examples=["test"])

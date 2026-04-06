@@ -9,4 +9,4 @@ from .logging_configuration import LoggingConfiguration
 
 
 class Configuration(BaseModel):
-    logging: LoggingConfiguration | None = None
+    logging: LoggingConfiguration

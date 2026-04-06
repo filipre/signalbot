@@ -18,18 +18,20 @@ from .api.device_link_uri_response import DeviceLinkUriResponse
 from .api.error import Error
 from .api.group_link import GroupLink
 from .api.logging_configuration import LoggingConfiguration
+from .api.pin_message_in_group_request import PinMessageInGroupRequest
 from .api.rate_limit_challenge_request import RateLimitChallengeRequest
-from .api.reaction import Reaction
 from .api.receipt import Receipt
 from .api.receipt_type import ReceiptType
 from .api.register_number_request import RegisterNumberRequest
 from .api.remote_delete_request import RemoteDeleteRequest
 from .api.remote_delete_response import RemoteDeleteResponse
+from .api.remove_reaction_request import RemoveReactionRequest
 from .api.search_response import SearchResponse
 from .api.send_message_error import SendMessageError
 from .api.send_message_response import SendMessageResponse
 from .api.send_message_v1 import SendMessageV1
 from .api.send_message_v2 import SendMessageV2
+from .api.send_reaction_request import SendReactionRequest
 from .api.set_pin_request import SetPinRequest
 from .api.set_username_request import SetUsernameRequest
 from .api.text_mode import TextMode
@@ -37,6 +39,7 @@ from .api.trust_identity_request import TrustIdentityRequest
 from .api.trust_mode_request import TrustModeRequest
 from .api.trust_mode_response import TrustModeResponse
 from .api.typing_indicator_request import TypingIndicatorRequest
+from .api.unpin_message_in_group_request import UnpinMessageInGroupRequest
 from .api.unregister_number_request import UnregisterNumberRequest
 from .api.update_account_settings_request import UpdateAccountSettingsRequest
 from .api.update_contact_request import UpdateContactRequest
@@ -93,19 +96,21 @@ __all__ = [
     "MessageMention",
     "Model",
     "Nickname",
+    "PinMessageInGroupRequest",
     "RateLimitChallengeRequest",
-    "Reaction",
     "Receipt",
     "ReceiptType",
     "RegisterNumberRequest",
     "RemoteDeleteRequest",
     "RemoteDeleteResponse",
+    "RemoveReactionRequest",
     "SearchResponse",
     "SendMessageError",
     "SendMessageResponse",
     "SendMessageV1",
     "SendMessageV2",
     "SendMessages",
+    "SendReactionRequest",
     "SetPinRequest",
     "SetUsernameRequest",
     "SetUsernameResponse",
@@ -114,6 +119,7 @@ __all__ = [
     "TrustModeRequest",
     "TrustModeResponse",
     "TypingIndicatorRequest",
+    "UnpinMessageInGroupRequest",
     "UnregisterNumberRequest",
     "UpdateAccountSettingsRequest",
     "UpdateContactRequest",

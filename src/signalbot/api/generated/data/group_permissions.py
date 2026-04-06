@@ -11,6 +11,6 @@ from .send_messages import SendMessages
 
 
 class GroupPermissions(BaseModel):
-    add_members: AddMembers | None = None
-    edit_group: EditGroup | None = None
-    send_messages: SendMessages | None = None
+    add_members: AddMembers
+    edit_group: EditGroup
+    send_messages: SendMessages

@@ -9,4 +9,4 @@ from pydantic import BaseModel
 class UpdateProfileRequest(BaseModel):
     about: str | None = None
     base64_avatar: str | None = None
-    name: str | None = None
+    name: str

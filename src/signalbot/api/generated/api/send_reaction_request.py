@@ -6,5 +6,8 @@ from __future__ import annotations
 from pydantic import BaseModel
 
 
-class TrustModeRequest(BaseModel):
-    trust_mode: str
+class SendReactionRequest(BaseModel):
+    reaction: str
+    recipient: str
+    target_author: str
+    timestamp: int

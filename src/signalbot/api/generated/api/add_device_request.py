@@ -7,4 +7,4 @@ from pydantic import BaseModel
 
 
 class AddDeviceRequest(BaseModel):
-    uri: str | None = None
+    uri: str

@@ -14,6 +14,6 @@ class SendMessageV1(BaseModel):
         ],
     )
     is_group: bool | None = None
-    message: str | None = None
-    number: str | None = None
-    recipients: list[str] | None = None
+    message: str
+    number: str
+    recipients: list[str]

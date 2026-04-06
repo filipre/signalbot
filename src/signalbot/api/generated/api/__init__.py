@@ -18,18 +18,20 @@ from .device_link_uri_response import DeviceLinkUriResponse
 from .error import Error
 from .group_link import GroupLink
 from .logging_configuration import LoggingConfiguration
+from .pin_message_in_group_request import PinMessageInGroupRequest
 from .rate_limit_challenge_request import RateLimitChallengeRequest
-from .reaction import Reaction
 from .receipt import Receipt
 from .receipt_type import ReceiptType
 from .register_number_request import RegisterNumberRequest
 from .remote_delete_request import RemoteDeleteRequest
 from .remote_delete_response import RemoteDeleteResponse
+from .remove_reaction_request import RemoveReactionRequest
 from .search_response import SearchResponse
 from .send_message_error import SendMessageError
 from .send_message_response import SendMessageResponse
 from .send_message_v1 import SendMessageV1
 from .send_message_v2 import SendMessageV2
+from .send_reaction_request import SendReactionRequest
 from .set_pin_request import SetPinRequest
 from .set_username_request import SetUsernameRequest
 from .text_mode import TextMode
@@ -37,6 +39,7 @@ from .trust_identity_request import TrustIdentityRequest
 from .trust_mode_request import TrustModeRequest
 from .trust_mode_response import TrustModeResponse
 from .typing_indicator_request import TypingIndicatorRequest
+from .unpin_message_in_group_request import UnpinMessageInGroupRequest
 from .unregister_number_request import UnregisterNumberRequest
 from .update_account_settings_request import UpdateAccountSettingsRequest
 from .update_contact_request import UpdateContactRequest
@@ -61,18 +64,20 @@ __all__ = [
     "Error",
     "GroupLink",
     "LoggingConfiguration",
+    "PinMessageInGroupRequest",
     "RateLimitChallengeRequest",
-    "Reaction",
     "Receipt",
     "ReceiptType",
     "RegisterNumberRequest",
     "RemoteDeleteRequest",
     "RemoteDeleteResponse",
+    "RemoveReactionRequest",
     "SearchResponse",
     "SendMessageError",
     "SendMessageResponse",
     "SendMessageV1",
     "SendMessageV2",
+    "SendReactionRequest",
     "SetPinRequest",
     "SetUsernameRequest",
     "TextMode",
@@ -80,6 +85,7 @@ __all__ = [
     "TrustModeRequest",
     "TrustModeResponse",
     "TypingIndicatorRequest",
+    "UnpinMessageInGroupRequest",
     "UnregisterNumberRequest",
     "UpdateAccountSettingsRequest",
     "UpdateContactRequest",

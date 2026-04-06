@@ -7,4 +7,4 @@ from pydantic import BaseModel
 
 
 class ChangeGroupMembersRequest(BaseModel):
-    members: list[str] | None = None
+    members: list[str]

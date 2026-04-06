@@ -9,6 +9,6 @@ from .receipt_type import ReceiptType
 
 
 class Receipt(BaseModel):
-    receipt_type: ReceiptType | None = None
-    recipient: str | None = None
-    timestamp: int | None = None
+    receipt_type: ReceiptType
+    recipient: str
+    timestamp: int

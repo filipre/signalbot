@@ -7,7 +7,5 @@ from pydantic import BaseModel, Field
 
 
 class ClosePollRequest(BaseModel):
-    poll_timestamp: str | None = Field(default=None, examples=["1769271479"])
-    recipient: str | None = Field(
-        default=None, examples=["<phone number> OR <username> OR <group id>"]
-    )
+    poll_timestamp: str = Field(..., examples=["1769271479"])
+    recipient: str = Field(..., examples=["<phone number> OR <username> OR <group id>"])

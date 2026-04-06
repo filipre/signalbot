@@ -7,8 +7,8 @@ from pydantic import BaseModel
 
 
 class ListInstalledStickerPacksResponse(BaseModel):
-    author: str | None = None
-    installed: bool | None = None
-    pack_id: str | None = None
-    title: str | None = None
-    url: str | None = None
+    author: str
+    installed: bool
+    pack_id: str
+    title: str
+    url: str

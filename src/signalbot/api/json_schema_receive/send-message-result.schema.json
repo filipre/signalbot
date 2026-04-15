@@ -1,0 +1,31 @@
+{
+    "$id": "send-message-result.schema.json",
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "properties": {
+        "groupId": {
+            "type": "string"
+        },
+        "recipientAddress": {
+            "$ref": "recipient-address.schema.json"
+        },
+        "retryAfterSeconds": {
+            "type": "integer"
+        },
+        "token": {
+            "type": "string"
+        },
+        "type": {
+            "enum": [
+                "SUCCESS",
+                "NETWORK_FAILURE",
+                "UNREGISTERED_FAILURE",
+                "IDENTITY_FAILURE",
+                "RATE_LIMIT_FAILURE",
+                "INVALID_PRE_KEY_FAILURE"
+            ],
+            "type": "string"
+        }
+    },
+    "title": "SendMessageResult",
+    "type": "object"
+}

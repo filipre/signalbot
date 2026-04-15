@@ -1,0 +1,20 @@
+{
+    "$id": "preview.schema.json",
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "properties": {
+        "description": {
+            "type": "string"
+        },
+        "image": {
+            "$ref": "attachment.schema.json"
+        },
+        "title": {
+            "type": "string"
+        },
+        "url": {
+            "type": "string"
+        }
+    },
+    "title": "Preview",
+    "type": "object"
+}

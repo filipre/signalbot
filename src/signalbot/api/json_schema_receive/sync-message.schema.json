@@ -1,0 +1,40 @@
+{
+    "$id": "sync-message.schema.json",
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "properties": {
+        "blockedGroupIds": {
+            "items": {
+                "type": "string"
+            },
+            "type": "array"
+        },
+        "blockedNumbers": {
+            "items": {
+                "type": "string"
+            },
+            "type": "array"
+        },
+        "readMessages": {
+            "items": {
+                "$ref": "sync-read-message.schema.json"
+            },
+            "type": "array"
+        },
+        "sentMessage": {
+            "$ref": "sync-data-message.schema.json"
+        },
+        "sentStoryMessage": {
+            "$ref": "sync-story-message.schema.json"
+        },
+        "type": {
+            "enum": [
+                "CONTACTS_SYNC",
+                "GROUPS_SYNC",
+                "REQUEST_SYNC"
+            ],
+            "type": "string"
+        }
+    },
+    "title": "SyncMessage",
+    "type": "object"
+}

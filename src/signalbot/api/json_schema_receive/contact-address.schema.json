@@ -1,0 +1,35 @@
+{
+    "$id": "contact-address.schema.json",
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "properties": {
+        "city": {
+            "type": "string"
+        },
+        "country": {
+            "type": "string"
+        },
+        "label": {
+            "type": "string"
+        },
+        "neighborhood": {
+            "type": "string"
+        },
+        "pobox": {
+            "type": "string"
+        },
+        "postcode": {
+            "type": "string"
+        },
+        "region": {
+            "type": "string"
+        },
+        "street": {
+            "type": "string"
+        },
+        "type": {
+            "type": "string"
+        }
+    },
+    "title": "ContactAddress",
+    "type": "object"
+}

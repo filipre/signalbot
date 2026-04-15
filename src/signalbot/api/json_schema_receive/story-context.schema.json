@@ -1,0 +1,20 @@
+{
+    "$id": "story-context.schema.json",
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "properties": {
+        "authorNumber": {
+            "type": "string"
+        },
+        "authorUuid": {
+            "type": "string"
+        },
+        "sentTimestamp": {
+            "type": "integer"
+        }
+    },
+    "required": [
+        "sentTimestamp"
+    ],
+    "title": "StoryContext",
+    "type": "object"
+}

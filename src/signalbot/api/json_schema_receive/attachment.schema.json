@@ -1,0 +1,32 @@
+{
+    "$id": "attachment.schema.json",
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "properties": {
+        "caption": {
+            "type": "string"
+        },
+        "contentType": {
+            "type": "string"
+        },
+        "filename": {
+            "type": "string"
+        },
+        "height": {
+            "type": "integer"
+        },
+        "id": {
+            "type": "string"
+        },
+        "size": {
+            "type": "integer"
+        },
+        "uploadTimestamp": {
+            "type": "integer"
+        },
+        "width": {
+            "type": "integer"
+        }
+    },
+    "title": "Attachment",
+    "type": "object"
+}

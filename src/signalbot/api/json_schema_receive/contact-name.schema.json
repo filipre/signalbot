@@ -1,0 +1,26 @@
+{
+    "$id": "contact-name.schema.json",
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "properties": {
+        "family": {
+            "type": "string"
+        },
+        "given": {
+            "type": "string"
+        },
+        "middle": {
+            "type": "string"
+        },
+        "nickname": {
+            "type": "string"
+        },
+        "prefix": {
+            "type": "string"
+        },
+        "suffix": {
+            "type": "string"
+        }
+    },
+    "title": "ContactName",
+    "type": "object"
+}

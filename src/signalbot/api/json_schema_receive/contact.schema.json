@@ -1,0 +1,73 @@
+{
+    "$id": "contact.schema.json",
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "properties": {
+        "color": {
+            "type": "string"
+        },
+        "familyName": {
+            "type": "string"
+        },
+        "givenName": {
+            "type": "string"
+        },
+        "internal": {
+            "$ref": "internal.schema.json"
+        },
+        "isArchived": {
+            "type": "boolean"
+        },
+        "isBlocked": {
+            "type": "boolean"
+        },
+        "isHidden": {
+            "type": "boolean"
+        },
+        "messageExpirationTime": {
+            "type": "integer"
+        },
+        "name": {
+            "type": "string"
+        },
+        "nickFamilyName": {
+            "type": "string"
+        },
+        "nickGivenName": {
+            "type": "string"
+        },
+        "nickName": {
+            "type": "string"
+        },
+        "note": {
+            "type": "string"
+        },
+        "number": {
+            "type": "string"
+        },
+        "profile": {
+            "$ref": "profile.schema.json"
+        },
+        "profileSharing": {
+            "type": "boolean"
+        },
+        "unregistered": {
+            "type": "boolean"
+        },
+        "username": {
+            "type": "string"
+        },
+        "uuid": {
+            "type": "string"
+        }
+    },
+    "required": [
+        "isArchived",
+        "isBlocked",
+        "isHidden",
+        "messageExpirationTime",
+        "profileSharing",
+        "unregistered"
+    ],
+    "title": "Contact",
+    "type": "object"
+}

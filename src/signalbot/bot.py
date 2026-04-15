@@ -10,13 +10,19 @@ import traceback
 import uuid
 from collections import defaultdict
 from collections.abc import Callable, Mapping
-from typing import TYPE_CHECKING, Any, Literal, TypeAlias
+from typing import TYPE_CHECKING, Literal, TypeAlias
 
 import phonenumbers
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from packaging.version import Version
 
 from signalbot.api import ReceiveMessagesError, SignalAPI
+from signalbot.api.receive_messages import (
+    GroupUpdateMessage,
+    ReceiveDataMessage,
+    ReceivedMessageType,
+)
+from signalbot.api.requests import SentMessage
 from signalbot.bot_config import (
     Config,
     InMemoryConfig,
@@ -26,22 +32,25 @@ from signalbot.bot_config import (
 )
 from signalbot.command import Command
 from signalbot.context import Context
-from signalbot.message import Message, MessageType, UnknownMessageFormatError
+from signalbot.message import Message, UnknownMessageFormatError, parse
 from signalbot.storage import RedisStorage, SQLiteStorage
 
 if TYPE_CHECKING:
     from pathlib import Path
 
-    from signalbot.link_previews import LinkPreview
+    from signalbot.api.generated import About, GroupEntry
+    from signalbot.api.requests import SendMessage
+
 
 CommandList: TypeAlias = list[
     tuple[
         Command,
-        list[str] | bool,
-        list[str] | bool,
-        Callable[[Message], bool] | None,
+        list[str] | bool,  # contacts
+        list[str] | bool | None,  # groups
+        Callable[[ReceivedMessageType], bool] | None,  # lambda filter
     ]
 ]
+
 
 LOGGER_NAME = "signalbot"
 """
@@ -110,7 +119,7 @@ class SignalBot:
         self._commands_to_be_registered: CommandList = []  # populated by .register()
         self.commands: CommandList = []  # populated by .start()
 
-        self.groups = []  # populated by .start()
+        self.groups: list[GroupEntry] = []  # populated by .start()
         self._groups_by_id = {}
         self._groups_by_internal_id = {}
         self._groups_by_name = defaultdict(list)
@@ -133,7 +142,9 @@ class SignalBot:
             self._event_loop = asyncio.new_event_loop()
             asyncio.set_event_loop(self._event_loop)
 
-        self._q = asyncio.Queue()
+        self._q: asyncio.Queue[tuple[Command, ReceivedMessageType, float]] = (
+            asyncio.Queue()
+        )
 
         self._produce_tasks: set[asyncio.Task] = set()
         self._consume_tasks: set[asyncio.Task] = set()
@@ -166,7 +177,7 @@ class SignalBot:
                 " to the config to silence this error.",
             )
 
-    def get_group(self, internal_id: str) -> dict[str, Any] | None:
+    def get_group(self, internal_id: str) -> GroupEntry | None:
         if internal_id in self._groups_by_internal_id:
             return copy.deepcopy(self._groups_by_internal_id[internal_id])
         return None
@@ -176,7 +187,7 @@ class SignalBot:
         command: Command,
         contacts: list[str] | bool = True,  # noqa: FBT001, FBT002
         groups: list[str] | bool = True,  # noqa: FBT001, FBT002
-        f: Callable[[Message], bool] | None = None,
+        f: Callable[[ReceivedMessageType], bool] | None = None,
     ) -> None:
         """Register a command with optional contact/group filters.
 
@@ -227,7 +238,7 @@ class SignalBot:
             await asyncio.sleep(self.config.retry_interval)
 
     async def _check_signal_cli_rest_api_version(self) -> None:
-        version = await self.signal_cli_rest_api_version()
+        version = (await self.signal_cli_rest_api_about()).version
 
         # `unset` version is for preview versions of signal-cli-rest-api
         if version == "unset":
@@ -242,7 +253,7 @@ class SignalBot:
             raise RuntimeError(error_msg)
 
     async def _check_signal_cli_rest_api_mode(self) -> None:
-        mode = await self.signal_cli_rest_api_mode()
+        mode = (await self.signal_cli_rest_api_about()).mode
         if mode != "json-rpc":
             error_msg = (
                 f"Wrong signal-cli-rest-api mode, found '{mode}', expected 'json-rpc'"
@@ -273,79 +284,38 @@ class SignalBot:
 
             self._event_loop.run_forever()
 
-    async def signal_cli_rest_api_version(self) -> str:
-        """Return the signal-cli-rest-api version."""
-        return await self._signal.get_signal_cli_rest_api_version()
+    async def signal_cli_rest_api_about(self) -> About:
+        """Return the signal-cli-rest-api about information."""
+        return await self._signal.get_signal_cli_about()
 
-    async def signal_cli_rest_api_mode(self) -> str:
-        """Return the signal-cli-rest-api mode."""
-        return await self._signal.get_signal_cli_rest_api_mode()
-
-    async def send(  # noqa: PLR0913
+    async def send(
         self,
-        receiver: str,
-        text: str,
-        *,
-        base64_attachments: list | None = None,
-        link_preview: LinkPreview | None = None,
-        quote_author: str | None = None,
-        quote_mentions: list | None = None,
-        quote_message: str | None = None,
-        quote_timestamp: int | None = None,
-        mentions: (
-            list[dict[str, Any]] | None
-        ) = None,  # [{ "author": "uuid" , "start": 0, "length": 1 }]
-        edit_timestamp: int | None = None,
-        text_mode: str | None = None,
-        view_once: bool = False,
-    ) -> int:
+        data_message: SendMessage,
+    ) -> SentMessage:
         """Send or edit a message.
 
         Args:
-            receiver: The recipient of the message.
-            text: The content of the message.
-            base64_attachments: List of attachments encoded in base64.
-            link_preview: Link previews to be sent with the message.
-            quote_author: The author of the quoted message, required if quote_message is
-                set.
-            quote_mentions: List of mentioned users in the quoted message, required if
-                quote_message is set.
-            quote_message: The content of the quoted message, required if quote_message
-                is set.
-            quote_timestamp: The timestamp of the quoted message, required if
-                quote_message is set.
-            mentions: List of dictionary of mentions, it has the format
-                `[{ "author": "uuid" , "start": 0, "length": 1 }]`.
-            edit_timestamp: The timestamp of the message to edit, if not set a new
-                message will be sent.
-            text_mode: The text mode of the message, can be "normal" or "styled".
-            view_once: Whether the message should be view once or not.
+            data_message: The message to send.
 
         Returns:
-            The timestamp of the sent or edited message.
+            A SentMessage instance.
         """
-        receiver = self._resolve_receiver(receiver)
-        link_preview_raw = link_preview.model_dump() if link_preview else None
+        if data_message.recipients is None:
+            error_msg = "Message must have at least one recipient"
+            raise ValueError(error_msg)
 
-        resp = await self._signal.send(
-            receiver,
-            text,
-            base64_attachments=base64_attachments,
-            link_preview=link_preview_raw,
-            quote_author=quote_author,
-            quote_mentions=quote_mentions,
-            quote_message=quote_message,
-            quote_timestamp=quote_timestamp,
-            mentions=mentions,
-            text_mode=text_mode,
-            edit_timestamp=edit_timestamp,
-            view_once=view_once,
-        )
+        data_message.recipients = [
+            self._resolve_receiver(recipient) for recipient in data_message.recipients
+        ]
+
+        resp = await self._signal.send(data_message)
         resp_payload = await resp.json()
         timestamp = int(resp_payload["timestamp"])
-        self._logger.info(f"[Bot] New message {timestamp} sent:\n{text}")  # noqa: G004
+        self._logger.info(
+            f"[Bot] New message {timestamp} sent:\n{data_message.text}"  # noqa: G004
+        )
 
-        return timestamp
+        return SentMessage.from_send_message(data_message, timestamp)
 
     async def poll(
         self,
@@ -512,49 +482,48 @@ class SignalBot:
         # reset group lookups to avoid stale data
         self.groups = await self._signal.get_groups()
 
-        self._groups_by_id: dict[str, dict[str, Any]] = {}
-        self._groups_by_internal_id: dict[str, dict[str, Any]] = {}
-        self._groups_by_name: defaultdict[str, list[dict[str, Any]]] = defaultdict(list)
+        self._groups_by_id: dict[str, GroupEntry] = {}
+        self._groups_by_internal_id: dict[str, GroupEntry] = {}
+        self._groups_by_name: defaultdict[str, list[GroupEntry]] = defaultdict(list)
         for group in self.groups:
-            self._groups_by_id[group["id"]] = group
-            self._groups_by_internal_id[group["internal_id"]] = group
-            self._groups_by_name[group["name"]].append(group)
+            self._groups_by_id[group.id] = group
+            self._groups_by_internal_id[group.internal_id] = group
+            self._groups_by_name[group.name].append(group)
 
         self._logger.info(f"[Bot] {len(self.groups)} groups detected")  # noqa: G004
 
     async def _update_group(self, group_internal_id: str) -> None:
         # look up group that requires update
         group = await self._signal.get_group(
-            self._groups_by_internal_id[group_internal_id]["id"]
+            self._groups_by_internal_id[group_internal_id].id
         )
 
-        current_group_name = self._groups_by_internal_id[group_internal_id][
-            "name"
-        ]  # group name may have been updated
+        current_group_name = self._groups_by_internal_id[group_internal_id].name
+        # group name may have been updated
         self._groups_by_name[current_group_name] = [
-            g
-            for g in self._groups_by_name[current_group_name]
-            if g["id"] != group["id"]
+            g for g in self._groups_by_name[current_group_name] if g.id != group.id
         ]
         self.groups = [
-            group if g["internal_id"] == group_internal_id else g for g in self.groups
+            group if g.internal_id == group_internal_id else g for g in self.groups
         ]
-        self._groups_by_id[group["id"]] = group
-        self._groups_by_internal_id[group["internal_id"]] = group
-        self._groups_by_name[group["name"]].append(group)
+        self._groups_by_id[group.id] = group
+        self._groups_by_internal_id[group.internal_id] = group
+        self._groups_by_name[group.name].append(group)
 
         self._logger.info("[Bot] Group updated")
 
-    async def _process_updates(self, message: Message) -> None:
+    async def _process_updates(self, message: ReceivedMessageType) -> None:
         # Update groups if message is from an unknown group
         if (
-            message.is_group()
-            and self._groups_by_internal_id.get(message.group) is None
+            isinstance(message, GroupUpdateMessage | ReceiveDataMessage)
+            and message.group_info is not None
+            and message.group_info.group_id is not None
+            and self._groups_by_internal_id.get(message.group_info.group_id) is None
         ):
             await self._detect_groups()
 
-        if message.type == MessageType.GROUP_UPDATE_MESSAGE:
-            await self._update_group(message.updated_group_id)
+        if isinstance(message, GroupUpdateMessage):
+            await self._update_group(message.group_info.group_id)
 
     def _resolve_receiver(self, receiver: str) -> str:
         if self._is_phone_number(receiver):
@@ -575,7 +544,7 @@ class SignalBot:
     def _resolve_group_receiver(self, group_id_or_name: str) -> str | None:
         group = self._groups_by_id.get(group_id_or_name)
         if group is not None:
-            return group["id"]
+            return group.id
 
         if self._is_group_id(group_id_or_name):
             error_msg = f"[Bot] Group with id '{group_id_or_name}' not found. There "
@@ -585,11 +554,11 @@ class SignalBot:
 
         group = self._groups_by_internal_id.get(group_id_or_name)
         if group is not None:
-            return group["id"]
+            return group.id
 
         group = self._get_group_by_name(group_id_or_name)
         if group is not None:
-            return group["id"]
+            return group.id
 
         return None
 
@@ -652,7 +621,7 @@ class SignalBot:
             return False
         return internal_id[-1] == "="
 
-    def _get_group_by_name(self, group_name: str) -> dict[str, Any] | None:
+    def _get_group_by_name(self, group_name: str) -> GroupEntry | None:
         groups = self._groups_by_name.get(group_name)
         if groups is not None:
             if len(groups) > 1:
@@ -721,7 +690,7 @@ class SignalBot:
                 self._logger.info(f"[Raw Message] {raw_message}")  # noqa: G004
 
                 try:
-                    message = await Message.parse(self._signal, raw_message)
+                    message = await parse(self._signal, raw_message)
                 except UnknownMessageFormatError:
                     continue
 
@@ -735,7 +704,7 @@ class SignalBot:
 
     def _should_react_for_contact(
         self,
-        message: Message,
+        message: ReceivedMessageType,
         contacts: list[str] | bool,  # noqa: FBT001
         group_ids: list[str] | bool,  # noqa: FBT001
     ) -> bool:
@@ -747,7 +716,9 @@ class SignalBot:
                 return True
 
             # b) whitelisted numbers
-            if isinstance(contacts, list) and message.source in contacts:
+            if isinstance(contacts, list) and (
+                message.source_number in contacts or message.source_uuid in contacts
+            ):
                 return True
 
         # Case 2: Group message
@@ -757,7 +728,9 @@ class SignalBot:
                 return True
 
             # b) whitelisted group ids
-            group_id = self._groups_by_internal_id.get(message.group, {}).get("id")
+            group_id = self._groups_by_internal_id.get(
+                message.source_or_group_uuid(), {}
+            ).get("id")
             if isinstance(group_ids, list) and group_id and group_id in group_ids:
                 return True
 
@@ -765,15 +738,15 @@ class SignalBot:
 
     def _should_react_for_lambda(
         self,
-        message: Message,
-        f: Callable[[Message], bool] | None = None,
+        message: ReceivedMessageType,
+        f: Callable[[ReceivedMessageType], bool] | None = None,
     ) -> bool:
         if f is None:
             return True
 
         return f(message)
 
-    async def _ask_commands_to_handle(self, message: Message) -> None:
+    async def _ask_commands_to_handle(self, message: ReceivedMessageType) -> None:
         for command, contacts, group_ids, f in self.commands:
             if not self._should_react_for_contact(message, contacts, group_ids):
                 continue

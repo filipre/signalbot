@@ -1,0 +1,14 @@
+{
+    "$id": "remote-delete.schema.json",
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "properties": {
+        "timestamp": {
+            "type": "integer"
+        }
+    },
+    "required": [
+        "timestamp"
+    ],
+    "title": "RemoteDelete",
+    "type": "object"
+}

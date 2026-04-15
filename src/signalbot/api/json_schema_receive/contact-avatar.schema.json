@@ -1,0 +1,17 @@
+{
+    "$id": "contact-avatar.schema.json",
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "properties": {
+        "attachment": {
+            "$ref": "attachment.schema.json"
+        },
+        "isProfile": {
+            "type": "boolean"
+        }
+    },
+    "required": [
+        "isProfile"
+    ],
+    "title": "ContactAvatar",
+    "type": "object"
+}

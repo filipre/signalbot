@@ -1,0 +1,17 @@
+{
+    "$id": "recipient-address.schema.json",
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "properties": {
+        "number": {
+            "type": "string"
+        },
+        "username": {
+            "type": "string"
+        },
+        "uuid": {
+            "type": "string"
+        }
+    },
+    "title": "RecipientAddress",
+    "type": "object"
+}

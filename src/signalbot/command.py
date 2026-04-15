@@ -5,6 +5,10 @@ import re
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING, ParamSpec, TypeVar
 
+from signalbot.api.receive_messages import (
+    ReceiveDataMessage,
+)
+
 T = TypeVar("T")
 P = ParamSpec("P")
 
@@ -32,8 +36,10 @@ def regex_triggered(
             *args: P.args, **kwargs: P.kwargs
         ) -> T | None:
             context: Context = args[1]
+            if not isinstance(context.message, ReceiveDataMessage):
+                return None
             text = context.message.text
-            if not isinstance(text, str):
+            if text is None:
                 return None
             matches = [bool(re.search(pattern, text)) for pattern in by]
             if True not in matches:
@@ -60,8 +66,11 @@ def triggered(
         @functools.wraps(func)
         async def wrapper_triggered(*args: P.args, **kwargs: P.kwargs) -> T | None:
             context: Context = args[1]
+            if not isinstance(context.message, ReceiveDataMessage):
+                return None
+
             text = context.message.text
-            if not isinstance(text, str):
+            if text is None:
                 return None
 
             by_words = by
@@ -113,7 +122,21 @@ class Command(ABC):
 
     def __init__(self) -> None:
         # The bot attribute is assigned after calling bot.register(Command())
-        self.bot: SignalBot | None = None
+        self._bot: SignalBot | None = None
+
+    @property
+    def bot(self) -> SignalBot:
+        if self._bot is None:
+            error_msg = "Command is not registered with a bot."
+            raise CommandError(error_msg)
+        return self._bot
+
+    @bot.setter
+    def bot(self, bot: SignalBot) -> None:
+        if self._bot is not None:
+            error_msg = "Command is already registered with a bot."
+            raise CommandError(error_msg)
+        self._bot = bot
 
     def setup(self) -> None:
         """Optional setup method that can be overridden by subclasses.

@@ -2,13 +2,17 @@ from __future__ import annotations
 
 import base64
 from enum import Enum
-from typing import TYPE_CHECKING, Any, Literal
+from typing import TYPE_CHECKING, Literal
 
 import aiohttp
 import websockets
 
+from signalbot.api.generated import About, GroupEntry
+
 if TYPE_CHECKING:
     from collections.abc import AsyncIterator
+
+    from signalbot.api.requests import SendMessage
 
 
 class ConnectionMode(str, Enum):
@@ -52,56 +56,19 @@ class SignalAPI:
             self.connection = websockets.connect(uri, ping_interval=None)
             async with self.connection as websocket:
                 async for raw_message in websocket:
-                    yield raw_message
+                    yield str(raw_message)
 
         except Exception as e:
             raise ReceiveMessagesError from e
 
-    async def send(  # noqa: C901, PLR0913
+    async def send(
         self,
-        receiver: str,
-        message: str,
-        *,
-        base64_attachments: list | None = None,
-        link_preview: dict[str, Any] | None = None,
-        quote_author: str | None = None,
-        quote_mentions: list | None = None,
-        quote_message: str | None = None,
-        quote_timestamp: int | None = None,
-        mentions: list[dict[str, Any]] | None = None,
-        text_mode: str | None = None,
-        edit_timestamp: int | None = None,
-        view_once: bool = False,
+        data_message: SendMessage,
     ) -> aiohttp.ClientResponse:
         uri = self._signal_api_uris.send_rest_uri()
-        if base64_attachments is None:
-            base64_attachments = []
 
-        payload = {
-            "base64_attachments": base64_attachments,
-            "message": message,
-            "number": self.phone_number,
-            "recipients": [receiver],
-        }
-
-        if quote_author:
-            payload["quote_author"] = quote_author
-        if quote_mentions:
-            payload["quote_mentions"] = quote_mentions
-        if quote_message:
-            payload["quote_message"] = quote_message
-        if quote_timestamp:
-            payload["quote_timestamp"] = quote_timestamp
-        if mentions:
-            payload["mentions"] = mentions
-        if text_mode:
-            payload["text_mode"] = text_mode
-        if edit_timestamp:
-            payload["edit_timestamp"] = edit_timestamp
-        if link_preview:
-            payload["link_preview"] = link_preview
-        if view_once:
-            payload["view_once"] = True
+        data_message.number = self.phone_number
+        payload = data_message.model_dump(exclude_none=True, by_alias=True)
 
         try:
             async with aiohttp.ClientSession() as session:
@@ -223,26 +190,26 @@ class SignalAPI:
         ) as exc:
             raise StopTypingError from exc
 
-    async def get_groups(self) -> list[dict[str, Any]]:
+    async def get_groups(self) -> list[GroupEntry]:
         uri = self._signal_api_uris.groups_uri()
         try:
             async with aiohttp.ClientSession() as session:
                 resp = await session.get(uri)
                 resp.raise_for_status()
-                return await resp.json()
+                return [GroupEntry.model_validate(group) for group in await resp.json()]
         except (
             aiohttp.ClientError,
             aiohttp.http_exceptions.HttpProcessingError,
         ) as exc:
             raise GroupsError from exc
 
-    async def get_group(self, group_id: str) -> dict[str, Any]:
+    async def get_group(self, group_id: str) -> GroupEntry:
         uri = self._signal_api_uris.group_id_uri(group_id)
         try:
             async with aiohttp.ClientSession() as session:
                 resp = await session.get(uri)
                 resp.raise_for_status()
-                return await resp.json()
+                return GroupEntry.model_validate(await resp.json())
         except (
             aiohttp.ClientError,
             aiohttp.http_exceptions.HttpProcessingError,
@@ -371,24 +338,18 @@ class SignalAPI:
         self._signal_api_uris.use_https = False
         return await self._is_signal_service_available()
 
-    async def get_signal_cli_about(self) -> dict[str, Any]:
+    async def get_signal_cli_about(self) -> About:
         uri = self._signal_api_uris.about_rest_uri()
         try:
             async with aiohttp.ClientSession() as session:
                 resp = await session.get(uri)
                 resp.raise_for_status()
-                return await resp.json()
+                return About.model_validate(await resp.json())
         except (
             aiohttp.ClientError,
             aiohttp.http_exceptions.HttpProcessingError,
         ) as exc:
             raise AboutError from exc
-
-    async def get_signal_cli_rest_api_version(self) -> str:
-        return (await self.get_signal_cli_about())["version"]
-
-    async def get_signal_cli_rest_api_mode(self) -> str:
-        return (await self.get_signal_cli_about())["mode"]
 
     async def remote_delete(
         self, receiver: str, timestamp: int

@@ -18,7 +18,7 @@ jobs:
       url: https://test.pypi.org/project/signalbot/${{ steps.get-version.outputs.package_version }}/
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Install uv
         uses: ./.github/workflows/install-uv
@@ -45,7 +45,7 @@ jobs:
       url: https://pypi.org/project/signalbot/${{ steps.get-version.outputs.package_version }}/
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Install uv
         uses: ./.github/workflows/install-uv

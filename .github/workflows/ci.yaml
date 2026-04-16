@@ -17,14 +17,14 @@ jobs:
     name: Run code checks
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: j178/prek-action@v1
+      - uses: actions/checkout@v6
+      - uses: j178/prek-action@v2
 
   unittest:
     name: Run unit tests
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - name: Print workflows
         run: ls -R ./.github/workflows/
@@ -39,6 +39,6 @@ jobs:
         run: uv run pytest --cov=src/signalbot --cov-branch --cov-report=xml
 
       - name: Upload coverage reports to Codecov
-        uses: codecov/codecov-action@v5
+        uses: codecov/codecov-action@v6
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
